@@ -1,0 +1,31 @@
+name: setup-cloud-sdk Unit
+
+on: [pull_request]
+
+jobs:
+  run:
+    name: Unit Tests
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-node@master
+      with:
+        node-version: 12.x
+
+    - name: npm install
+      run: npm install
+
+    - name: npm lint
+      run: npm run lint
+
+    - name: npm test
+      run: npm run test
+      env:
+        KEY: ${{ secrets.SETUP_SDK_CRED_SA_KEY_JSON }}
+        B64_KEY: ${{ secrets.SETUP_SDK_CRED_SA_KEY_B64 }}
+        PROJECT_ID: ${{ secrets.SETUP_SDK_CRED_PROJECT_ID }}
+      

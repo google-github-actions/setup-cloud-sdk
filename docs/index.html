@@ -1,0 +1,186 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@google-cloud/setup-cloud-sdk</title>
+	<meta name="description" content="Documentation for @google-cloud/setup-cloud-sdk">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@google-cloud/setup-cloud-sdk</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<h1>@google-cloud/setup-cloud-sdk</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#google-github-actions-setup-cloud-sdk-client" id="google-github-actions-setup-cloud-sdk-client" style="color: inherit; text-decoration: none;">
+					<h1><a href="https://github.com/google-github-actions">Google GitHub actions: Setup Cloud SDK Client</a></h1>
+				</a>
+				<p>Setup Cloud SDK for GitHub Actions API client for Node.js</p>
+				<p>A comprehensive list of changes in each version may be found in
+				<a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/master/CHANGELOG.md">the CHANGELOG</a>.</p>
+				<ul>
+					<li><a href="./docs/index.html">Client API Reference</a></li>
+				</ul>
+				<p><strong>Table of contents:</strong></p>
+				<ul>
+					<li><a href="#installing-the-client-library">Installing the client library</a></li>
+					<li><a href="#using-the-client-library">Using the client library</a></li>
+					<li><a href="#versioning">Versioning</a></li>
+					<li><a href="#contributing">Contributing</a></li>
+					<li><a href="#license">License</a></li>
+				</ul>
+				<a href="#installing-the-client-library" id="installing-the-client-library" style="color: inherit; text-decoration: none;">
+					<h3>Installing the client library</h3>
+				</a>
+				<pre><code class="language-bash"><span style="color: #000000">npm install @google-cloud/setup-cloud-sdk</span>
+</code></pre>
+				<a href="#using-the-client-library" id="using-the-client-library" style="color: inherit; text-decoration: none;">
+					<h3>Using the client library</h3>
+				</a>
+				<pre><code class="language-TS"><span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #0000FF">*</span><span style="color: #000000"> </span><span style="color: #AF00DB">as</span><span style="color: #000000"> </span><span style="color: #001080">core</span><span style="color: #000000"> </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@actions/core&#039;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #0000FF">*</span><span style="color: #000000"> </span><span style="color: #AF00DB">as</span><span style="color: #000000"> </span><span style="color: #001080">toolCache</span><span style="color: #000000"> </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@actions/tool-cache&#039;</span><span style="color: #000000">;</span>
+<span style="color: #AF00DB">import</span><span style="color: #000000"> </span><span style="color: #0000FF">*</span><span style="color: #000000"> </span><span style="color: #AF00DB">as</span><span style="color: #000000"> </span><span style="color: #001080">setupGcloud</span><span style="color: #000000"> </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;setup-cloud-sdk&#039;</span><span style="color: #000000">;</span>
+
+<span style="color: #008000">// Install gcloud if not already installed.</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">gcloudVersion</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">setupGcloud</span><span style="color: #000000">.</span><span style="color: #795E26">getLatestGcloudSDKVersion</span><span style="color: #000000">();</span>
+
+<span style="color: #AF00DB">if</span><span style="color: #000000"> (!</span><span style="color: #001080">setupGcloud</span><span style="color: #000000">.</span><span style="color: #795E26">isInstalled</span><span style="color: #000000">(</span><span style="color: #001080">gcloudVersion</span><span style="color: #000000">)) {</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">setupGcloud</span><span style="color: #000000">.</span><span style="color: #795E26">installGcloudSDK</span><span style="color: #000000">(</span><span style="color: #001080">gcloudVersion</span><span style="color: #000000">);</span>
+<span style="color: #000000">} </span><span style="color: #AF00DB">else</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">toolPath</span><span style="color: #000000"> = </span><span style="color: #001080">toolCache</span><span style="color: #000000">.</span><span style="color: #795E26">find</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;gcloud&#039;</span><span style="color: #000000">, </span><span style="color: #001080">gcloudVersion</span><span style="color: #000000">);</span>
+<span style="color: #000000">    </span><span style="color: #001080">core</span><span style="color: #000000">.</span><span style="color: #795E26">addPath</span><span style="color: #000000">(</span><span style="color: #001080">path</span><span style="color: #000000">.</span><span style="color: #795E26">join</span><span style="color: #000000">(</span><span style="color: #001080">toolPath</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;bin&#039;</span><span style="color: #000000">));</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #008000">// Authenticate gcloud SDK.</span>
+<span style="color: #AF00DB">if</span><span style="color: #000000"> (</span><span style="color: #001080">credentials</span><span style="color: #000000">) </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">setupGcloud</span><span style="color: #000000">.</span><span style="color: #795E26">authenticateGcloudSDK</span><span style="color: #000000">(</span><span style="color: #001080">credentials</span><span style="color: #000000">);</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">authenticated</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #001080">setupGcloud</span><span style="color: #000000">.</span><span style="color: #795E26">isAuthenticated</span><span style="color: #000000">();</span>
+<span style="color: #AF00DB">if</span><span style="color: #000000"> (!</span><span style="color: #001080">authenticated</span><span style="color: #000000">) {</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">throw</span><span style="color: #000000"> </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Error</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Error authenticating the Cloud SDK.&#039;</span><span style="color: #000000">);</span>
+<span style="color: #000000">}</span>
+
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">toolCommand</span><span style="color: #000000"> = </span><span style="color: #001080">setupGcloud</span><span style="color: #000000">.</span><span style="color: #795E26">getToolCommand</span><span style="color: #000000">();</span>
+</code></pre>
+				<a href="#versioning" id="versioning" style="color: inherit; text-decoration: none;">
+					<h2>Versioning</h2>
+				</a>
+				<p>This library follows <a href="http://semver.org/">Semantic Versioning</a>.</p>
+				<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
+					<h2>Contributing</h2>
+				</a>
+				<p>Contributions welcome! See the <a href="./CONTRIBUTING.md">Contributing Guide</a>.</p>
+				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+					<h2>License</h2>
+				</a>
+				<p>Apache Version 2.0</p>
+				<p>See <a href="./LICENSE">LICENSE</a></p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-function">
+						<a href="modules.html#authenticategcloudsdk" class="tsd-kind-icon">authenticate<wbr>GcloudSDK</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#getlatestgcloudsdkversion" class="tsd-kind-icon">get<wbr>Latest<wbr>GcloudSDKVersion</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#gettoolcommand" class="tsd-kind-icon">get<wbr>Tool<wbr>Command</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#installcomponent" class="tsd-kind-icon">install<wbr>Component</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#installgcloudsdk" class="tsd-kind-icon">install<wbr>GcloudSDK</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#isauthenticated" class="tsd-kind-icon">is<wbr>Authenticated</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#isinstalled" class="tsd-kind-icon">is<wbr>Installed</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#isprojectidset" class="tsd-kind-icon">is<wbr>Project<wbr>IdSet</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#parseserviceaccountkey" class="tsd-kind-icon">parse<wbr>Service<wbr>Account<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#setproject" class="tsd-kind-icon">set<wbr>Project</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#setprojectwithkey" class="tsd-kind-icon">set<wbr>Project<wbr>With<wbr>Key</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
