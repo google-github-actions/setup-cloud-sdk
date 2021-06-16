@@ -15,11 +15,9 @@
  */
 
 import 'mocha';
-import * as core from '@actions/core';
 import * as setupCloudSDK from '../src/index';
 import { expect } from 'chai';
 import * as io from '@actions/io';
-import { getLatestGcloudSDKVersion } from '../src/version-util';
 import { TestToolCache } from '../src/test-util';
 
 const { KEY, B64_KEY, PROJECT_ID, RUNNER_OS } = process.env;
@@ -124,10 +122,12 @@ describe('#setupCloudSDK', function() {
 
   it('parses a service account key', async function() {
     const key = setupCloudSDK.parseServiceAccountKey(KEY!);
+    expect(key).not.eql(undefined);
   });
 
   it('parses a base64 key', async function() {
     const key = setupCloudSDK.parseServiceAccountKey(B64_KEY!);
+    expect(key).not.eql(undefined);
   });
 
   it('errors with bad key', async function() {

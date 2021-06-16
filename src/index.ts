@@ -251,24 +251,14 @@ export async function setProjectWithKey(
 export async function installComponent(component: string): Promise<void> {
   const toolCommand = getToolCommand();
   const options = {
-    // silent: true,
+    silent: true,
   };
   try {
-    const toolPath = toolCache.findAllVersions('gcloud');
-    console.log(toolPath);
-    const toolRoot = '~/workspace';
-    const installPath = toolRoot + '/install.sh';
-    console.log(installPath);
-    await exec.exec(installPath, [
-      '--quiet',
-      '--additional-components',
-      component,
-    ]);
-    // await exec.exec(
-    //   toolCommand,
-    //   ['--quiet', 'components', 'install', component],
-    //   options,
-    // );
+    await exec.exec(
+      toolCommand,
+      ['--quiet', 'components', 'install', component],
+      options,
+    );
   } catch (err) {
     throw new Error(`Unable to install component: ${component}`);
   }
