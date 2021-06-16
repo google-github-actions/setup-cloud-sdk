@@ -1,5 +1,5 @@
 {
-  "name": "@google-cloud/setup-cloud-sdk",
+  "name": "@google-github-actions/setup-cloud-sdk",
   "version": "0.1.0",
   "description": "Utilities to download and install the Cloud SDK for GitHub Actions",
   "main": "dist/index.js",

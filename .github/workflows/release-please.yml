@@ -19,6 +19,8 @@ jobs:
         run: npm install
       - name: build
         run: npm run build
+      - name: docs
+        run: npm run docs
       - name: commit
         run: |-
           set -e

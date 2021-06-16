@@ -19,7 +19,7 @@ A comprehensive list of changes in each version may be found in
 ### Installing the client library
 
 ```bash
-npm install @google-cloud/setup-cloud-sdk
+npm install @google-github-actions/setup-cloud-sdk
 ```
 
 ### Using the client library
