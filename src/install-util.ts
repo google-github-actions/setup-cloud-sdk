@@ -20,6 +20,8 @@
 import * as toolCache from '@actions/tool-cache';
 import * as core from '@actions/core';
 import * as path from 'path';
+import { exec } from '@actions/exec';
+// import { getToolCommand } from './index';
 
 /**
  * Installs the gcloud SDK into the actions environment.
@@ -36,5 +38,10 @@ export async function installGcloudSDK(
   let toolPath = await toolCache.cacheDir(toolRoot, 'gcloud', version);
   toolPath = path.join(toolPath, 'bin');
   core.addPath(toolPath);
+  // const toolCmd = getToolCommand();
+  // await exec('gcloud', ['init', '--skip-diagnostics', '--console-only']);
+  // const installPath = toolRoot + '/install.sh';
+  // console.log(installPath);
+  // await exec(installPath, ['--quiet']);
   return toolPath;
 }
