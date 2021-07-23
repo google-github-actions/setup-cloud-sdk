@@ -22,7 +22,6 @@ import { TestToolCache } from '../src/test-util';
 
 const { KEY, B64_KEY, PROJECT_ID, RUNNER_OS } = process.env;
 const [toolDir, tempDir] = TestToolCache.override();
-const version = 'latest';
 
 describe('#setupCloudSDK', function() {
   beforeEach(async function() {
@@ -39,10 +38,12 @@ describe('#setupCloudSDK', function() {
     }
   });
 
-  before(() => {
+  let version = '349.0.0';
+  before(async() => {
     if (!KEY || !B64_KEY || !PROJECT_ID) {
       throw Error('Env Vars not found!');
     }
+    version = await setupCloudSDK.getLatestGcloudSDKVersion();
   });
 
   it('returns true if installed', async function() {
