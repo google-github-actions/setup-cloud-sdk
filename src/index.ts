@@ -64,15 +64,12 @@ export function getToolCommand(): string {
  * @returns true is project Id is set.
  */
 export async function isProjectIdSet(): Promise<boolean> {
-  // stdout captures project id
   let output = '';
   const stdout = (data: Buffer): void => {
     output += data.toString();
   };
-  // stderr captures "(unset)"
-  let errOutput = '';
   const stderr = (data: Buffer): void => {
-    errOutput += data.toString();
+    output += data.toString();
   };
   const options = {
     listeners: {
@@ -85,7 +82,7 @@ export async function isProjectIdSet(): Promise<boolean> {
   const toolCommand = getToolCommand();
 
   await exec.exec(toolCommand, ['config', 'get-value', 'project'], options);
-  return !(output.includes('unset') || errOutput.includes('unset'));
+  return !output.includes('unset');
 }
 
 /**

@@ -39,7 +39,7 @@ describe('#setupCloudSDK', function() {
   });
 
   let version = '349.0.0';
-  before(async() => {
+  before(async () => {
     if (!KEY || !B64_KEY || !PROJECT_ID) {
       throw Error('Env Vars not found!');
     }
