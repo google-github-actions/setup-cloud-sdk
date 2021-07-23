@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
+import {addPath} from '@actions/core';
 import * as exec from '@actions/exec';
 import * as toolCache from '@actions/tool-cache';
 import * as os from 'os';
 import * as tmp from 'tmp';
+import * as path from 'path';
 import { getReleaseURL } from './format-url';
 import * as downloadUtil from './download-util';
 import * as installUtil from './install-util';
@@ -122,7 +124,6 @@ export async function installGcloudSDK(version: string): Promise<void> {
   // Retrieve the release corresponding to the specified version and OS
   const osPlat = os.platform();
   const osArch = os.arch();
-  console.log(osPlat, osArch);
   const url = await getReleaseURL(osPlat, osArch, version);
 
   // Download and extract the release
@@ -133,6 +134,8 @@ export async function installGcloudSDK(version: string): Promise<void> {
 
   // Install the downloaded release into the github action env
   await installUtil.installGcloudSDK(version, extPath);
+  const toolPath = toolCache.find('gcloud', version);
+  addPath(path.join(toolPath, 'bin'));
 }
 
 /**
@@ -249,7 +252,7 @@ export async function setProjectWithKey(
 export async function installComponent(component: string): Promise<void> {
   const toolCommand = getToolCommand();
   const options = {
-    silent: false,
+    silent: true,
   };
   try {
     await exec.exec(
@@ -287,7 +290,7 @@ export async function runCmdWithJsonFormat(cmd: string): Promise<any> {
     await exec.exec(toolCommand, formattedCmd, options);
     return JSON.parse(output);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 

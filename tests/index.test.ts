@@ -34,7 +34,7 @@ describe('#setupCloudSDK', function() {
       await io.rmRF(toolDir);
       await io.rmRF(tempDir);
     } catch (err) {
-      console.log('Error occurred during cleanup: ' + err);
+      console.error('Error occurred during cleanup: ' + err);
     }
   });
 
@@ -46,17 +46,23 @@ describe('#setupCloudSDK', function() {
     version = await setupCloudSDK.getLatestGcloudSDKVersion();
   });
 
+  it('returns false if not installed', function() {
+    const installed = setupCloudSDK.isInstalled();
+
+    expect(installed).eql(false);
+  });
+
+  it('returns false if version is not installed', function() {
+    const installed = setupCloudSDK.isInstalled(version);
+    
+    expect(installed).eql(false);
+  });
+
   it('returns true if installed', async function() {
     await setupCloudSDK.installGcloudSDK(version);
     const installed = setupCloudSDK.isInstalled();
 
     expect(installed).eql(true);
-  });
-
-  it('returns false if not installed', function() {
-    const installed = setupCloudSDK.isInstalled();
-
-    expect(installed).eql(false);
   });
 
   it('returns true if version is installed', async function() {
@@ -65,11 +71,6 @@ describe('#setupCloudSDK', function() {
     expect(installed).eql(true);
   });
 
-  it('returns false if version is not installed', function() {
-    const installed = setupCloudSDK.isInstalled(version);
-
-    expect(installed).eql(false);
-  });
 
   it('returns the correct tool cmd', function() {
     const cmd = setupCloudSDK.getToolCommand();
@@ -84,6 +85,10 @@ describe('#setupCloudSDK', function() {
     const isSet = await setupCloudSDK.isProjectIdSet();
     expect(isSet).eql(false);
   });
+  it('returns false if not authenticated', async function() {
+    const isAuth = await setupCloudSDK.isAuthenticated();
+    expect(isAuth).eql(false);
+  });
 
   it('returns true if project Id is set', async function() {
     await setupCloudSDK.setProject(PROJECT_ID!);
@@ -95,10 +100,6 @@ describe('#setupCloudSDK', function() {
     expect(output.core.project).eql(PROJECT_ID);
   });
 
-  it('returns false if not authenticated', async function() {
-    const isAuth = await setupCloudSDK.isAuthenticated();
-    expect(isAuth).eql(false);
-  });
 
   it('returns true if authenticated', async function() {
     await setupCloudSDK.authenticateGcloudSDK(KEY!);
@@ -167,7 +168,7 @@ describe('#setupCloudSDK', function() {
     const output = await setupCloudSDK.runCmdWithJsonFormat(
       'gcloud components list --filter Status=Installed',
     );
-    console.log(output);
+
     const found = output.find((component: { id: string }) => {
       return component.id == expectedComponent;
     });
