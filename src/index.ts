@@ -118,10 +118,11 @@ export async function isAuthenticated(): Promise<boolean> {
  * @param version - The version being installed.
  * @returns The path of the installed tool.
  */
-export async function installGcloudSDK(version: string): Promise<string> {
-  // Retreive the release corresponding to the specified version and OS
+export async function installGcloudSDK(version: string): Promise<void> {
+  // Retrieve the release corresponding to the specified version and OS
   const osPlat = os.platform();
   const osArch = os.arch();
+  console.log(osPlat, osArch);
   const url = await getReleaseURL(osPlat, osArch, version);
 
   // Download and extract the release
@@ -131,7 +132,7 @@ export async function installGcloudSDK(version: string): Promise<string> {
   }
 
   // Install the downloaded release into the github action env
-  return await installUtil.installGcloudSDK(version, extPath);
+  await installUtil.installGcloudSDK(version, extPath);
 }
 
 /**
