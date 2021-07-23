@@ -248,7 +248,7 @@ export async function setProjectWithKey(
 export async function installComponent(component: string): Promise<void> {
   const toolCommand = getToolCommand();
   const options = {
-    silent: true,
+    silent: false,
   };
   try {
     await exec.exec(
