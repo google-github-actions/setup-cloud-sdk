@@ -167,6 +167,7 @@ describe('#setupCloudSDK', function() {
     const output = await setupCloudSDK.runCmdWithJsonFormat(
       'gcloud components list --filter Status=Installed',
     );
+    console.log(output);
     const found = output.find((component: { id: string }) => {
       return component.id == expectedComponent;
     });
