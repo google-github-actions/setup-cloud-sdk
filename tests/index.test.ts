@@ -22,7 +22,7 @@ import { TestToolCache } from '../src/test-util';
 
 const { KEY, B64_KEY, PROJECT_ID, RUNNER_OS } = process.env;
 const [toolDir, tempDir] = TestToolCache.override();
-const version = '272.0.0';
+const version = 'latest';
 
 describe('#setupCloudSDK', function() {
   beforeEach(async function() {
