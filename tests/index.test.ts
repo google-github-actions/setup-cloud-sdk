@@ -54,7 +54,7 @@ describe('#setupCloudSDK', function() {
 
   it('returns false if version is not installed', function() {
     const installed = setupCloudSDK.isInstalled(version);
-    
+
     expect(installed).eql(false);
   });
 
@@ -70,7 +70,6 @@ describe('#setupCloudSDK', function() {
     const installed = setupCloudSDK.isInstalled(version);
     expect(installed).eql(true);
   });
-
 
   it('returns the correct tool cmd', function() {
     const cmd = setupCloudSDK.getToolCommand();
@@ -99,7 +98,6 @@ describe('#setupCloudSDK', function() {
     );
     expect(output.core.project).eql(PROJECT_ID);
   });
-
 
   it('returns true if authenticated', async function() {
     await setupCloudSDK.authenticateGcloudSDK(KEY!);

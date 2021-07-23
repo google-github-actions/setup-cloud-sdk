@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {addPath} from '@actions/core';
+import { addPath } from '@actions/core';
 import * as exec from '@actions/exec';
 import * as toolCache from '@actions/tool-cache';
 import * as os from 'os';
