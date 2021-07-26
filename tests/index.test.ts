@@ -81,15 +81,18 @@ describe('#setupCloudSDK', function() {
   });
 
   it('returns false if project Id is not set', async function() {
+    await setupCloudSDK.installGcloudSDK(version);
     const isSet = await setupCloudSDK.isProjectIdSet();
     expect(isSet).eql(false);
   });
   it('returns false if not authenticated', async function() {
+    await setupCloudSDK.installGcloudSDK(version);
     const isAuth = await setupCloudSDK.isAuthenticated();
     expect(isAuth).eql(false);
   });
 
   it('returns true if project Id is set', async function() {
+    await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.setProject(PROJECT_ID!);
     const isSet = await setupCloudSDK.isProjectIdSet();
     expect(isSet).eql(true);
@@ -100,6 +103,7 @@ describe('#setupCloudSDK', function() {
   });
 
   it('returns true if authenticated', async function() {
+    await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.authenticateGcloudSDK(KEY!);
     const isAuth = await setupCloudSDK.isAuthenticated();
     expect(isAuth).eql(true);
@@ -139,12 +143,14 @@ describe('#setupCloudSDK', function() {
   });
 
   it('sets authentication', async function() {
+    await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.authenticateGcloudSDK(KEY!);
     const isAuth = await setupCloudSDK.isAuthenticated();
     expect(isAuth).eql(true);
   });
 
   it('sets the Project Id', async function() {
+    await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.setProject(PROJECT_ID!);
     const output = await setupCloudSDK.runCmdWithJsonFormat(
       'gcloud config list',
@@ -153,6 +159,7 @@ describe('#setupCloudSDK', function() {
   });
 
   it('sets the Project Id from key', async function() {
+    await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.setProjectWithKey(KEY!);
     const output = await setupCloudSDK.runCmdWithJsonFormat(
       'gcloud config list',
