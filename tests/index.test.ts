@@ -162,6 +162,7 @@ describe('#setupCloudSDK', function() {
 
   it('installs beta components', async function() {
     const expectedComponent = 'beta';
+    await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.installComponent(expectedComponent);
     const output = await setupCloudSDK.runCmdWithJsonFormat(
       'gcloud components list --filter Status=Installed',
