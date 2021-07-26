@@ -87,13 +87,13 @@
 					<a name="authenticategcloudsdk" class="tsd-anchor"></a>
 					<h3>authenticate<wbr>GcloudSDK</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">authenticate<wbr>GcloudSDK<span class="tsd-signature-symbol">(</span>serviceAccountKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">authenticate<wbr>GcloudSDK<span class="tsd-signature-symbol">(</span>serviceAccountKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, silent<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/771d69d/src/index.ts#L182">index.ts:182</a></li>
+									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/c1f45a4/src/index.ts#L186">index.ts:186</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -108,6 +108,9 @@
 									<div class="tsd-comment tsd-typography">
 										<p>The service account key used for authentication.</p>
 									</div>
+								</li>
+								<li>
+									<h5>silent: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -125,7 +128,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/771d69d/src/version-util.ts#L27">version-util.ts:27</a></li>
+									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/c1f45a4/src/version-util.ts#L27">version-util.ts:27</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -143,7 +146,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/771d69d/src/index.ts#L51">index.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/c1f45a4/src/index.ts#L52">index.ts:52</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -160,13 +163,13 @@
 					<a name="installcomponent" class="tsd-anchor"></a>
 					<h3>install<wbr>Component</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">install<wbr>Component<span class="tsd-signature-symbol">(</span>component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">install<wbr>Component<span class="tsd-signature-symbol">(</span>component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, silent<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/771d69d/src/index.ts#L247">index.ts:247</a></li>
+									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/c1f45a4/src/index.ts#L254">index.ts:254</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -182,6 +185,9 @@
 										<p>gcloud component group to install ie alpha, beta.</p>
 									</div>
 								</li>
+								<li>
+									<h5>silent: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></h5>
+								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>CMD output</p>
@@ -192,13 +198,13 @@
 					<a name="installgcloudsdk" class="tsd-anchor"></a>
 					<h3>install<wbr>GcloudSDK</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">install<wbr>GcloudSDK<span class="tsd-signature-symbol">(</span>version<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">install<wbr>GcloudSDK<span class="tsd-signature-symbol">(</span>version<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/771d69d/src/index.ts#L120">index.ts:120</a></li>
+									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/c1f45a4/src/index.ts#L122">index.ts:122</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -215,7 +221,7 @@
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>The path of the installed tool.</p>
 						</li>
 					</ul>
@@ -224,13 +230,13 @@
 					<a name="isauthenticated" class="tsd-anchor"></a>
 					<h3>is<wbr>Authenticated</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">is<wbr>Authenticated<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Authenticated<span class="tsd-signature-symbol">(</span>silent<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/771d69d/src/index.ts#L96">index.ts:96</a></li>
+									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/c1f45a4/src/index.ts#L94">index.ts:94</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -238,6 +244,12 @@
 									<p>Checks if gcloud is authenticated.</p>
 								</div>
 							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>silent: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>true is gcloud is authenticated.</p>
 						</li>
@@ -253,7 +265,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/771d69d/src/index.ts#L35">index.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/c1f45a4/src/index.ts#L36">index.ts:36</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -279,13 +291,13 @@
 					<a name="isprojectidset" class="tsd-anchor"></a>
 					<h3>is<wbr>Project<wbr>IdSet</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">is<wbr>Project<wbr>IdSet<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Project<wbr>IdSet<span class="tsd-signature-symbol">(</span>silent<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/771d69d/src/index.ts#L66">index.ts:66</a></li>
+									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/c1f45a4/src/index.ts#L67">index.ts:67</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -293,6 +305,12 @@
 									<p>Checks if the project Id is set in the gcloud config.</p>
 								</div>
 							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>silent: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></h5>
+								</li>
+							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">&gt;</span></h4>
 							<p>true is project Id is set.</p>
 						</li>
@@ -308,7 +326,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/771d69d/src/index.ts#L142">index.ts:142</a></li>
+									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/c1f45a4/src/index.ts#L146">index.ts:146</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -334,19 +352,22 @@
 					<a name="runcmdwithjsonformat" class="tsd-anchor"></a>
 					<h3>run<wbr>Cmd<wbr>With<wbr>Json<wbr>Format</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">run<wbr>Cmd<wbr>With<wbr>Json<wbr>Format<span class="tsd-signature-symbol">(</span>cmd<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">run<wbr>Cmd<wbr>With<wbr>Json<wbr>Format<span class="tsd-signature-symbol">(</span>cmd<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, silent<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/771d69d/src/index.ts#L263">index.ts:263</a></li>
+									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/c1f45a4/src/index.ts#L273">index.ts:273</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>cmd: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>silent: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -357,13 +378,13 @@
 					<a name="setproject" class="tsd-anchor"></a>
 					<h3>set<wbr>Project</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Project<span class="tsd-signature-symbol">(</span>projectId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Project<span class="tsd-signature-symbol">(</span>projectId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, silent<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/771d69d/src/index.ts#L215">index.ts:215</a></li>
+									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/c1f45a4/src/index.ts#L219">index.ts:219</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -375,6 +396,9 @@
 							<ul class="tsd-parameters">
 								<li>
 									<h5>projectId: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>silent: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = true</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -392,7 +416,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/771d69d/src/index.ts#L233">index.ts:233</a></li>
+									<li>Defined in <a href="https://github.com/google-github-actions/setup-cloud-sdk/blob/c1f45a4/src/index.ts#L240">index.ts:240</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">

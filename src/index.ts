@@ -18,7 +18,6 @@ import { addPath } from '@actions/core';
 import * as exec from '@actions/exec';
 import * as toolCache from '@actions/tool-cache';
 import * as os from 'os';
-import * as tmp from 'tmp';
 import * as path from 'path';
 import { getReleaseURL } from './format-url';
 import * as downloadUtil from './download-util';
@@ -188,7 +187,6 @@ export async function authenticateGcloudSDK(
   serviceAccountKey: string,
   silent = true,
 ): Promise<number> {
-  tmp.setGracefulCleanup();
   const serviceAccountJson = parseServiceAccountKey(serviceAccountKey);
   const serviceAccountEmail = serviceAccountJson.client_email;
 

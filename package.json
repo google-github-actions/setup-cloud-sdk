@@ -9,7 +9,7 @@
     "lint": "eslint src/ tests/ --ext .ts,.tsx",
     "format": "prettier --write src/*.ts tests/*.ts",
     "docs": "typedoc src/index.ts",
-    "test": "mocha -r ts-node/register -t 90s 'tests/index.test.ts'"
+    "test": "mocha -r ts-node/register -t 90s 'tests/*.ts'"
   },
   "files": [
     "dist/**/*"
