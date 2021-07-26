@@ -43,7 +43,7 @@ describe('#downloadAndExtractTool', function() {
       await io.rmRF(toolDir);
       await io.rmRF(tempDir);
     } catch (err) {
-      console.log('Error occurred during cleanup: ' + err);
+      console.error('Error occurred during cleanup: ' + err);
     }
   });
 

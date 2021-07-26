@@ -65,7 +65,7 @@ export function getToolCommand(): string {
  *
  * @returns true is project Id is set.
  */
-export async function isProjectIdSet(): Promise<boolean> {
+export async function isProjectIdSet(silent = true): Promise<boolean> {
   let output = '';
   const stdout = (data: Buffer): void => {
     output += data.toString();
@@ -78,7 +78,7 @@ export async function isProjectIdSet(): Promise<boolean> {
       stdout,
       stderr,
     },
-    silent: true,
+    silent,
   };
 
   const toolCommand = getToolCommand();
@@ -92,7 +92,7 @@ export async function isProjectIdSet(): Promise<boolean> {
  *
  * @returns true is gcloud is authenticated.
  */
-export async function isAuthenticated(): Promise<boolean> {
+export async function isAuthenticated(silent = true): Promise<boolean> {
   let output = '';
   const stdout = (data: Buffer): void => {
     output += data.toString();
@@ -105,7 +105,7 @@ export async function isAuthenticated(): Promise<boolean> {
       stdout,
       stderr,
     },
-    silent: true,
+    silent,
   };
 
   const toolCommand = getToolCommand();
@@ -186,6 +186,7 @@ export function parseServiceAccountKey(
  */
 export async function authenticateGcloudSDK(
   serviceAccountKey: string,
+  silent = true,
 ): Promise<number> {
   tmp.setGracefulCleanup();
   const serviceAccountJson = parseServiceAccountKey(serviceAccountKey);
@@ -195,7 +196,7 @@ export async function authenticateGcloudSDK(
   // Authenticate as the specified service account.
   const options = {
     input: Buffer.from(JSON.stringify(serviceAccountJson)),
-    silent: true,
+    silent,
   };
   return await exec.exec(
     toolCommand,
@@ -217,10 +218,13 @@ export async function authenticateGcloudSDK(
  * @param serviceAccountKey - The service account key used for authentication.
  * @returns project ID.
  */
-export async function setProject(projectId: string): Promise<number> {
+export async function setProject(
+  projectId: string,
+  silent = true,
+): Promise<number> {
   const toolCommand = getToolCommand();
   const options = {
-    silent: true,
+    silent,
   };
   return await exec.exec(
     toolCommand,
@@ -249,10 +253,13 @@ export async function setProjectWithKey(
  * @param component - gcloud component group to install ie alpha, beta.
  * @returns CMD output
  */
-export async function installComponent(component: string): Promise<void> {
+export async function installComponent(
+  component: string,
+  silent = true,
+): Promise<void> {
   const toolCommand = getToolCommand();
   const options = {
-    silent: false,
+    silent,
   };
   try {
     await exec.exec(
@@ -265,7 +272,10 @@ export async function installComponent(component: string): Promise<void> {
   }
 }
 
-export async function runCmdWithJsonFormat(cmd: string): Promise<any> {
+export async function runCmdWithJsonFormat(
+  cmd: string,
+  silent = true,
+): Promise<any> {
   let output = '';
   const stdout = (data: Buffer): void => {
     output += data.toString();
@@ -279,19 +289,15 @@ export async function runCmdWithJsonFormat(cmd: string): Promise<any> {
       stdout,
       stderr,
     },
-    silent: true,
+    silent,
   };
 
   const toolCommand = getToolCommand();
   const formattedCmd = cmd.split(' ');
   formattedCmd.push('--format', 'json');
   formattedCmd.shift(); // Remove duplicate gcloud
-  try {
-    await exec.exec(toolCommand, formattedCmd, options);
-    return JSON.parse(output);
-  } catch (err) {
-    console.error(err);
-  }
+  await exec.exec(toolCommand, formattedCmd, options);
+  return JSON.parse(output);
 }
 
 interface ServiceAccountKey {
