@@ -1,3 +1,5 @@
+@google-github-actions/setup-cloud-sdk / [Exports](modules.md)
+
 # [Google GitHub actions: Setup Cloud SDK Client](https://github.com/google-github-actions)
 
 Setup Cloud SDK for GitHub Actions API client for Node.js
@@ -5,7 +7,7 @@ Setup Cloud SDK for GitHub Actions API client for Node.js
 A comprehensive list of changes in each version may be found in
 [the CHANGELOG](https://github.com/google-github-actions/setup-cloud-sdk/blob/master/CHANGELOG.md).
 
-* [Client API Reference](./docs/modules.md)
+* [Client API Reference](./docs/index.html)
 
 **Table of contents:**
 
@@ -14,7 +16,6 @@ A comprehensive list of changes in each version may be found in
 * [Versioning](#versioning)
 * [Contributing](#contributing)
 * [License](#license)
-
 
 ### Installing the client library
 
