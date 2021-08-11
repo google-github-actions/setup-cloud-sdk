@@ -258,12 +258,13 @@ export async function installComponent(
   const options = {
     silent,
   };
-  const cmd = ['--quiet', 'components', 'install'];
+  let cmd = ['--quiet', 'components', 'install'];
   if (Array.isArray(component)) {
-    cmd.concat(component);
+    cmd = cmd.concat(component);
   } else {
     cmd.push(component);
   }
+
   try {
     await exec.exec(toolCommand, cmd, options);
   } catch (err) {
