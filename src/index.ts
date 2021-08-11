@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,9 @@ export function isInstalled(version?: string): boolean {
   if (version) {
     toolPath = toolCache.find('gcloud', version);
     return toolPath != undefined && toolPath !== '';
-  } else {
-    toolPath = toolCache.findAllVersions('gcloud');
-    return toolPath.length > 0;
   }
+  toolPath = toolCache.findAllVersions('gcloud');
+  return toolPath.length > 0;
 }
 
 /**
@@ -246,47 +245,44 @@ export async function setProjectWithKey(
 }
 
 /**
- * Sets the GCP Project Id in the gcloud config.
+ * Install a Cloud SDK component.
  *
  * @param component - gcloud component group to install ie alpha, beta.
  * @returns CMD output
  */
 export async function installComponent(
-  component: string,
+  component: string[] | string,
   silent = true,
 ): Promise<void> {
   const toolCommand = getToolCommand();
   const options = {
     silent,
   };
+  let cmd = ['--quiet', 'components', 'install'];
+  if (Array.isArray(component)) {
+    cmd.concat(component);
+  } else {
+    cmd.push(component);
+  }
   try {
-    await exec.exec(
-      toolCommand,
-      ['--quiet', 'components', 'install', component],
-      options,
-    );
+    await exec.exec(toolCommand, cmd, options);
   } catch (err) {
     throw new Error(`Unable to install component: ${component}`);
   }
 }
 
+/**
+ * Run a gcloud command and return output as parsed JSON.
+ *
+ * @param cmd - the gcloud cmd to run.
+ * @param silent - print output to console.
+ * @returns CMD output
+ */
 export async function runCmdWithJsonFormat(
   cmd: string,
   silent = true,
 ): Promise<any> {
-  let output = '';
-  const stdout = (data: Buffer): void => {
-    output += data.toString();
-  };
-  let errOutput = '';
-  const stderr = (data: Buffer): void => {
-    errOutput += data.toString();
-  };
   const options = {
-    listeners: {
-      stdout,
-      stderr,
-    },
     silent,
   };
 
@@ -294,8 +290,8 @@ export async function runCmdWithJsonFormat(
   const formattedCmd = cmd.split(' ');
   formattedCmd.push('--format', 'json');
   formattedCmd.shift(); // Remove duplicate gcloud
-  await exec.exec(toolCommand, formattedCmd, options);
-  return JSON.parse(output);
+  const output = await exec.getExecOutput(toolCommand, formattedCmd, options);
+  return JSON.parse(output.stdout);
 }
 
 interface ServiceAccountKey {

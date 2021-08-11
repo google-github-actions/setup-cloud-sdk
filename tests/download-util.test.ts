@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,11 @@
 /*
  * Tests download-util.
  */
-// import 'mocha';
-import { expect } from 'chai';
+import * as chai from 'chai';
+import chaiAsPromised = require('chai-as-promised');
+
+chai.use(chaiAsPromised);
+const expect = chai.expect;
 
 import * as fs from 'fs';
 import * as os from 'os';
@@ -48,11 +51,6 @@ describe('#downloadAndExtractTool', function() {
   });
 
   it('downloads and extracts linux version', async function() {
-    if (os.platform() === 'win32') {
-      // https://github.com/actions/toolkit/issues/194
-      this.skip();
-    }
-
     const url = await getReleaseURL('linux', 'x86_64', TEST_SDK_VERSION);
     const extPath = await downloadUtil.downloadAndExtractTool(url);
     expect(extPath).to.be;
@@ -69,11 +67,6 @@ describe('#downloadAndExtractTool', function() {
   });
 
   it('downloads and extracts darwin version', async function() {
-    if (os.platform() === 'win32') {
-      // https://github.com/actions/toolkit/issues/194
-      this.skip();
-    }
-
     const url = await getReleaseURL('darwin', 'x86_64', TEST_SDK_VERSION);
     const extPath = await downloadUtil.downloadAndExtractTool(url);
     expect(extPath).to.be;
@@ -81,13 +74,7 @@ describe('#downloadAndExtractTool', function() {
   });
 
   it('errors on download not found', async function() {
-    downloadUtil
-      .downloadAndExtractTool('fakeUrl')
-      .then(() => {
-        throw new Error('expected error');
-      })
-      .catch(() => {
-        // pass test
-      });
+    const promise = downloadUtil.downloadAndExtractTool('fakeUrl');
+    expect(promise).to.eventually.be.rejectedWith('unable to find url');
   });
 });

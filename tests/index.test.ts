@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-import 'mocha';
 import * as setupCloudSDK from '../src/index';
 import { expect } from 'chai';
 import * as io from '@actions/io';
-import { TestToolCache } from '../src/test-util';
+import {
+  TestToolCache,
+  TEST_SDK_VERSION,
+  TEST_SDK_VERSIONS,
+} from '../src/test-util';
 
 const { KEY, B64_KEY, PROJECT_ID, RUNNER_OS } = process.env;
 const [toolDir, tempDir] = TestToolCache.override();
@@ -38,7 +41,7 @@ describe('#setupCloudSDK', function() {
     }
   });
 
-  let version = '349.0.0';
+  let version = TEST_SDK_VERSION;
   before(async () => {
     if (!KEY || !B64_KEY || !PROJECT_ID) {
       throw Error('Env Vars not found!');
@@ -52,8 +55,11 @@ describe('#setupCloudSDK', function() {
     expect(installed).eql(false);
   });
 
-  it('returns false if version is not installed', function() {
-    const installed = setupCloudSDK.isInstalled(version);
+  it('returns false if version is not installed', async function() {
+    await setupCloudSDK.installGcloudSDK(TEST_SDK_VERSION);
+    const installed = setupCloudSDK.isInstalled(
+      TEST_SDK_VERSIONS[TEST_SDK_VERSIONS.length - 2],
+    );
 
     expect(installed).eql(false);
   });
@@ -192,6 +198,19 @@ describe('#setupCloudSDK', function() {
       return component.id == expectedComponent;
     });
     expect(found).to.not.equal(undefined);
+  });
+
+  it('installs multiple components', async function() {
+    const expectedComponents = ['alpha', 'cbt'];
+    await setupCloudSDK.installGcloudSDK(version);
+    await setupCloudSDK.installComponent(expectedComponents);
+    const output = await setupCloudSDK.runCmdWithJsonFormat(
+      'gcloud components list --filter Status=Installed',
+    );
+    const found = output.filter((component: { id: string }) => {
+      return expectedComponents.includes(component.id);
+    });
+    expect(found.length > 0).to.equal(true);
   });
 
   it('errors with bad components', async function() {

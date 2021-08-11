@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,12 @@ export class TestToolCache {
 /**
  * The version of the gcloud SDK being tested against.
  */
-export const TEST_SDK_VERSIONS = ['0.9.83', '270.0.0', '272.0.0', '275.0.0'];
+export const TEST_SDK_VERSIONS = [
+  '0.9.83',
+  '270.0.0',
+  '272.0.0',
+  '275.0.0',
+  '349.0.0',
+];
 
 export const TEST_SDK_VERSION = TEST_SDK_VERSIONS[TEST_SDK_VERSIONS.length - 1];

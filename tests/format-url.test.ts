@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,11 @@
 /*
  * Tests format-url.
  */
-// import 'mocha';
-import { expect } from 'chai';
+import * as chai from 'chai';
+import chaiAsPromised = require('chai-as-promised');
+
+chai.use(chaiAsPromised);
+const expect = chai.expect;
 
 import { TEST_SDK_VERSIONS } from '../src/test-util';
 import { getReleaseURL } from '../src/format-url';
@@ -42,24 +45,14 @@ describe('#getReleaseURL', function() {
       });
 
       it(`errors on unsupported OS`, async function() {
-        getReleaseURL('temple', 'x86_64', version)
-          .then(() => {
-            throw new Error('expected error');
-          })
-          .catch(() => {
-            // pass test
-          });
+        const promise = getReleaseURL('temple', 'x86_64', version);
+        expect(promise).to.eventually.be.rejected;
       });
     });
   });
 
   it(`errors on unsupported version`, async function() {
-    getReleaseURL('linux', 'x86_64', 'NOPE')
-      .then(() => {
-        throw new Error('expected error');
-      })
-      .catch(() => {
-        // pass test
-      });
+    const promise = getReleaseURL('linux', 'x86_64', 'NOPE');
+    expect(promise).to.eventually.be.rejected;
   });
 });

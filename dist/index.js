@@ -368,7 +368,7 @@ function copyFile(srcFile, destFile, force) {
 "use strict";
 
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1714,7 +1714,7 @@ exports._readLinuxVersionFile = _readLinuxVersionFile;
 "use strict";
 
 /*
- * Copyright 2020 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -3767,7 +3767,7 @@ function coerce (version, options) {
 "use strict";
 
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -4073,7 +4073,7 @@ module.exports = __webpack_require__(669).inspect;
 "use strict";
 
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -8535,7 +8535,7 @@ exports.checkBypass = checkBypass;
 "use strict";
 
 /*
- * Copyright 2019 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
