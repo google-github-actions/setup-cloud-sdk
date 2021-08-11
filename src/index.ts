@@ -258,7 +258,7 @@ export async function installComponent(
   const options = {
     silent,
   };
-  let cmd = ['--quiet', 'components', 'install'];
+  const cmd = ['--quiet', 'components', 'install'];
   if (Array.isArray(component)) {
     cmd.concat(component);
   } else {
