@@ -167,9 +167,10 @@ export function parseServiceAccountKey(
       "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service-account-email"
     }
     `;
+    const errMsg = error instanceof Error ? error.message : error;
     const message =
       'Error parsing credentials: ' +
-      error.message +
+      errMsg +
       '\nEnsure your credentials are base64 encoded or validate JSON format: ' +
       keyFormat;
     throw new Error(message);
@@ -282,7 +283,7 @@ export async function installComponent(
 export async function runCmdWithJsonFormat(
   cmd: string,
   silent = true,
-): Promise<string> {
+): Promise<any> {
   const options = {
     silent,
   };

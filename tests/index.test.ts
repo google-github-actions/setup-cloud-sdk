@@ -217,7 +217,8 @@ describe('#setupCloudSDK', function () {
     try {
       await setupCloudSDK.installComponent('not-a-component');
     } catch (err) {
-      expect(err.message).include('Unable to install');
+      const message = err instanceof Error ? err.message : err;
+      expect(message).include('Unable to install');
     }
   });
 });
