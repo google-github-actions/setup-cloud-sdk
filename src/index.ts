@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { addPath } from '@actions/core';
+// import { addPath } from '@actions/core';
 import * as exec from '@actions/exec';
 import * as toolCache from '@actions/tool-cache';
 import * as os from 'os';
-import * as path from 'path';
+// import * as path from 'path';
 import { getReleaseURL } from './format-url';
 import * as downloadUtil from './download-util';
 import * as installUtil from './install-util';
@@ -282,7 +282,7 @@ export async function installComponent(
 export async function runCmdWithJsonFormat(
   cmd: string,
   silent = true,
-): Promise<any> {
+): Promise<string> {
   const options = {
     silent,
   };
