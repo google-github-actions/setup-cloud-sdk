@@ -132,8 +132,8 @@ export async function installGcloudSDK(version: string): Promise<void> {
 
   // Install the downloaded release into the github action env
   await installUtil.installGcloudSDK(version, extPath);
-  const toolPath = toolCache.find('gcloud', version);
-  addPath(path.join(toolPath, 'bin'));
+  // const toolPath = toolCache.find('gcloud', version);
+  // addPath(path.join(toolPath, 'bin'));
 }
 
 /**
