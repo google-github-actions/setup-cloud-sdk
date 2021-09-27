@@ -36,7 +36,7 @@
     "@types/chai": "^4.2.x",
     "@types/chai-as-promised": "^7.1.4",
     "@types/mocha": "^7.0.x",
-    "@types/node": "^12.20.16",
+    "@types/node": "^16.10.1",
     "@typescript-eslint/eslint-plugin": "^2.20.0",
     "@typescript-eslint/parser": "^2.20.0",
     "@zeit/ncc": "^0.20.x",
