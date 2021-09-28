@@ -26,13 +26,13 @@ import {
 const { KEY, B64_KEY, PROJECT_ID, RUNNER_OS } = process.env;
 const [toolDir, tempDir] = TestToolCache.override();
 
-describe('#setupCloudSDK', function() {
-  beforeEach(async function() {
+describe('#setupCloudSDK', function () {
+  beforeEach(async function () {
     await io.rmRF(toolDir);
     await io.rmRF(tempDir);
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     try {
       await io.rmRF(toolDir);
       await io.rmRF(tempDir);
@@ -49,13 +49,13 @@ describe('#setupCloudSDK', function() {
     version = await setupCloudSDK.getLatestGcloudSDKVersion();
   });
 
-  it('returns false if not installed', function() {
+  it('returns false if not installed', function () {
     const installed = setupCloudSDK.isInstalled();
 
     expect(installed).eql(false);
   });
 
-  it('returns false if version is not installed', async function() {
+  it('returns false if version is not installed', async function () {
     await setupCloudSDK.installGcloudSDK(TEST_SDK_VERSION);
     const installed = setupCloudSDK.isInstalled(
       TEST_SDK_VERSIONS[TEST_SDK_VERSIONS.length - 2],
@@ -64,20 +64,20 @@ describe('#setupCloudSDK', function() {
     expect(installed).eql(false);
   });
 
-  it('returns true if installed', async function() {
+  it('returns true if installed', async function () {
     await setupCloudSDK.installGcloudSDK(version);
     const installed = setupCloudSDK.isInstalled();
 
     expect(installed).eql(true);
   });
 
-  it('returns true if version is installed', async function() {
+  it('returns true if version is installed', async function () {
     await setupCloudSDK.installGcloudSDK(version);
     const installed = setupCloudSDK.isInstalled(version);
     expect(installed).eql(true);
   });
 
-  it('returns the correct tool cmd', function() {
+  it('returns the correct tool cmd', function () {
     const cmd = setupCloudSDK.getToolCommand();
     if (RUNNER_OS == 'Windows') {
       expect(cmd).eql('gcloud.cmd');
@@ -86,18 +86,18 @@ describe('#setupCloudSDK', function() {
     }
   });
 
-  it('returns false if project Id is not set', async function() {
+  it('returns false if project Id is not set', async function () {
     await setupCloudSDK.installGcloudSDK(version);
     const isSet = await setupCloudSDK.isProjectIdSet();
     expect(isSet).eql(false);
   });
-  it('returns false if not authenticated', async function() {
+  it('returns false if not authenticated', async function () {
     await setupCloudSDK.installGcloudSDK(version);
     const isAuth = await setupCloudSDK.isAuthenticated();
     expect(isAuth).eql(false);
   });
 
-  it('returns true if project Id is set', async function() {
+  it('returns true if project Id is set', async function () {
     await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.setProject(PROJECT_ID!);
     const isSet = await setupCloudSDK.isProjectIdSet();
@@ -108,14 +108,14 @@ describe('#setupCloudSDK', function() {
     expect(output.core.project).eql(PROJECT_ID);
   });
 
-  it('returns true if authenticated', async function() {
+  it('returns true if authenticated', async function () {
     await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.authenticateGcloudSDK(KEY!);
     const isAuth = await setupCloudSDK.isAuthenticated();
     expect(isAuth).eql(true);
   });
 
-  it('installs latest gcloud', async function() {
+  it('installs latest gcloud', async function () {
     const latest = await setupCloudSDK.getLatestGcloudSDKVersion();
     await setupCloudSDK.installGcloudSDK(latest);
     const installed = setupCloudSDK.isInstalled();
@@ -123,24 +123,24 @@ describe('#setupCloudSDK', function() {
     expect(installed).eql(true);
   });
 
-  it('installs a versioned gcloud', async function() {
+  it('installs a versioned gcloud', async function () {
     await setupCloudSDK.installGcloudSDK(version);
     const installed = setupCloudSDK.isInstalled(version);
 
     expect(installed).eql(true);
   });
 
-  it('parses a service account key', async function() {
+  it('parses a service account key', async function () {
     const key = setupCloudSDK.parseServiceAccountKey(KEY!);
     expect(key).not.eql(undefined);
   });
 
-  it('parses a base64 key', async function() {
+  it('parses a base64 key', async function () {
     const key = setupCloudSDK.parseServiceAccountKey(B64_KEY!);
     expect(key).not.eql(undefined);
   });
 
-  it('errors with bad key', async function() {
+  it('errors with bad key', async function () {
     try {
       setupCloudSDK.parseServiceAccountKey('{}');
     } catch (err) {
@@ -148,14 +148,14 @@ describe('#setupCloudSDK', function() {
     }
   });
 
-  it('sets authentication', async function() {
+  it('sets authentication', async function () {
     await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.authenticateGcloudSDK(KEY!);
     const isAuth = await setupCloudSDK.isAuthenticated();
     expect(isAuth).eql(true);
   });
 
-  it('sets the Project Id', async function() {
+  it('sets the Project Id', async function () {
     await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.setProject(PROJECT_ID!);
     const output = await setupCloudSDK.runCmdWithJsonFormat(
@@ -164,7 +164,7 @@ describe('#setupCloudSDK', function() {
     expect(output.core.project).eql(PROJECT_ID);
   });
 
-  it('sets the Project Id from key', async function() {
+  it('sets the Project Id from key', async function () {
     await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.setProjectWithKey(KEY!);
     const output = await setupCloudSDK.runCmdWithJsonFormat(
@@ -173,7 +173,7 @@ describe('#setupCloudSDK', function() {
     expect(output.core.project).eql(PROJECT_ID);
   });
 
-  it('installs beta components', async function() {
+  it('installs beta components', async function () {
     const expectedComponent = 'beta';
     await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.installComponent(expectedComponent);
@@ -187,7 +187,7 @@ describe('#setupCloudSDK', function() {
     expect(found).to.not.equal(undefined);
   });
 
-  it('installs gsutil components', async function() {
+  it('installs gsutil components', async function () {
     const expectedComponent = 'gsutil';
     await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.installComponent(expectedComponent);
@@ -200,7 +200,7 @@ describe('#setupCloudSDK', function() {
     expect(found).to.not.equal(undefined);
   });
 
-  it('installs multiple components', async function() {
+  it('installs multiple components', async function () {
     const expectedComponents = ['alpha', 'cbt'];
     await setupCloudSDK.installGcloudSDK(version);
     await setupCloudSDK.installComponent(expectedComponents);
@@ -213,11 +213,12 @@ describe('#setupCloudSDK', function() {
     expect(found.length > 0).to.equal(true);
   });
 
-  it('errors with bad components', async function() {
+  it('errors with bad components', async function () {
     try {
       await setupCloudSDK.installComponent('not-a-component');
     } catch (err) {
-      expect(err.message).include('Unable to install');
+      const message = err instanceof Error ? err.message : err;
+      expect(message).include('Unable to install');
     }
   });
 });

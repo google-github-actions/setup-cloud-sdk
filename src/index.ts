@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import { addPath } from '@actions/core';
 import * as exec from '@actions/exec';
 import * as toolCache from '@actions/tool-cache';
 import * as os from 'os';
-import * as path from 'path';
 import { getReleaseURL } from './format-url';
 import * as downloadUtil from './download-util';
 import * as installUtil from './install-util';
@@ -132,8 +130,6 @@ export async function installGcloudSDK(version: string): Promise<void> {
 
   // Install the downloaded release into the github action env
   await installUtil.installGcloudSDK(version, extPath);
-  const toolPath = toolCache.find('gcloud', version);
-  addPath(path.join(toolPath, 'bin'));
 }
 
 /**
@@ -167,9 +163,10 @@ export function parseServiceAccountKey(
       "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service-account-email"
     }
     `;
+    const errMsg = error instanceof Error ? error.message : error;
     const message =
       'Error parsing credentials: ' +
-      error.message +
+      errMsg +
       '\nEnsure your credentials are base64 encoded or validate JSON format: ' +
       keyFormat;
     throw new Error(message);

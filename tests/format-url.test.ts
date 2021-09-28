@@ -26,32 +26,32 @@ const expect = chai.expect;
 import { TEST_SDK_VERSIONS } from '../src/test-util';
 import { getReleaseURL } from '../src/format-url';
 
-describe('#getReleaseURL', function() {
+describe('#getReleaseURL', function () {
   TEST_SDK_VERSIONS.forEach((version) => {
-    describe(version, function() {
-      it(`finds matching linux version`, async function() {
+    describe(version, function () {
+      it(`finds matching linux version`, async function () {
         const result = await getReleaseURL('linux', 'x86_64', version);
         expect(result).to.be;
       });
 
-      it(`finds matching windows version`, async function() {
+      it(`finds matching windows version`, async function () {
         const result = await getReleaseURL('win32', 'x86_64', version);
         expect(result).to.be;
       });
 
-      it(`finds matching darwin version`, async function() {
+      it(`finds matching darwin version`, async function () {
         const result = await getReleaseURL('darwin', 'x86_64', version);
         expect(result).to.be;
       });
 
-      it(`errors on unsupported OS`, async function() {
+      it(`errors on unsupported OS`, async function () {
         const promise = getReleaseURL('temple', 'x86_64', version);
         expect(promise).to.eventually.be.rejected;
       });
     });
   });
 
-  it(`errors on unsupported version`, async function() {
+  it(`errors on unsupported version`, async function () {
     const promise = getReleaseURL('linux', 'x86_64', 'NOPE');
     expect(promise).to.eventually.be.rejected;
   });
