@@ -9,7 +9,7 @@ on:
 jobs:
   run:
     name: Unit Tests
-    if: ${{ github.actor != google-github-actions-bot}}
+    if: ${{ github.actor != 'google-github-actions-bot'}}
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
