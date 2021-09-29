@@ -42,7 +42,7 @@ exit code.
 
 #### Defined in
 
-[index.ts:186](https://github.com/google-github-actions/setup-cloud-sdk/blob/73fe456/src/index.ts#L186)
+[index.ts:182](https://github.com/google-github-actions/setup-cloud-sdk/blob/2901264/src/index.ts#L182)
 
 ___
 
@@ -58,7 +58,7 @@ The latest stable version of the gcloud SDK.
 
 #### Defined in
 
-[version-util.ts:27](https://github.com/google-github-actions/setup-cloud-sdk/blob/73fe456/src/version-util.ts#L27)
+[version-util.ts:27](https://github.com/google-github-actions/setup-cloud-sdk/blob/2901264/src/version-util.ts#L27)
 
 ___
 
@@ -76,7 +76,7 @@ gcloud command.
 
 #### Defined in
 
-[index.ts:52](https://github.com/google-github-actions/setup-cloud-sdk/blob/73fe456/src/index.ts#L52)
+[index.ts:49](https://github.com/google-github-actions/setup-cloud-sdk/blob/2901264/src/index.ts#L49)
 
 ___
 
@@ -84,13 +84,13 @@ ___
 
 ▸ **installComponent**(`component`, `silent?`): `Promise`<`void`\>
 
-Sets the GCP Project Id in the gcloud config.
+Install a Cloud SDK component.
 
 #### Parameters
 
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
-| `component` | `string` | `undefined` | gcloud component group to install ie alpha, beta. |
+| `component` | `string` \| `string`[] | `undefined` | gcloud component group to install ie alpha, beta. |
 | `silent` | `boolean` | `true` | - |
 
 #### Returns
@@ -101,7 +101,7 @@ CMD output
 
 #### Defined in
 
-[index.ts:254](https://github.com/google-github-actions/setup-cloud-sdk/blob/73fe456/src/index.ts#L254)
+[index.ts:250](https://github.com/google-github-actions/setup-cloud-sdk/blob/2901264/src/index.ts#L250)
 
 ___
 
@@ -125,7 +125,7 @@ The path of the installed tool.
 
 #### Defined in
 
-[index.ts:122](https://github.com/google-github-actions/setup-cloud-sdk/blob/73fe456/src/index.ts#L122)
+[index.ts:119](https://github.com/google-github-actions/setup-cloud-sdk/blob/2901264/src/index.ts#L119)
 
 ___
 
@@ -149,7 +149,7 @@ true is gcloud is authenticated.
 
 #### Defined in
 
-[index.ts:94](https://github.com/google-github-actions/setup-cloud-sdk/blob/73fe456/src/index.ts#L94)
+[index.ts:91](https://github.com/google-github-actions/setup-cloud-sdk/blob/2901264/src/index.ts#L91)
 
 ___
 
@@ -173,7 +173,7 @@ true if gcloud is found in toolpath.
 
 #### Defined in
 
-[index.ts:36](https://github.com/google-github-actions/setup-cloud-sdk/blob/73fe456/src/index.ts#L36)
+[index.ts:34](https://github.com/google-github-actions/setup-cloud-sdk/blob/2901264/src/index.ts#L34)
 
 ___
 
@@ -197,7 +197,7 @@ true is project Id is set.
 
 #### Defined in
 
-[index.ts:67](https://github.com/google-github-actions/setup-cloud-sdk/blob/73fe456/src/index.ts#L67)
+[index.ts:64](https://github.com/google-github-actions/setup-cloud-sdk/blob/2901264/src/index.ts#L64)
 
 ___
 
@@ -221,7 +221,7 @@ ServiceAccountKey as an object.
 
 #### Defined in
 
-[index.ts:146](https://github.com/google-github-actions/setup-cloud-sdk/blob/73fe456/src/index.ts#L146)
+[index.ts:141](https://github.com/google-github-actions/setup-cloud-sdk/blob/2901264/src/index.ts#L141)
 
 ___
 
@@ -229,20 +229,24 @@ ___
 
 ▸ **runCmdWithJsonFormat**(`cmd`, `silent?`): `Promise`<`any`\>
 
+Run a gcloud command and return output as parsed JSON.
+
 #### Parameters
 
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `cmd` | `string` | `undefined` |
-| `silent` | `boolean` | `true` |
+| Name | Type | Default value | Description |
+| :------ | :------ | :------ | :------ |
+| `cmd` | `string` | `undefined` | the gcloud cmd to run. |
+| `silent` | `boolean` | `true` | print output to console. |
 
 #### Returns
 
 `Promise`<`any`\>
 
+CMD output
+
 #### Defined in
 
-[index.ts:273](https://github.com/google-github-actions/setup-cloud-sdk/blob/73fe456/src/index.ts#L273)
+[index.ts:279](https://github.com/google-github-actions/setup-cloud-sdk/blob/2901264/src/index.ts#L279)
 
 ___
 
@@ -267,7 +271,7 @@ project ID.
 
 #### Defined in
 
-[index.ts:219](https://github.com/google-github-actions/setup-cloud-sdk/blob/73fe456/src/index.ts#L219)
+[index.ts:215](https://github.com/google-github-actions/setup-cloud-sdk/blob/2901264/src/index.ts#L215)
 
 ___
 
@@ -291,4 +295,4 @@ project ID.
 
 #### Defined in
 
-[index.ts:240](https://github.com/google-github-actions/setup-cloud-sdk/blob/73fe456/src/index.ts#L240)
+[index.ts:236](https://github.com/google-github-actions/setup-cloud-sdk/blob/2901264/src/index.ts#L236)
