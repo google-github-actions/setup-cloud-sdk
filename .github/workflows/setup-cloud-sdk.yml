@@ -1,10 +1,15 @@
 name: setup-cloud-sdk Unit
 
-on: [pull_request]
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   run:
     name: Unit Tests
+    if: ${{ github.actor != google-github-actions-bot}}
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
