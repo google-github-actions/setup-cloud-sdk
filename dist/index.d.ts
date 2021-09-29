@@ -61,12 +61,19 @@ export declare function setProject(projectId: string, silent?: boolean): Promise
  */
 export declare function setProjectWithKey(serviceAccountKey: string): Promise<string>;
 /**
- * Sets the GCP Project Id in the gcloud config.
+ * Install a Cloud SDK component.
  *
  * @param component - gcloud component group to install ie alpha, beta.
  * @returns CMD output
  */
-export declare function installComponent(component: string, silent?: boolean): Promise<void>;
+export declare function installComponent(component: string[] | string, silent?: boolean): Promise<void>;
+/**
+ * Run a gcloud command and return output as parsed JSON.
+ *
+ * @param cmd - the gcloud cmd to run.
+ * @param silent - print output to console.
+ * @returns CMD output
+ */
 export declare function runCmdWithJsonFormat(cmd: string, silent?: boolean): Promise<any>;
 interface ServiceAccountKey {
     type: string;
