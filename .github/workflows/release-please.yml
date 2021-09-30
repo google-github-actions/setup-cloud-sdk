@@ -19,12 +19,13 @@ jobs:
         run: npm install
       - name: build
         run: npm run build
-      - id: diff
+      - name: check diff 
+        id: diff
         run: |-
-          # If build changes, DIFF will equal 1
-          echo '::set-output name=DIFF::$(git diff-index HEAD --quiet)'
+          export DIFF=$(git diff-index HEAD --quiet) # If build changes, DIFF will equal 1
+          echo ::set-output name=build-diff::$DIFF
       - name: docs
-        if: ${{ steps.diff.outputs.DIFF == 1 }}
+        if: ${{ steps.diff.outputs.build-diff == 1 }}
         run: npm run docs
       - name: commit
         run: |-
