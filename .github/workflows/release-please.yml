@@ -32,7 +32,7 @@ jobs:
           # build and commit dist if diff
           git config --global user.name "actions-bot"
           git config user.email 'github-actions-bot@google.com'
-          git add dist/
+          git add dist/ docs/
           git diff-index --quiet HEAD || git commit -m "chore: build dist ${PACKAGE_NAME}"
           # if last commit hash of last build dist was found, get logs of commits in btw for PR body
           if [ -z "$LAST_BUILD_HASH" ]
