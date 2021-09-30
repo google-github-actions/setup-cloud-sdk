@@ -22,6 +22,7 @@ jobs:
       - name: check diff 
         id: diff
         run: |-
+          echo $(git diff)
           export DIFF=$(git diff-index HEAD --quiet || echo 1 )
           echo ::set-output name=build-diff::$DIFF
       - name: docs
