@@ -27,7 +27,7 @@ npm install @google-github-actions/setup-cloud-sdk
 ```TS
 import * as core from '@actions/core';
 import * as toolCache from '@actions/tool-cache';
-import * as setupGcloud from 'setup-cloud-sdk';
+import * as setupGcloud from '@google-github-actions/setup-cloud-sdk';
 
 // Install gcloud if not already installed.
 const gcloudVersion = await setupGcloud.getLatestGcloudSDKVersion();

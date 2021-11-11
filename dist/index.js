@@ -8385,6 +8385,12 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getReleaseURL = void 0;
 const httpm = __nccwpck_require__(5538);
 const attempt_1 = __nccwpck_require__(6449);
+// archMap is a mapping of how node detects an operating system to the
+// associated cloud sdk architecture value.
+const archMap = {
+    x64: 'x86_64',
+    arm64: 'arm',
+};
 /**
  * Formats the gcloud SDK release URL according to the specified arguments.
  *
@@ -8395,8 +8401,8 @@ const attempt_1 = __nccwpck_require__(6449);
  */
 function formatReleaseURL(os, arch, version) {
     // massage the arch to match gcloud sdk conventions
-    if (arch == 'x64') {
-        arch = 'x86_64';
+    if (archMap[arch]) {
+        arch = archMap[arch];
     }
     let objectName;
     switch (os) {
