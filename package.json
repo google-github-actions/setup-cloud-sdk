@@ -36,20 +36,20 @@
     "@types/chai": "^4.2.x",
     "@types/chai-as-promised": "^7.1.4",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^16.10.1",
-    "@typescript-eslint/eslint-plugin": "^4.32.0",
-    "@typescript-eslint/parser": "^4.32.0",
-    "@vercel/ncc": "^0.31.1",
+    "@types/node": "^16.11.10",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "@vercel/ncc": "^0.32.0",
     "chai": "^4.2.x",
     "chai-as-promised": "^7.1.1",
-    "eslint": "^7.32.0",
+    "eslint": "^8.3.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "mocha": "^9.1.2",
     "prettier": "^2.4.1",
     "ts-node": "^10.2.1",
-    "typedoc": "^0.22.4",
-    "typedoc-plugin-markdown": "^3.10.4",
-    "typescript": "^4.4.3"
+    "typedoc": "^0.22.9",
+    "typedoc-plugin-markdown": "^3.11.7",
+    "typescript": "^4.4.4"
   }
 }

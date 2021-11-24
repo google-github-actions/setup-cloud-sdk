@@ -51,6 +51,10 @@ describe('#downloadAndExtractTool', function () {
   });
 
   it('downloads and extracts linux version', async function () {
+    if (os.platform() === 'win32') {
+      // https://github.com/actions/toolkit/issues/194
+      this.skip();
+    }
     const url = await getReleaseURL('linux', 'x86_64', TEST_SDK_VERSION);
     const extPath = await downloadUtil.downloadAndExtractTool(url);
     expect(extPath).to.be;
@@ -67,6 +71,10 @@ describe('#downloadAndExtractTool', function () {
   });
 
   it('downloads and extracts darwin version', async function () {
+    if (os.platform() === 'win32') {
+      // https://github.com/actions/toolkit/issues/194
+      this.skip();
+    }
     const url = await getReleaseURL('darwin', 'x86_64', TEST_SDK_VERSION);
     const extPath = await downloadUtil.downloadAndExtractTool(url);
     expect(extPath).to.be;
@@ -74,6 +82,10 @@ describe('#downloadAndExtractTool', function () {
   });
 
   it('downloads and extracts mac ARM version', async function () {
+    if (os.platform() === 'win32') {
+      // https://github.com/actions/toolkit/issues/194
+      this.skip();
+    }
     const url = await getReleaseURL('darwin', 'arm64', TEST_SDK_VERSION);
     const extPath = await downloadUtil.downloadAndExtractTool(url);
     expect(extPath).to.be;
