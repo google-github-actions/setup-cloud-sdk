@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://www.github.com/google-github-actions/setup-cloud-sdk/compare/v0.1.1...v0.2.0) (2021-11-11)
+
+
+### Features
+
+* Add support for arm ([#35](https://www.github.com/google-github-actions/setup-cloud-sdk/issues/35)) ([1bbf019](https://www.github.com/google-github-actions/setup-cloud-sdk/commit/1bbf01998fbfee5edfa04165770e4ecac87d9573))
+
 ### [0.1.1](https://www.github.com/google-github-actions/setup-cloud-sdk/compare/v0.1.0...v0.1.1) (2021-09-30)
 
 
