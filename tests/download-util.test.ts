@@ -81,6 +81,17 @@ describe('#downloadAndExtractTool', function () {
     expect(fs.existsSync(extPath)).to.be.true;
   });
 
+  it('downloads and extracts mac ARM version', async function () {
+    if (os.platform() === 'win32') {
+      // https://github.com/actions/toolkit/issues/194
+      this.skip();
+    }
+    const url = await getReleaseURL('darwin', 'arm64', TEST_SDK_VERSION);
+    const extPath = await downloadUtil.downloadAndExtractTool(url);
+    expect(extPath).to.be;
+    expect(fs.existsSync(extPath)).to.be.true;
+  });
+
   it('errors on download not found', async function () {
     const promise = downloadUtil.downloadAndExtractTool('fakeUrl');
     expect(promise).to.eventually.be.rejectedWith('unable to find url');
