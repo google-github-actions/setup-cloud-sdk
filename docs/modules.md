@@ -34,7 +34,7 @@ param is supported for legacy Actions.
 | Name | Type | Default value | Description |
 | :------ | :------ | :------ | :------ |
 | `serviceAccountKey?` | `string` | `undefined` | The service account key used for authentication. |
-| `silent` | `boolean` | `true` | - |
+| `silent` | `boolean` | `true` | Skip writing output to sdout. |
 
 #### Returns
 
@@ -44,7 +44,7 @@ exit code.
 
 #### Defined in
 
-[index.ts:200](https://github.com/google-github-actions/setup-cloud-sdk/blob/96713e3/src/index.ts#L200)
+[index.ts:201](https://github.com/google-github-actions/setup-cloud-sdk/blob/ed4039f/src/index.ts#L201)
 
 ___
 
@@ -60,7 +60,7 @@ The latest stable version of the gcloud SDK.
 
 #### Defined in
 
-[version-util.ts:27](https://github.com/google-github-actions/setup-cloud-sdk/blob/96713e3/src/version-util.ts#L27)
+[version-util.ts:27](https://github.com/google-github-actions/setup-cloud-sdk/blob/ed4039f/src/version-util.ts#L27)
 
 ___
 
@@ -78,7 +78,7 @@ gcloud command.
 
 #### Defined in
 
-[index.ts:50](https://github.com/google-github-actions/setup-cloud-sdk/blob/96713e3/src/index.ts#L50)
+[index.ts:50](https://github.com/google-github-actions/setup-cloud-sdk/blob/ed4039f/src/index.ts#L50)
 
 ___
 
@@ -103,7 +103,7 @@ CMD output
 
 #### Defined in
 
-[index.ts:320](https://github.com/google-github-actions/setup-cloud-sdk/blob/96713e3/src/index.ts#L320)
+[index.ts:321](https://github.com/google-github-actions/setup-cloud-sdk/blob/ed4039f/src/index.ts#L321)
 
 ___
 
@@ -127,7 +127,7 @@ The path of the installed tool.
 
 #### Defined in
 
-[index.ts:120](https://github.com/google-github-actions/setup-cloud-sdk/blob/96713e3/src/index.ts#L120)
+[index.ts:120](https://github.com/google-github-actions/setup-cloud-sdk/blob/ed4039f/src/index.ts#L120)
 
 ___
 
@@ -151,7 +151,7 @@ true is gcloud is authenticated.
 
 #### Defined in
 
-[index.ts:92](https://github.com/google-github-actions/setup-cloud-sdk/blob/96713e3/src/index.ts#L92)
+[index.ts:92](https://github.com/google-github-actions/setup-cloud-sdk/blob/ed4039f/src/index.ts#L92)
 
 ___
 
@@ -175,7 +175,7 @@ true if gcloud is found in toolpath.
 
 #### Defined in
 
-[index.ts:35](https://github.com/google-github-actions/setup-cloud-sdk/blob/96713e3/src/index.ts#L35)
+[index.ts:35](https://github.com/google-github-actions/setup-cloud-sdk/blob/ed4039f/src/index.ts#L35)
 
 ___
 
@@ -199,7 +199,7 @@ true is project Id is set.
 
 #### Defined in
 
-[index.ts:65](https://github.com/google-github-actions/setup-cloud-sdk/blob/96713e3/src/index.ts#L65)
+[index.ts:65](https://github.com/google-github-actions/setup-cloud-sdk/blob/ed4039f/src/index.ts#L65)
 
 ___
 
@@ -223,7 +223,7 @@ ServiceAccountKey as an object.
 
 #### Defined in
 
-[index.ts:142](https://github.com/google-github-actions/setup-cloud-sdk/blob/96713e3/src/index.ts#L142)
+[index.ts:142](https://github.com/google-github-actions/setup-cloud-sdk/blob/ed4039f/src/index.ts#L142)
 
 ___
 
@@ -248,7 +248,7 @@ CMD output
 
 #### Defined in
 
-[index.ts:349](https://github.com/google-github-actions/setup-cloud-sdk/blob/96713e3/src/index.ts#L349)
+[index.ts:350](https://github.com/google-github-actions/setup-cloud-sdk/blob/ed4039f/src/index.ts#L350)
 
 ___
 
@@ -273,7 +273,7 @@ project ID.
 
 #### Defined in
 
-[index.ts:285](https://github.com/google-github-actions/setup-cloud-sdk/blob/96713e3/src/index.ts#L285)
+[index.ts:286](https://github.com/google-github-actions/setup-cloud-sdk/blob/ed4039f/src/index.ts#L286)
 
 ___
 
@@ -297,4 +297,4 @@ project ID.
 
 #### Defined in
 
-[index.ts:306](https://github.com/google-github-actions/setup-cloud-sdk/blob/96713e3/src/index.ts#L306)
+[index.ts:307](https://github.com/google-github-actions/setup-cloud-sdk/blob/ed4039f/src/index.ts#L307)
