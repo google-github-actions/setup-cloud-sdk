@@ -16,11 +16,17 @@
 
 import * as setupCloudSDK from '../src/index';
 import { expect } from 'chai';
+import * as sinon from 'sinon';
 import * as io from '@actions/io';
+import * as exec from '@actions/exec';
 import {
   TestToolCache,
+  writeTmpFile,
+  TEST_TMP_FILES_DIR,
   TEST_SDK_VERSION,
   TEST_SDK_VERSIONS,
+  TEST_SA_KEY_CREDS_FILE,
+  TEST_WIF_CREDS_FILE,
 } from '../src/test-util';
 
 const { KEY, B64_KEY, PROJECT_ID, RUNNER_OS } = process.env;
@@ -30,12 +36,15 @@ describe('#setupCloudSDK', function () {
   beforeEach(async function () {
     await io.rmRF(toolDir);
     await io.rmRF(tempDir);
+    await io.rmRF(TEST_TMP_FILES_DIR);
   });
 
   afterEach(async function () {
     try {
       await io.rmRF(toolDir);
       await io.rmRF(tempDir);
+      delete process.env.GOOGLE_GHA_CREDS_PATH;
+      sinon.restore();
     } catch (err) {
       console.error('Error occurred during test cleanup: ' + err);
     }
@@ -113,6 +122,73 @@ describe('#setupCloudSDK', function () {
     await setupCloudSDK.authenticateGcloudSDK(KEY!);
     const isAuth = await setupCloudSDK.isAuthenticated();
     expect(isAuth).eql(true);
+  });
+
+  it('runs correct command for WIF Creds via GOOGLE_GHA_CREDS_PATH', async function () {
+    const credFileFixture = await writeTmpFile(TEST_WIF_CREDS_FILE);
+    process.env.GOOGLE_GHA_CREDS_PATH = credFileFixture;
+    await setupCloudSDK.installGcloudSDK(version);
+    this.gcloudStub = sinon.stub(exec, 'exec').callsFake(() => {
+      return Promise.resolve(0);
+    });
+
+    await setupCloudSDK.authenticateGcloudSDK();
+
+    expect(this.gcloudStub.args[0][1]).eql([
+      '--quiet',
+      'auth',
+      'login',
+      '--cred-file',
+      credFileFixture,
+    ]);
+  });
+
+  it('runs correct command for SA Key Creds via GOOGLE_GHA_CREDS_PATH', async function () {
+    const credFileFixture = await writeTmpFile(TEST_SA_KEY_CREDS_FILE);
+    process.env.GOOGLE_GHA_CREDS_PATH = credFileFixture;
+    await setupCloudSDK.installGcloudSDK(version);
+    this.gcloudStub = sinon.stub(exec, 'exec').callsFake(() => {
+      return Promise.resolve(0);
+    });
+
+    await setupCloudSDK.authenticateGcloudSDK();
+
+    // correct SA key passed via stdin
+    expect(this.gcloudStub.args[0][2].input).eql(
+      Buffer.from(JSON.stringify(JSON.parse(TEST_SA_KEY_CREDS_FILE))),
+    );
+    expect(this.gcloudStub.args[0][1]).eql([
+      '--quiet',
+      'auth',
+      'activate-service-account',
+      'my-service-account@my-project.iam.gserviceaccount.com',
+      '--key-file',
+      '-',
+    ]);
+  });
+
+  it('throws an error if GOOGLE_GHA_CREDS_PATH is invalid', async function () {
+    process.env.GOOGLE_GHA_CREDS_PATH = 'invalid';
+    await setupCloudSDK.installGcloudSDK(version);
+
+    try {
+      await setupCloudSDK.authenticateGcloudSDK();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : err;
+      expect(message).contains('no such file or directory');
+    }
+  });
+
+  it('throws an error if GOOGLE_GHA_CREDS_PATH is not set and SA key is not provided', async function () {
+    // await setupCloudSDK.installGcloudSDK(version);
+    try {
+      await setupCloudSDK.authenticateGcloudSDK();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : err;
+      expect(message).eql(
+        'Error authenticating the Cloud SDK. Please use `google-github-actions/auth` to export credentials.',
+      );
+    }
   });
 
   it('installs latest gcloud', async function () {
