@@ -180,7 +180,7 @@ describe('#setupCloudSDK', function () {
   });
 
   it('throws an error if GOOGLE_GHA_CREDS_PATH is not set and SA key is not provided', async function () {
-    // await setupCloudSDK.installGcloudSDK(version);
+    await setupCloudSDK.installGcloudSDK(version);
     try {
       await setupCloudSDK.authenticateGcloudSDK();
     } catch (err) {
