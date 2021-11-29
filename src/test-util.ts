@@ -19,7 +19,7 @@
  */
 import * as path from 'path';
 import * as os from 'os';
-import { v4 as uuidv4 } from 'uuid';
+import * as crypto from 'crypto';
 import { promises as fs } from 'fs';
 
 /**
@@ -66,9 +66,18 @@ export const TEST_TMP_FILES_DIR = path.join(os.tmpdir(), 'test-setupcloudsdk');
  */
 export async function writeTmpFile(data: string): Promise<string> {
   const tmpDir = await fs.mkdtemp(TEST_TMP_FILES_DIR);
-  const tmpFile = path.join(tmpDir, uuidv4());
-  await fs.writeFile(tmpFile, data);
-  return tmpFile;
+  // Generate a random filename to store the data. 12 bytes is 24
+  // characters in hex. It's not the ideal entropy, but we have to be under
+  // the 255 character limit for Windows filenames (which includes their
+  // entire leading path).
+  const uniqueName = crypto.randomBytes(12).toString('hex');
+  const pth = path.join(tmpDir, uniqueName);
+
+  // Write the file as 0640 so the owner has RW, group as R, and the file is
+  // otherwise unreadable. Also write with EXCL to prevent a symlink attack.
+  await fs.writeFile(pth, data, { mode: 0o640, flag: 'wx' });
+
+  return pth;
 }
 
 /**

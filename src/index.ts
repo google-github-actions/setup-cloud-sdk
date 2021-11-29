@@ -22,7 +22,7 @@ import * as downloadUtil from './download-util';
 import * as installUtil from './install-util';
 import { getLatestGcloudSDKVersion } from './version-util';
 import { ExecOptions } from '@actions/exec/lib/interfaces';
-import * as fs from 'fs';
+import { promises as fs } from 'fs';
 
 export { getLatestGcloudSDKVersion };
 
@@ -195,6 +195,7 @@ function isWIFCredFile(credFile: string): boolean {
  * param is supported for legacy Actions.
  *
  * @param serviceAccountKey - The service account key used for authentication.
+ * @param silent - Skip writing output to sdout.
  * @returns exit code.
  */
 export async function authenticateGcloudSDK(
@@ -204,7 +205,7 @@ export async function authenticateGcloudSDK(
   // Check if GOOGLE_GHA_CREDS_PATH has been set by auth
   if (process.env.GOOGLE_GHA_CREDS_PATH) {
     const credFilePath = process.env.GOOGLE_GHA_CREDS_PATH;
-    const credFile = await fs.promises.readFile(credFilePath, 'utf8');
+    const credFile = await fs.readFile(credFilePath, 'utf8');
     // Check if credential is a WIF creds file
     if (isWIFCredFile(credFile)) {
       return authGcloudWIFCredsFile(credFilePath, silent);
