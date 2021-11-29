@@ -191,7 +191,7 @@ function isWIFCredFile(credFile: string): boolean {
 
 /**
  * Authenticates the gcloud tool using a service account key or WIF credential configuration
- * discovered via GOOGLE_GHA_CREDS_PATH environment variable. An explicit serviceAccountKey
+ * discovered via GOOGLE_GHA_CREDS_PATH environment variable. An optional serviceAccountKey
  * param is supported for legacy Actions.
  *
  * @param serviceAccountKey - The service account key used for authentication.
