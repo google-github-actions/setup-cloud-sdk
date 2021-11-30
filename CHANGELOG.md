@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://www.github.com/google-github-actions/setup-cloud-sdk/compare/v0.2.0...v0.3.0) (2021-11-30)
+
+
+### Features
+
+* Support authentication from Auth Action ([#48](https://www.github.com/google-github-actions/setup-cloud-sdk/issues/48)) ([d76bc07](https://www.github.com/google-github-actions/setup-cloud-sdk/commit/d76bc07c27d18f139ef42e5845c1f83f17947a09))
+
 ## [0.2.0](https://www.github.com/google-github-actions/setup-cloud-sdk/compare/v0.1.1...v0.2.0) (2021-11-11)
 
 
