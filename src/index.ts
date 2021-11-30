@@ -22,6 +22,7 @@ import * as downloadUtil from './download-util';
 import * as installUtil from './install-util';
 import { getLatestGcloudSDKVersion } from './version-util';
 import { ExecOptions } from '@actions/exec/lib/interfaces';
+import { promises as fs } from 'fs';
 
 export { getLatestGcloudSDKVersion };
 
@@ -174,12 +175,61 @@ export function parseServiceAccountKey(
 }
 
 /**
+ * Check if a given credential is WIF credential configuration.
+ *
+ * @param credFile - The  WIF credential configuration.
+ * @returns boolean.
+ */
+function isWIFCredFile(credFile: string): boolean {
+  try {
+    const creds = JSON.parse(credFile);
+    return 'type' in creds && creds.type == 'external_account';
+  } catch (err) {
+    throw new SyntaxError(`Failed to parse credentials as JSON: ${err}`);
+  }
+}
+
+/**
+ * Authenticates the gcloud tool using a service account key or WIF credential configuration
+ * discovered via GOOGLE_GHA_CREDS_PATH environment variable. An optional serviceAccountKey
+ * param is supported for legacy Actions.
+ *
+ * @param serviceAccountKey - The service account key used for authentication.
+ * @param silent - Skip writing output to sdout.
+ * @returns exit code.
+ */
+export async function authenticateGcloudSDK(
+  serviceAccountKey?: string,
+  silent = true,
+): Promise<number> {
+  // Check if GOOGLE_GHA_CREDS_PATH has been set by auth
+  if (process.env.GOOGLE_GHA_CREDS_PATH) {
+    const credFilePath = process.env.GOOGLE_GHA_CREDS_PATH;
+    const credFile = await fs.readFile(credFilePath, 'utf8');
+    // Check if credential is a WIF creds file
+    if (isWIFCredFile(credFile)) {
+      return authGcloudWIFCredsFile(credFilePath, silent);
+    }
+    return authGcloudSAKey(credFile, silent);
+  }
+  // Support legacy actions that pass in SA key
+  if (serviceAccountKey) {
+    return authGcloudSAKey(serviceAccountKey, silent);
+  }
+  // One of GOOGLE_GHA_CREDS_PATH or SA key is required
+  throw new Error(
+    'Error authenticating the Cloud SDK. Please use `google-github-actions/auth` to export credentials.',
+  );
+}
+
+/**
  * Authenticates the gcloud tool using a service account key.
  *
  * @param serviceAccountKey - The service account key used for authentication.
  * @returns exit code.
  */
-export async function authenticateGcloudSDK(
+
+async function authGcloudSAKey(
   serviceAccountKey: string,
   silent = true,
 ): Promise<number> {
@@ -202,6 +252,27 @@ export async function authenticateGcloudSDK(
       '--key-file',
       '-',
     ],
+    options as ExecOptions,
+  );
+}
+
+/**
+ * Authenticates the gcloud tool using WIF credential configuration.
+ *
+ * @param credsFile - The WIF credential configuration path.
+ * @returns exit code.
+ */
+async function authGcloudWIFCredsFile(
+  credFilePath: string,
+  silent = true,
+): Promise<number> {
+  const toolCommand = getToolCommand();
+  const options = {
+    silent,
+  };
+  return await exec.exec(
+    toolCommand,
+    ['--quiet', 'auth', 'login', '--cred-file', credFilePath],
     options as ExecOptions,
   );
 }
