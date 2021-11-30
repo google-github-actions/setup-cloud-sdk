@@ -40,12 +40,15 @@ export declare function installGcloudSDK(version: string): Promise<void>;
  */
 export declare function parseServiceAccountKey(serviceAccountKey: string): ServiceAccountKey;
 /**
- * Authenticates the gcloud tool using a service account key.
+ * Authenticates the gcloud tool using a service account key or WIF credential configuration
+ * discovered via GOOGLE_GHA_CREDS_PATH environment variable. An optional serviceAccountKey
+ * param is supported for legacy Actions.
  *
  * @param serviceAccountKey - The service account key used for authentication.
+ * @param silent - Skip writing output to sdout.
  * @returns exit code.
  */
-export declare function authenticateGcloudSDK(serviceAccountKey: string, silent?: boolean): Promise<number>;
+export declare function authenticateGcloudSDK(serviceAccountKey?: string, silent?: boolean): Promise<number>;
 /**
  * Sets the GCP Project Id in the gcloud config.
  *
