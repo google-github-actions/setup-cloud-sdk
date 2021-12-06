@@ -192,7 +192,7 @@ function isWIFCredFile(credFile: string): boolean {
 /**
  * Authenticates the gcloud tool using a service account key or WIF credential configuration
  * discovered via GOOGLE_GHA_CREDS_PATH environment variable. An optional serviceAccountKey
- * param is supported for legacy Actions.
+ * param is supported for legacy Actions and will take precedence over GOOGLE_GHA_CREDS_PATH.
  *
  * @param serviceAccountKey - The service account key used for authentication.
  * @param silent - Skip writing output to sdout.
@@ -202,6 +202,10 @@ export async function authenticateGcloudSDK(
   serviceAccountKey?: string,
   silent = true,
 ): Promise<number> {
+  // Support legacy actions that pass in SA key
+  if (serviceAccountKey) {
+    return authGcloudSAKey(serviceAccountKey, silent);
+  }
   // Check if GOOGLE_GHA_CREDS_PATH has been set by auth
   if (process.env.GOOGLE_GHA_CREDS_PATH) {
     const credFilePath = process.env.GOOGLE_GHA_CREDS_PATH;
@@ -211,10 +215,6 @@ export async function authenticateGcloudSDK(
       return authGcloudWIFCredsFile(credFilePath, silent);
     }
     return authGcloudSAKey(credFile, silent);
-  }
-  // Support legacy actions that pass in SA key
-  if (serviceAccountKey) {
-    return authGcloudSAKey(serviceAccountKey, silent);
   }
   // One of GOOGLE_GHA_CREDS_PATH or SA key is required
   throw new Error(
