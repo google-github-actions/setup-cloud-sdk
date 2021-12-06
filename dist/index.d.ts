@@ -42,7 +42,7 @@ export declare function parseServiceAccountKey(serviceAccountKey: string): Servi
 /**
  * Authenticates the gcloud tool using a service account key or WIF credential configuration
  * discovered via GOOGLE_GHA_CREDS_PATH environment variable. An optional serviceAccountKey
- * param is supported for legacy Actions.
+ * param is supported for legacy Actions and will take precedence over GOOGLE_GHA_CREDS_PATH.
  *
  * @param serviceAccountKey - The service account key used for authentication.
  * @param silent - Skip writing output to sdout.
