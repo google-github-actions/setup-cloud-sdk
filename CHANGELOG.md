@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.3.1](https://www.github.com/google-github-actions/setup-cloud-sdk/compare/v0.3.0...v0.3.1) (2021-12-06)
+
+
+### Bug Fixes
+
+* fix auth precedence for envvar ([#50](https://www.github.com/google-github-actions/setup-cloud-sdk/issues/50)) ([75f0480](https://www.github.com/google-github-actions/setup-cloud-sdk/commit/75f04802b68546f53c1f05496f983a3e1cbb3650))
+
 ## [0.3.0](https://www.github.com/google-github-actions/setup-cloud-sdk/compare/v0.2.0...v0.3.0) (2021-11-30)
 
 
