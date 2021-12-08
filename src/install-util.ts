@@ -28,10 +28,7 @@ import * as path from 'path';
  * @param gcloudExtPath The extraction path for the gcloud SDK.
  * @returns The path of the installed tool.
  */
-export async function installGcloudSDK(
-  version: string,
-  gcloudExtPath: string,
-): Promise<string> {
+export async function installGcloudSDK(version: string, gcloudExtPath: string): Promise<string> {
   const toolRoot = path.join(gcloudExtPath, 'google-cloud-sdk');
   let toolPath = await toolCache.cacheDir(toolRoot, 'gcloud', version);
   toolPath = path.join(toolPath, 'bin');

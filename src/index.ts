@@ -139,9 +139,7 @@ export async function installGcloudSDK(version: string): Promise<void> {
  * @param serviceAccountKey - The service account key used for authentication.
  * @returns ServiceAccountKey as an object.
  */
-export function parseServiceAccountKey(
-  serviceAccountKey: string,
-): ServiceAccountKey {
+export function parseServiceAccountKey(serviceAccountKey: string): ServiceAccountKey {
   let serviceAccount = serviceAccountKey;
   // Handle base64-encoded credentials
   if (!serviceAccountKey.trim().startsWith('{')) {
@@ -229,10 +227,7 @@ export async function authenticateGcloudSDK(
  * @returns exit code.
  */
 
-async function authGcloudSAKey(
-  serviceAccountKey: string,
-  silent = true,
-): Promise<number> {
+async function authGcloudSAKey(serviceAccountKey: string, silent = true): Promise<number> {
   const serviceAccountJson = parseServiceAccountKey(serviceAccountKey);
   const serviceAccountEmail = serviceAccountJson.client_email;
 
@@ -244,14 +239,7 @@ async function authGcloudSAKey(
   };
   return await exec.exec(
     toolCommand,
-    [
-      '--quiet',
-      'auth',
-      'activate-service-account',
-      serviceAccountEmail,
-      '--key-file',
-      '-',
-    ],
+    ['--quiet', 'auth', 'activate-service-account', serviceAccountEmail, '--key-file', '-'],
     options as ExecOptions,
   );
 }
@@ -262,10 +250,7 @@ async function authGcloudSAKey(
  * @param credsFile - The WIF credential configuration path.
  * @returns exit code.
  */
-async function authGcloudWIFCredsFile(
-  credFilePath: string,
-  silent = true,
-): Promise<number> {
+async function authGcloudWIFCredsFile(credFilePath: string, silent = true): Promise<number> {
   const toolCommand = getToolCommand();
   const options = {
     silent,
@@ -283,19 +268,12 @@ async function authGcloudWIFCredsFile(
  * @param serviceAccountKey - The service account key used for authentication.
  * @returns project ID.
  */
-export async function setProject(
-  projectId: string,
-  silent = true,
-): Promise<number> {
+export async function setProject(projectId: string, silent = true): Promise<number> {
   const toolCommand = getToolCommand();
   const options = {
     silent,
   };
-  return await exec.exec(
-    toolCommand,
-    ['--quiet', 'config', 'set', 'project', projectId],
-    options,
-  );
+  return await exec.exec(toolCommand, ['--quiet', 'config', 'set', 'project', projectId], options);
 }
 
 /**
@@ -304,9 +282,7 @@ export async function setProject(
  * @param serviceAccountKey - The service account key used for authentication.
  * @returns project ID.
  */
-export async function setProjectWithKey(
-  serviceAccountKey: string,
-): Promise<string> {
+export async function setProjectWithKey(serviceAccountKey: string): Promise<string> {
   const serviceAccountJson = parseServiceAccountKey(serviceAccountKey);
   await setProject(serviceAccountJson.project_id);
   return serviceAccountJson.project_id;
@@ -318,10 +294,7 @@ export async function setProjectWithKey(
  * @param component - gcloud component group to install ie alpha, beta.
  * @returns CMD output
  */
-export async function installComponent(
-  component: string[] | string,
-  silent = true,
-): Promise<void> {
+export async function installComponent(component: string[] | string, silent = true): Promise<void> {
   const toolCommand = getToolCommand();
   const options = {
     silent,
@@ -347,10 +320,8 @@ export async function installComponent(
  * @param silent - print output to console.
  * @returns CMD output
  */
-export async function runCmdWithJsonFormat(
-  cmd: string,
-  silent = true,
-): Promise<any> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function runCmdWithJsonFormat(cmd: string, silent = true): Promise<any> {
   const options = {
     silent,
   };

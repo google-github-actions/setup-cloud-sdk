@@ -83,13 +83,7 @@ export async function writeTmpFile(data: string): Promise<string> {
 /**
  * The version of the gcloud SDK being tested against.
  */
-export const TEST_SDK_VERSIONS = [
-  '0.9.83',
-  '270.0.0',
-  '272.0.0',
-  '275.0.0',
-  '349.0.0',
-];
+export const TEST_SDK_VERSIONS = ['0.9.83', '270.0.0', '272.0.0', '275.0.0', '349.0.0'];
 
 export const TEST_SDK_VERSION = TEST_SDK_VERSIONS[TEST_SDK_VERSIONS.length - 1];
 

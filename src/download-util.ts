@@ -40,9 +40,7 @@ export async function downloadAndExtractTool(url: string): Promise<string> {
   } else if (url.indexOf('.7z') != -1) {
     extractedPath = await toolCache.extract7z(downloadPath);
   } else {
-    throw new Error(
-      `Unexpected download archive type, downloadPath: ${downloadPath}`,
-    );
+    throw new Error(`Unexpected download archive type, downloadPath: ${downloadPath}`);
   }
   return extractedPath;
 }

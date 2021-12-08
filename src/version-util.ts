@@ -25,11 +25,8 @@ import { retry } from '@lifeomic/attempt';
  * @returns The latest stable version of the gcloud SDK.
  */
 export async function getLatestGcloudSDKVersion(): Promise<string> {
-  const queryUrl =
-    'https://dl.google.com/dl/cloudsdk/channels/rapid/components-2.json';
-  const client: httpm.HttpClient = new httpm.HttpClient(
-    'github-actions-setup-gcloud-sdk',
-  );
+  const queryUrl = 'https://dl.google.com/dl/cloudsdk/channels/rapid/components-2.json';
+  const client: httpm.HttpClient = new httpm.HttpClient('github-actions-setup-gcloud-sdk');
   return await retry(
     async () => {
       const res = await client.get(queryUrl);
@@ -42,9 +39,7 @@ export async function getLatestGcloudSDKVersion(): Promise<string> {
       const body = await res.readBody();
       const responseObject = JSON.parse(body);
       if (!responseObject.version) {
-        throw new Error(
-          `Failed to retrieve gcloud SDK version, invalid response body: ${body}`,
-        );
+        throw new Error(`Failed to retrieve gcloud SDK version, invalid response body: ${body}`);
       }
       return responseObject.version;
     },
