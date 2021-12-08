@@ -1,37 +1,51 @@
-name: setup-cloud-sdk Unit
+name: 'unit'
 
-on: 
+on:
   push:
     branches:
-      - main
+    - 'main'
   pull_request:
+    branches:
+    - 'main'
+  workflow_dispatch:
+
+concurrency:
+  group: '${{ github.workflow }}-${{ github.head_ref || github.ref }}'
+  cancel-in-progress: true
 
 jobs:
   run:
-    name: Unit Tests
-    if: ${{ github.event.pull_request.head.user.login != 'google-github-actions-bot'}}
-    runs-on: ${{ matrix.operating-system }}
+    name: 'unit'
+    runs-on: '${{ matrix.os }}'
     strategy:
       matrix:
-        operating-system: [ubuntu-latest, windows-latest, macos-latest]
-        node: [10, 12, 14]
+        os:
+        - 'ubuntu-latest'
+        - 'windows-latest'
+        - 'macos-latest'
+        node:
+        - '10'
+        - '12'
+        - '14'
     steps:
-    - uses: actions/checkout@v2
+    - uses: 'actions/checkout@v2'
 
-    - uses: actions/setup-node@master
+    - uses: 'actions/setup-node@v2'
       with:
-        node-version: 12.x
+        node-version: '${{ matrix.node }}.x'
 
-    - name: npm install
-      run: npm install
+    - name: 'npm build'
+      run: 'npm ci && npm run build'
 
-    - name: npm lint
-      run: npm run lint
+    - name: 'npm lint'
+      # There's no need to run the linter for each operating system, since it
+      # will find the same thing 9x and clog up the PR review.
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.node == '14' }}
+      run: 'npm run lint'
 
-    - name: npm test
-      run: npm run test
+    - name: 'npm test'
       env:
-        KEY: ${{ secrets.SETUP_SDK_CRED_SA_KEY_JSON }}
-        B64_KEY: ${{ secrets.SETUP_SDK_CRED_SA_KEY_B64 }}
-        PROJECT_ID: ${{ secrets.SETUP_SDK_CRED_PROJECT_ID }}
-      
+        KEY: '${{ secrets.SETUP_SDK_CRED_SA_KEY_JSON }}'
+        B64_KEY: '${{ secrets.SETUP_SDK_CRED_SA_KEY_B64 }}'
+        PROJECT_ID: '${{ secrets.SETUP_SDK_CRED_PROJECT_ID }}'
+      run: 'npm run test'

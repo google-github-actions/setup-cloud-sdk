@@ -53,9 +53,7 @@ function formatReleaseURL(os: string, arch: string, version: string): string {
       throw new Error(`Unexpected OS '${os}'`);
   }
 
-  return encodeURI(
-    `https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${objectName}`,
-  );
+  return encodeURI(`https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${objectName}`);
 }
 
 /**
@@ -67,11 +65,7 @@ function formatReleaseURL(os: string, arch: string, version: string): string {
  * @param version The version of the requested release.
  * @returns The verified gcloud SDK release URL.
  */
-export async function getReleaseURL(
-  os: string,
-  arch: string,
-  version: string,
-): Promise<string> {
+export async function getReleaseURL(os: string, arch: string, version: string): Promise<string> {
   try {
     const url = formatReleaseURL(os, arch, version);
     const client = new httpm.HttpClient('github-actions-setup-gcloud-sdk');
