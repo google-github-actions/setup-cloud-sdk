@@ -14,45 +14,67 @@
  * limitations under the License.
  */
 
-/*
- * Tests format-url.
- */
-import * as chai from 'chai';
-import chaiAsPromised = require('chai-as-promised');
+import 'mocha';
+import { expect } from 'chai';
 
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import { buildReleaseURL } from '../src/format-url';
 
-import { TEST_SDK_VERSIONS } from '../src/test-util';
-import { getReleaseURL } from '../src/format-url';
+describe('#buildReleaseURL', () => {
+  const cases = [
+    {
+      name: 'unknown os',
+      os: 'nope',
+      arch: 'x86_64',
+      version: '345.0.0',
+      error: 'Unexpected OS',
+    },
+    {
+      name: 'linux/x64_64',
+      os: 'linux',
+      arch: 'x64_64',
+      version: '345.0.0',
+      expected: 'google-cloud-sdk-345.0.0-linux-x64_64.tar.gz',
+    },
+    {
+      name: 'darwin/x64_64',
+      os: 'darwin',
+      arch: 'x64_64',
+      version: '345.0.0',
+      expected: 'google-cloud-sdk-345.0.0-darwin-x64_64.tar.gz',
+    },
+    {
+      name: 'win32/x64_64',
+      os: 'win32',
+      arch: 'x64_64',
+      version: '345.0.0',
+      expected: 'google-cloud-sdk-345.0.0-windows-x64_64.zip',
+    },
+    {
+      name: 'linux/x64',
+      os: 'linux',
+      arch: 'x64',
+      version: '345.0.0',
+      expected: 'google-cloud-sdk-345.0.0-linux-x86_64.tar.gz',
+    },
+    {
+      name: 'linux/arm64',
+      os: 'linux',
+      arch: 'arm64',
+      version: '345.0.0',
+      expected: 'google-cloud-sdk-345.0.0-linux-arm.tar.gz',
+    },
+  ];
 
-describe('#getReleaseURL', function () {
-  TEST_SDK_VERSIONS.forEach((version) => {
-    describe(version, function () {
-      it(`finds matching linux version`, async function () {
-        const result = await getReleaseURL('linux', 'x86_64', version);
-        expect(result).to.be;
-      });
-
-      it(`finds matching windows version`, async function () {
-        const result = await getReleaseURL('win32', 'x86_64', version);
-        expect(result).to.be;
-      });
-
-      it(`finds matching darwin version`, async function () {
-        const result = await getReleaseURL('darwin', 'x86_64', version);
-        expect(result).to.be;
-      });
-
-      it(`errors on unsupported OS`, async function () {
-        const promise = getReleaseURL('temple', 'x86_64', version);
-        expect(promise).to.eventually.be.rejected;
-      });
+  cases.forEach((tc) => {
+    it(tc.name, async () => {
+      if (tc.expected) {
+        const exp = `https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${tc.expected}`;
+        expect(buildReleaseURL(tc.os, tc.arch, tc.version)).to.eql(exp);
+      } else if (tc.error) {
+        expect(() => {
+          buildReleaseURL(tc.os, tc.arch, tc.version);
+        }).to.throw(tc.error);
+      }
     });
-  });
-
-  it(`errors on unsupported version`, async function () {
-    const promise = getReleaseURL('linux', 'x86_64', 'NOPE');
-    expect(promise).to.eventually.be.rejected;
   });
 });

@@ -17,7 +17,7 @@
 import * as exec from '@actions/exec';
 import * as toolCache from '@actions/tool-cache';
 import * as os from 'os';
-import { getReleaseURL } from './format-url';
+import { buildReleaseURL } from './format-url';
 import * as downloadUtil from './download-util';
 import * as installUtil from './install-util';
 import { getLatestGcloudSDKVersion } from './version-util';
@@ -121,7 +121,7 @@ export async function installGcloudSDK(version: string): Promise<void> {
   // Retrieve the release corresponding to the specified version and OS
   const osPlat = os.platform();
   const osArch = os.arch();
-  const url = await getReleaseURL(osPlat, osArch, version);
+  const url = buildReleaseURL(osPlat, osArch, version);
 
   // Download and extract the release
   const extPath = await downloadUtil.downloadAndExtractTool(url);

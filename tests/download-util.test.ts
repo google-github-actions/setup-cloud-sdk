@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 
-/*
- * Tests download-util.
- */
-import * as chai from 'chai';
-import chaiAsPromised = require('chai-as-promised');
-
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+import 'mocha';
+import { expect } from 'chai';
 
 import * as fs from 'fs';
 import * as os from 'os';
@@ -33,7 +27,7 @@ const [toolDir, tempDir] = TestToolCache.override();
 // Import modules being tested after test setup as run.
 import * as downloadUtil from '../src/download-util';
 
-import { getReleaseURL } from '../src/format-url';
+import { buildReleaseURL } from '../src/format-url';
 
 describe('#downloadAndExtractTool', function () {
   beforeEach(async function () {
@@ -55,7 +49,8 @@ describe('#downloadAndExtractTool', function () {
       // https://github.com/actions/toolkit/issues/194
       this.skip();
     }
-    const url = await getReleaseURL('linux', 'x86_64', TEST_SDK_VERSION);
+
+    const url = buildReleaseURL('linux', 'x86_64', TEST_SDK_VERSION);
     const extPath = await downloadUtil.downloadAndExtractTool(url);
     expect(extPath).to.be;
     expect(fs.existsSync(extPath)).to.be.true;
@@ -64,7 +59,7 @@ describe('#downloadAndExtractTool', function () {
   it('downloads and extracts windows version', async function () {
     // Use an older version of the Windows release, as the current release is
     // 200MB+ and takes too long to download.
-    const url = await getReleaseURL('win32', 'x86_64', '0.9.83');
+    const url = buildReleaseURL('win32', 'x86_64', '0.9.83');
     const extPath = await downloadUtil.downloadAndExtractTool(url);
     expect(extPath).to.be;
     expect(fs.existsSync(extPath)).to.be.true;
@@ -75,7 +70,8 @@ describe('#downloadAndExtractTool', function () {
       // https://github.com/actions/toolkit/issues/194
       this.skip();
     }
-    const url = await getReleaseURL('darwin', 'x86_64', TEST_SDK_VERSION);
+
+    const url = buildReleaseURL('darwin', 'x86_64', TEST_SDK_VERSION);
     const extPath = await downloadUtil.downloadAndExtractTool(url);
     expect(extPath).to.be;
     expect(fs.existsSync(extPath)).to.be.true;
@@ -86,14 +82,20 @@ describe('#downloadAndExtractTool', function () {
       // https://github.com/actions/toolkit/issues/194
       this.skip();
     }
-    const url = await getReleaseURL('darwin', 'arm64', TEST_SDK_VERSION);
+
+    const url = buildReleaseURL('darwin', 'arm64', TEST_SDK_VERSION);
     const extPath = await downloadUtil.downloadAndExtractTool(url);
     expect(extPath).to.be;
     expect(fs.existsSync(extPath)).to.be.true;
   });
 
   it('errors on download not found', async function () {
-    const promise = downloadUtil.downloadAndExtractTool('fakeUrl');
-    expect(promise).to.eventually.be.rejectedWith('unable to find url');
+    try {
+      await downloadUtil.downloadAndExtractTool('fakeUrl');
+      throw new Error('expected exception to be throw');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : `${err}`;
+      expect(msg).to.include('Invalid URL: fakeUrl');
+    }
   });
 });
