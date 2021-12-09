@@ -266,10 +266,10 @@ describe('#setupCloudSDK', function () {
     const output = await setupCloudSDK.runCmdWithJsonFormat(
       'gcloud components list --filter Status=Installed',
     );
-    const found = output.find((component: { id: string }) => {
-      return component.id == expectedComponent;
+    const installedComponents = output.map((component: { id: string }) => {
+      return component.id;
     });
-    expect(found).to.not.equal(undefined);
+    expect(installedComponents).to.include(expectedComponent);
   });
 
   it('installs multiple components', async function () {
@@ -279,10 +279,10 @@ describe('#setupCloudSDK', function () {
     const output = await setupCloudSDK.runCmdWithJsonFormat(
       'gcloud components list --filter Status=Installed',
     );
-    const found = output.filter((component: { id: string }) => {
-      return expectedComponents.includes(component.id);
+    const installedComponents = output.map((component: { id: string }) => {
+      return component.id;
     });
-    expect(found.length > 0).to.equal(true);
+    expect(installedComponents).to.include.members(expectedComponents);
   });
 
   it('errors with bad components', async function () {

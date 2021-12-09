@@ -29,11 +29,9 @@
     "@actions/core": "^1.6.0",
     "@actions/exec": "^1.1.0",
     "@actions/tool-cache": "^1.7.1",
-    "@lifeomic/attempt": "^3.0.1",
-    "typed-rest-client": "^1.8.6"
+    "@lifeomic/attempt": "^3.0.1"
   },
   "devDependencies": {
-    "@types/chai-as-promised": "^7.1.4",
     "@types/chai": "^4.3.x",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.11.12",
@@ -41,7 +39,6 @@
     "@typescript-eslint/eslint-plugin": "^5.6.0",
     "@typescript-eslint/parser": "^5.6.0",
     "@vercel/ncc": "^0.33.0",
-    "chai-as-promised": "^7.1.1",
     "chai": "^4.3.x",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",

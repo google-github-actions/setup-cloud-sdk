@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-import * as httpm from 'typed-rest-client/HttpClient';
-import { retry } from '@lifeomic/attempt';
-
 // archMap is a mapping of how node detects an operating system to the
 // associated cloud sdk architecture value.
 const archMap: Record<string, string> = {
@@ -25,14 +22,15 @@ const archMap: Record<string, string> = {
 };
 
 /**
- * Formats the gcloud SDK release URL according to the specified arguments.
+ * buildReleaseURL builds the URL at which to dowbnload the gcloud SDK,
+ * according to the specified arguments.
  *
  * @param os The OS of the requested release.
  * @param arch The system architecture of the requested release.
  * @param version The version of the requested release.
  * @returns The formatted gcloud SDK release URL.
  */
-function formatReleaseURL(os: string, arch: string, version: string): string {
+export function buildReleaseURL(os: string, arch: string, version: string): string {
   // massage the arch to match gcloud sdk conventions
   if (archMap[arch]) {
     arch = archMap[arch];
@@ -53,40 +51,5 @@ function formatReleaseURL(os: string, arch: string, version: string): string {
       throw new Error(`Unexpected OS '${os}'`);
   }
 
-  return encodeURI(`https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${objectName}`);
-}
-
-/**
- * Creates the gcloud SDK release URL for the specified arguments, verifying
- * its existence.
- *
- * @param os The OS of the requested release.
- * @param arch The system architecture of the requested release.
- * @param version The version of the requested release.
- * @returns The verified gcloud SDK release URL.
- */
-export async function getReleaseURL(os: string, arch: string, version: string): Promise<string> {
-  try {
-    const url = formatReleaseURL(os, arch, version);
-    const client = new httpm.HttpClient('github-actions-setup-gcloud-sdk');
-    return retry(
-      async () => {
-        const res = await client.head(url);
-        if (res.message.statusCode === 200) {
-          return url;
-        } else {
-          throw new Error(`error code: ${res.message.statusCode}`);
-        }
-      },
-      {
-        delay: 200,
-        factor: 2,
-        maxAttempts: 4,
-      },
-    );
-  } catch (err) {
-    throw new Error(
-      `Error trying to get gcloud SDK release URL: os: ${os} arch: ${arch} version: ${version}, err: ${err}`,
-    );
-  }
+  return `https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${encodeURI(objectName)}`;
 }
