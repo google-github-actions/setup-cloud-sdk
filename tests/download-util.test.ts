@@ -30,6 +30,15 @@ import * as downloadUtil from '../src/download-util';
 import { buildReleaseURL } from '../src/format-url';
 
 describe('#downloadAndExtractTool', function () {
+  before(async function () {
+    // Minimize download failure retry times in tests:
+    //
+    //   https://github.com/actions/toolkit/blob/a1b068ec31a042ff1e10a522d8fdf0b8869d53ca/packages/tool-cache/src/tool-cache.ts#L51
+    const g = global as any;
+    g['TEST_DOWNLOAD_TOOL_RETRY_MIN_SECONDS'] = '0';
+    g['TEST_DOWNLOAD_TOOL_RETRY_MAX_SECONDS'] = '0';
+  });
+
   beforeEach(async function () {
     await io.rmRF(toolDir);
     await io.rmRF(tempDir);
@@ -42,6 +51,12 @@ describe('#downloadAndExtractTool', function () {
     } catch (err) {
       console.error('Error occurred during test cleanup: ' + err);
     }
+  });
+
+  after(async function () {
+    const g = global as any;
+    delete g['TEST_DOWNLOAD_TOOL_RETRY_MIN_SECONDS'];
+    delete g['TEST_DOWNLOAD_TOOL_RETRY_MAX_SECONDS'];
   });
 
   it('downloads and extracts linux version', async function () {

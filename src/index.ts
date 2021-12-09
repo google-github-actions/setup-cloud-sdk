@@ -309,7 +309,8 @@ export async function installComponent(component: string[] | string, silent = tr
   try {
     await exec.exec(toolCommand, cmd, options);
   } catch (err) {
-    throw new Error(`Unable to install component: ${component}`);
+    const msg = err instanceof Error ? err.message : `${err}`;
+    throw new Error(`Unable to install component "${component}": ${msg}`);
   }
 }
 
