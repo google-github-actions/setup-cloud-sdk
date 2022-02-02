@@ -16,17 +16,23 @@
 
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
+    "alwaysStrict": true,
     "declaration": true,
-    "lib": [
-      "es6"
-    ],
+    "esModuleInterop": true,
+    "lib": ["es6"],
+    "module": "commonjs",
+    "noImplicitAny": true,
     "outDir": "./dist",
     "rootDir": "./src",
+    "sourceMap": true,
     "strict": true,
-    "noImplicitAny": true,
-    "esModuleInterop": true
+    "target": "es6"
   },
-  "exclude": ["node_modules", "**/*.test.ts"]
+  "exclude": ["dist/**/*", "node_modules", "**/*.test.ts"],
+  "typedocOptions": {
+    "entryPoints": ["./src"],
+    "entryPointStrategy": "expand",
+    "gitRevision": "main",
+    "out": "./docs"
+  }
 }
