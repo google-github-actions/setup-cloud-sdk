@@ -123,7 +123,9 @@ describe.only('#setupCloudSDK', () => {
     });
 
     describe('#setProjectWithKey', () => {
-      it('sets the project', async () => {
+      it('sets the project', async function () {
+        if (!KEY) this.skip();
+
         const parsed = setupCloudSDK.parseServiceAccountKey(KEY);
 
         await setupCloudSDK.setProjectWithKey(KEY);
@@ -138,7 +140,9 @@ describe.only('#setupCloudSDK', () => {
         expect(isAuth).to.eql(false);
       });
 
-      it('returns true when authenticated', async () => {
+      it('returns true when authenticated', async function () {
+        if (!KEY) this.skip();
+
         await setupCloudSDK.authenticateGcloudSDK(KEY);
         const isAuth = await setupCloudSDK.isAuthenticated();
         expect(isAuth).to.eql(true);
@@ -146,7 +150,9 @@ describe.only('#setupCloudSDK', () => {
     });
 
     describe('#authenticateGcloudSDK', () => {
-      it('authenticates with a key', async () => {
+      it('authenticates with a key', async function () {
+        if (!KEY) this.skip();
+
         const parsed = setupCloudSDK.parseServiceAccountKey(KEY);
 
         await setupCloudSDK.authenticateGcloudSDK(KEY);
