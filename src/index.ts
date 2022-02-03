@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-import * as exec from '@actions/exec';
+import { getExecOutput } from '@actions/exec';
+import * as core from '@actions/core';
 import * as toolCache from '@actions/tool-cache';
 import * as os from 'os';
 import { buildReleaseURL } from './format-url';
 import * as downloadUtil from './download-util';
 import * as installUtil from './install-util';
 import { getLatestGcloudSDKVersion } from './version-util';
-import { ExecOptions } from '@actions/exec/lib/interfaces';
+import { ExecOptions as ActionsExecOptions } from '@actions/exec/lib/interfaces';
 import { promises as fs } from 'fs';
 
 export { getLatestGcloudSDKVersion };
@@ -58,30 +59,79 @@ export function getToolCommand(): string {
 }
 
 /**
+ * ExecOptions is a type alias to core/exec ExecOptions.
+ */
+export type ExecOptions = ActionsExecOptions;
+
+/**
+ * ExecOutput is the output returned from a gcloud exec.
+ */
+export type ExecOutput = {
+  stderr: string;
+  stdout: string;
+  output: string;
+};
+
+/**
+ * gcloudRun executes the given gcloud command using actions/exec under the
+ * hood. It handles non-zero exit codes and throws a more semantic error on
+ * failure.
+ *
+ * @param cmd The command to run.
+ * @param options Any options.
+ *
+ * @return ExecOutput
+ */
+export async function gcloudRun(cmd: string[], options?: ExecOptions): Promise<ExecOutput> {
+  const toolCommand = getToolCommand();
+  const opts = Object.assign({}, { silent: true, ignoreReturnCode: true }, options);
+  const commandString = `${toolCommand} ${cmd.join(' ')}`;
+  core.debug(`Running command: ${commandString}`);
+
+  const result = await getExecOutput(toolCommand, cmd, opts);
+  if (result.exitCode !== 0) {
+    const errMsg = result.stderr || `command exited ${result.exitCode}, but stderr had no output`;
+    throw new Error(`failed to execute command \`${commandString}\`: ${errMsg}`);
+  }
+
+  return {
+    stderr: result.stderr,
+    stdout: result.stdout,
+    output: result.stdout + '\n' + result.stderr,
+  };
+}
+
+/**
+ * gcloudRunJSON runs the gcloud command with JSON output and parses the result
+ * as JSON. If the parsing fails, it throws an error.
+ *
+ * @param cmd The command to run.
+ * @param options Any options.
+ *
+ * @return Parsed JSON as an object (or array).
+ */
+export async function gcloudRunJSON(cmd: string[], options?: ExecOptions): Promise<any> {
+  const jsonCmd = ['--format', 'json'].concat(cmd);
+  const output = await gcloudRun(jsonCmd, options);
+
+  try {
+    const parsed = JSON.parse(output.stdout);
+    return parsed;
+  } catch (err) {
+    throw new Error(
+      `failed to parse output as JSON: ${err}\n\nstdout:\n${output.stdout}\n\nstderr:\n${output.stderr}`,
+    );
+  }
+}
+
+/**
  * Checks if the project Id is set in the gcloud config.
  *
  * @returns true is project Id is set.
  */
-export async function isProjectIdSet(silent = true): Promise<boolean> {
-  let output = '';
-  const stdout = (data: Buffer): void => {
-    output += data.toString();
-  };
-  const stderr = (data: Buffer): void => {
-    output += data.toString();
-  };
-  const options = {
-    listeners: {
-      stdout,
-      stderr,
-    },
-    silent,
-  };
-
-  const toolCommand = getToolCommand();
-
-  await exec.exec(toolCommand, ['config', 'get-value', 'project'], options);
-  return !output.includes('unset');
+export async function isProjectIdSet(): Promise<boolean> {
+  const result = await gcloudRun(['config', 'get-value', 'project']);
+  return !result.output.includes('unset');
 }
 
 /**
@@ -89,26 +139,9 @@ export async function isProjectIdSet(silent = true): Promise<boolean> {
  *
  * @returns true is gcloud is authenticated.
  */
-export async function isAuthenticated(silent = true): Promise<boolean> {
-  let output = '';
-  const stdout = (data: Buffer): void => {
-    output += data.toString();
-  };
-  const stderr = (data: Buffer): void => {
-    output += data.toString();
-  };
-  const options = {
-    listeners: {
-      stdout,
-      stderr,
-    },
-    silent,
-  };
-
-  const toolCommand = getToolCommand();
-
-  await exec.exec(toolCommand, ['auth', 'list'], options);
-  return !output.includes('No credentialed accounts.');
+export async function isAuthenticated(): Promise<boolean> {
+  const result = await gcloudRun(['auth', 'list']);
+  return !result.output.includes('No credentialed accounts.');
 }
 
 /**
@@ -193,16 +226,11 @@ function isWIFCredFile(credFile: string): boolean {
  * param is supported for legacy Actions and will take precedence over GOOGLE_GHA_CREDS_PATH.
  *
  * @param serviceAccountKey - The service account key used for authentication.
- * @param silent - Skip writing output to sdout.
- * @returns exit code.
  */
-export async function authenticateGcloudSDK(
-  serviceAccountKey?: string,
-  silent = true,
-): Promise<number> {
+export async function authenticateGcloudSDK(serviceAccountKey?: string): Promise<void> {
   // Support legacy actions that pass in SA key
   if (serviceAccountKey) {
-    return authGcloudSAKey(serviceAccountKey, silent);
+    return authGcloudSAKey(serviceAccountKey);
   }
   // Check if GOOGLE_GHA_CREDS_PATH has been set by auth
   if (process.env.GOOGLE_GHA_CREDS_PATH) {
@@ -210,10 +238,11 @@ export async function authenticateGcloudSDK(
     const credFile = await fs.readFile(credFilePath, 'utf8');
     // Check if credential is a WIF creds file
     if (isWIFCredFile(credFile)) {
-      return authGcloudWIFCredsFile(credFilePath, silent);
+      return authGcloudWIFCredsFile(credFilePath);
     }
-    return authGcloudSAKey(credFile, silent);
+    return authGcloudSAKey(credFile);
   }
+
   // One of GOOGLE_GHA_CREDS_PATH or SA key is required
   throw new Error(
     'Error authenticating the Cloud SDK. Please use `google-github-actions/auth` to export credentials.',
@@ -227,20 +256,18 @@ export async function authenticateGcloudSDK(
  * @returns exit code.
  */
 
-async function authGcloudSAKey(serviceAccountKey: string, silent = true): Promise<number> {
+async function authGcloudSAKey(serviceAccountKey: string): Promise<void> {
   const serviceAccountJson = parseServiceAccountKey(serviceAccountKey);
   const serviceAccountEmail = serviceAccountJson.client_email;
 
-  const toolCommand = getToolCommand();
-  // Authenticate as the specified service account.
-  const options = {
+  // Pass the service account in via stdin
+  const opts = {
     input: Buffer.from(JSON.stringify(serviceAccountJson)),
-    silent,
   };
-  return await exec.exec(
-    toolCommand,
+
+  await gcloudRun(
     ['--quiet', 'auth', 'activate-service-account', serviceAccountEmail, '--key-file', '-'],
-    options as ExecOptions,
+    opts,
   );
 }
 
@@ -250,16 +277,8 @@ async function authGcloudSAKey(serviceAccountKey: string, silent = true): Promis
  * @param credsFile - The WIF credential configuration path.
  * @returns exit code.
  */
-async function authGcloudWIFCredsFile(credFilePath: string, silent = true): Promise<number> {
-  const toolCommand = getToolCommand();
-  const options = {
-    silent,
-  };
-  return await exec.exec(
-    toolCommand,
-    ['--quiet', 'auth', 'login', '--cred-file', credFilePath],
-    options as ExecOptions,
-  );
+async function authGcloudWIFCredsFile(credFilePath: string): Promise<void> {
+  await gcloudRun(['--quiet', 'auth', 'login', '--cred-file', credFilePath]);
 }
 
 /**
@@ -268,12 +287,8 @@ async function authGcloudWIFCredsFile(credFilePath: string, silent = true): Prom
  * @param serviceAccountKey - The service account key used for authentication.
  * @returns project ID.
  */
-export async function setProject(projectId: string, silent = true): Promise<number> {
-  const toolCommand = getToolCommand();
-  const options = {
-    silent,
-  };
-  return await exec.exec(toolCommand, ['--quiet', 'config', 'set', 'project', projectId], options);
+export async function setProject(projectId: string): Promise<void> {
+  await gcloudRun(['--quiet', 'config', 'set', 'project', projectId]);
 }
 
 /**
@@ -294,11 +309,7 @@ export async function setProjectWithKey(serviceAccountKey: string): Promise<stri
  * @param component - gcloud component group to install ie alpha, beta.
  * @returns CMD output
  */
-export async function installComponent(component: string[] | string, silent = true): Promise<void> {
-  const toolCommand = getToolCommand();
-  const options = {
-    silent,
-  };
+export async function installComponent(component: string[] | string): Promise<void> {
   let cmd = ['--quiet', 'components', 'install'];
   if (Array.isArray(component)) {
     cmd = cmd.concat(component);
@@ -306,33 +317,7 @@ export async function installComponent(component: string[] | string, silent = tr
     cmd.push(component);
   }
 
-  try {
-    await exec.exec(toolCommand, cmd, options);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : `${err}`;
-    throw new Error(`Unable to install component "${component}": ${msg}`);
-  }
-}
-
-/**
- * Run a gcloud command and return output as parsed JSON.
- *
- * @param cmd - the gcloud cmd to run.
- * @param silent - print output to console.
- * @returns CMD output
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function runCmdWithJsonFormat(cmd: string, silent = true): Promise<any> {
-  const options = {
-    silent,
-  };
-
-  const toolCommand = getToolCommand();
-  const formattedCmd = cmd.split(' ');
-  formattedCmd.push('--format', 'json');
-  formattedCmd.shift(); // Remove duplicate gcloud
-  const output = await exec.getExecOutput(toolCommand, formattedCmd, options);
-  return JSON.parse(output.stdout);
+  await gcloudRun(cmd);
 }
 
 interface ServiceAccountKey {
