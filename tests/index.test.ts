@@ -33,7 +33,6 @@ import {
 } from '../src/test-util';
 
 const KEY = process.env.KEY || '';
-const B64_KEY = process.env.B64_KEY || '';
 
 const [toolDir, tempDir] = TestToolCache.override();
 
@@ -286,12 +285,13 @@ describe.only('#setupCloudSDK', () => {
 
   describe('#parseServiceAccountKey', () => {
     it('parses json', () => {
-      const key = setupCloudSDK.parseServiceAccountKey(KEY);
+      const key = setupCloudSDK.parseServiceAccountKey(TEST_SA_KEY_CREDS_FILE);
       expect(key).to.be;
     });
 
     it('parses base64', () => {
-      const key = setupCloudSDK.parseServiceAccountKey(B64_KEY);
+      const b64Key = Buffer.from(TEST_SA_KEY_CREDS_FILE).toString('base64');
+      const key = setupCloudSDK.parseServiceAccountKey(b64Key);
       expect(key).to.be;
     });
 
