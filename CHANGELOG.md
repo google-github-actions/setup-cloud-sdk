@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/google-github-actions/setup-cloud-sdk/compare/v0.3.1...v0.4.0) (2022-02-03)
+
+
+### Features
+
+* add gcloudRun and use getExecOutput ([#77](https://github.com/google-github-actions/setup-cloud-sdk/issues/77)) ([3778ef8](https://github.com/google-github-actions/setup-cloud-sdk/commit/3778ef84102b620307c528ced79f0c5cbf11c71e))
+
 ### [0.3.1](https://www.github.com/google-github-actions/setup-cloud-sdk/compare/v0.3.0...v0.3.1) (2021-12-06)
 
 
