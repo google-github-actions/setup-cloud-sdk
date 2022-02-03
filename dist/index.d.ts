@@ -1,4 +1,5 @@
 import { getLatestGcloudSDKVersion } from './version-util';
+import { ExecOptions as ActionsExecOptions } from '@actions/exec/lib/interfaces';
 export { getLatestGcloudSDKVersion };
 /**
  * Checks if gcloud is installed.
@@ -14,17 +15,50 @@ export declare function isInstalled(version?: string): boolean;
  */
 export declare function getToolCommand(): string;
 /**
+ * ExecOptions is a type alias to core/exec ExecOptions.
+ */
+export declare type ExecOptions = ActionsExecOptions;
+/**
+ * ExecOutput is the output returned from a gcloud exec.
+ */
+export declare type ExecOutput = {
+    stderr: string;
+    stdout: string;
+    output: string;
+};
+/**
+ * gcloudRun executes the given gcloud command using actions/exec under the
+ * hood. It handles non-zero exit codes and throws a more semantic error on
+ * failure.
+ *
+ * @param cmd The command to run.
+ * @param options Any options.
+ *
+ * @return ExecOutput
+ */
+export declare function gcloudRun(cmd: string[], options?: ExecOptions): Promise<ExecOutput>;
+/**
+ * gcloudRunJSON runs the gcloud command with JSON output and parses the result
+ * as JSON. If the parsing fails, it throws an error.
+ *
+ * @param cmd The command to run.
+ * @param options Any options.
+ *
+ * @return Parsed JSON as an object (or array).
+ */
+export declare function gcloudRunJSON(cmd: string[], options?: ExecOptions): Promise<any>;
+/**
  * Checks if the project Id is set in the gcloud config.
  *
  * @returns true is project Id is set.
  */
-export declare function isProjectIdSet(silent?: boolean): Promise<boolean>;
+export declare function isProjectIdSet(): Promise<boolean>;
 /**
  * Checks if gcloud is authenticated.
  *
  * @returns true is gcloud is authenticated.
  */
-export declare function isAuthenticated(silent?: boolean): Promise<boolean>;
+export declare function isAuthenticated(): Promise<boolean>;
 /**
  * Installs the gcloud SDK into the actions environment.
  *
@@ -45,17 +79,15 @@ export declare function parseServiceAccountKey(serviceAccountKey: string): Servi
  * param is supported for legacy Actions and will take precedence over GOOGLE_GHA_CREDS_PATH.
  *
  * @param serviceAccountKey - The service account key used for authentication.
- * @param silent - Skip writing output to sdout.
- * @returns exit code.
  */
-export declare function authenticateGcloudSDK(serviceAccountKey?: string, silent?: boolean): Promise<number>;
+export declare function authenticateGcloudSDK(serviceAccountKey?: string): Promise<void>;
 /**
  * Sets the GCP Project Id in the gcloud config.
  *
  * @param serviceAccountKey - The service account key used for authentication.
  * @returns project ID.
  */
-export declare function setProject(projectId: string, silent?: boolean): Promise<number>;
+export declare function setProject(projectId: string): Promise<void>;
 /**
  * Sets the GCP Project Id in the gcloud config.
  *
@@ -69,15 +101,7 @@ export declare function setProjectWithKey(serviceAccountKey: string): Promise<st
  * @param component - gcloud component group to install ie alpha, beta.
  * @returns CMD output
  */
-export declare function installComponent(component: string[] | string, silent?: boolean): Promise<void>;
-/**
- * Run a gcloud command and return output as parsed JSON.
- *
- * @param cmd - the gcloud cmd to run.
- * @param silent - print output to console.
- * @returns CMD output
- */
-export declare function runCmdWithJsonFormat(cmd: string, silent?: boolean): Promise<any>;
+export declare function installComponent(component: string[] | string): Promise<void>;
 interface ServiceAccountKey {
     type: string;
     project_id: string;

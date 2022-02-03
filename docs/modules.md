@@ -4,9 +4,16 @@
 
 ## Table of contents
 
+### Type aliases
+
+- [ExecOptions](modules.md#execoptions)
+- [ExecOutput](modules.md#execoutput)
+
 ### Functions
 
 - [authenticateGcloudSDK](modules.md#authenticategcloudsdk)
+- [gcloudRun](modules.md#gcloudrun)
+- [gcloudRunJSON](modules.md#gcloudrunjson)
 - [getLatestGcloudSDKVersion](modules.md#getlatestgcloudsdkversion)
 - [getToolCommand](modules.md#gettoolcommand)
 - [installComponent](modules.md#installcomponent)
@@ -15,15 +22,46 @@
 - [isInstalled](modules.md#isinstalled)
 - [isProjectIdSet](modules.md#isprojectidset)
 - [parseServiceAccountKey](modules.md#parseserviceaccountkey)
-- [runCmdWithJsonFormat](modules.md#runcmdwithjsonformat)
 - [setProject](modules.md#setproject)
 - [setProjectWithKey](modules.md#setprojectwithkey)
+
+## Type aliases
+
+### ExecOptions
+
+Ƭ **ExecOptions**: `ActionsExecOptions`
+
+ExecOptions is a type alias to core/exec ExecOptions.
+
+#### Defined in
+
+[index.ts:64](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L64)
+
+___
+
+### ExecOutput
+
+Ƭ **ExecOutput**: `Object`
+
+ExecOutput is the output returned from a gcloud exec.
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `output` | `string` |
+| `stderr` | `string` |
+| `stdout` | `string` |
+
+#### Defined in
+
+[index.ts:69](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L69)
 
 ## Functions
 
 ### authenticateGcloudSDK
 
-▸ **authenticateGcloudSDK**(`serviceAccountKey?`, `silent?`): `Promise`<`number`\>
+▸ **authenticateGcloudSDK**(`serviceAccountKey?`): `Promise`<`void`\>
 
 Authenticates the gcloud tool using a service account key or WIF credential configuration
 discovered via GOOGLE_GHA_CREDS_PATH environment variable. An optional serviceAccountKey
@@ -31,26 +69,78 @@ param is supported for legacy Actions and will take precedence over GOOGLE_GHA_C
 
 #### Parameters
 
-| Name | Type | Default value | Description |
-| :------ | :------ | :------ | :------ |
-| `serviceAccountKey?` | `string` | `undefined` | The service account key used for authentication. |
-| `silent` | `boolean` | `true` | Skip writing output to sdout. |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `serviceAccountKey?` | `string` | The service account key used for authentication. |
 
 #### Returns
 
-`Promise`<`number`\>
-
-exit code.
+`Promise`<`void`\>
 
 #### Defined in
 
-[index.ts:201](https://github.com/google-github-actions/setup-cloud-sdk/blob/75f0480/src/index.ts#L201)
+[index.ts:230](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L230)
+
+___
+
+### gcloudRun
+
+▸ **gcloudRun**(`cmd`, `options?`): `Promise`<[`ExecOutput`](modules.md#execoutput)\>
+
+gcloudRun executes the given gcloud command using actions/exec under the
+hood. It handles non-zero exit codes and throws a more semantic error on
+failure.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cmd` | `string`[] | The command to run. |
+| `options?` | `ExecOptions` | Any options. |
+
+#### Returns
+
+`Promise`<[`ExecOutput`](modules.md#execoutput)\>
+
+ExecOutput
+
+#### Defined in
+
+[index.ts:85](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L85)
+
+___
+
+### gcloudRunJSON
+
+▸ **gcloudRunJSON**(`cmd`, `options?`): `Promise`<`any`\>
+
+gcloudRunJSON runs the gcloud command with JSON output and parses the result
+as JSON. If the parsing fails, it throws an error.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `cmd` | `string`[] | The command to run. |
+| `options?` | `ExecOptions` | Any options. |
+
+#### Returns
+
+`Promise`<`any`\>
+
+Parsed JSON as an object (or array).
+
+#### Defined in
+
+[index.ts:113](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L113)
 
 ___
 
 ### getLatestGcloudSDKVersion
 
 ▸ **getLatestGcloudSDKVersion**(): `Promise`<`string`\>
+
+getLatestGcloudSDKVersion fetches the latest version number from the API.
 
 #### Returns
 
@@ -60,7 +150,7 @@ The latest stable version of the gcloud SDK.
 
 #### Defined in
 
-[version-util.ts:27](https://github.com/google-github-actions/setup-cloud-sdk/blob/75f0480/src/version-util.ts#L27)
+[version-util.ts:36](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/version-util.ts#L36)
 
 ___
 
@@ -78,22 +168,21 @@ gcloud command.
 
 #### Defined in
 
-[index.ts:50](https://github.com/google-github-actions/setup-cloud-sdk/blob/75f0480/src/index.ts#L50)
+[index.ts:51](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L51)
 
 ___
 
 ### installComponent
 
-▸ **installComponent**(`component`, `silent?`): `Promise`<`void`\>
+▸ **installComponent**(`component`): `Promise`<`void`\>
 
 Install a Cloud SDK component.
 
 #### Parameters
 
-| Name | Type | Default value | Description |
-| :------ | :------ | :------ | :------ |
-| `component` | `string` \| `string`[] | `undefined` | gcloud component group to install ie alpha, beta. |
-| `silent` | `boolean` | `true` | - |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `component` | `string` \| `string`[] | gcloud component group to install ie alpha, beta. |
 
 #### Returns
 
@@ -103,7 +192,7 @@ CMD output
 
 #### Defined in
 
-[index.ts:321](https://github.com/google-github-actions/setup-cloud-sdk/blob/75f0480/src/index.ts#L321)
+[index.ts:312](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L312)
 
 ___
 
@@ -127,21 +216,15 @@ The path of the installed tool.
 
 #### Defined in
 
-[index.ts:120](https://github.com/google-github-actions/setup-cloud-sdk/blob/75f0480/src/index.ts#L120)
+[index.ts:153](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L153)
 
 ___
 
 ### isAuthenticated
 
-▸ **isAuthenticated**(`silent?`): `Promise`<`boolean`\>
+▸ **isAuthenticated**(): `Promise`<`boolean`\>
 
 Checks if gcloud is authenticated.
-
-#### Parameters
-
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `silent` | `boolean` | `true` |
 
 #### Returns
 
@@ -151,7 +234,7 @@ true is gcloud is authenticated.
 
 #### Defined in
 
-[index.ts:92](https://github.com/google-github-actions/setup-cloud-sdk/blob/75f0480/src/index.ts#L92)
+[index.ts:142](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L142)
 
 ___
 
@@ -175,21 +258,15 @@ true if gcloud is found in toolpath.
 
 #### Defined in
 
-[index.ts:35](https://github.com/google-github-actions/setup-cloud-sdk/blob/75f0480/src/index.ts#L35)
+[index.ts:36](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L36)
 
 ___
 
 ### isProjectIdSet
 
-▸ **isProjectIdSet**(`silent?`): `Promise`<`boolean`\>
+▸ **isProjectIdSet**(): `Promise`<`boolean`\>
 
 Checks if the project Id is set in the gcloud config.
-
-#### Parameters
-
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `silent` | `boolean` | `true` |
 
 #### Returns
 
@@ -199,7 +276,7 @@ true is project Id is set.
 
 #### Defined in
 
-[index.ts:65](https://github.com/google-github-actions/setup-cloud-sdk/blob/75f0480/src/index.ts#L65)
+[index.ts:132](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L132)
 
 ___
 
@@ -223,57 +300,31 @@ ServiceAccountKey as an object.
 
 #### Defined in
 
-[index.ts:142](https://github.com/google-github-actions/setup-cloud-sdk/blob/75f0480/src/index.ts#L142)
-
-___
-
-### runCmdWithJsonFormat
-
-▸ **runCmdWithJsonFormat**(`cmd`, `silent?`): `Promise`<`any`\>
-
-Run a gcloud command and return output as parsed JSON.
-
-#### Parameters
-
-| Name | Type | Default value | Description |
-| :------ | :------ | :------ | :------ |
-| `cmd` | `string` | `undefined` | the gcloud cmd to run. |
-| `silent` | `boolean` | `true` | print output to console. |
-
-#### Returns
-
-`Promise`<`any`\>
-
-CMD output
-
-#### Defined in
-
-[index.ts:350](https://github.com/google-github-actions/setup-cloud-sdk/blob/75f0480/src/index.ts#L350)
+[index.ts:175](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L175)
 
 ___
 
 ### setProject
 
-▸ **setProject**(`projectId`, `silent?`): `Promise`<`number`\>
+▸ **setProject**(`projectId`): `Promise`<`void`\>
 
 Sets the GCP Project Id in the gcloud config.
 
 #### Parameters
 
-| Name | Type | Default value |
-| :------ | :------ | :------ |
-| `projectId` | `string` | `undefined` |
-| `silent` | `boolean` | `true` |
+| Name | Type |
+| :------ | :------ |
+| `projectId` | `string` |
 
 #### Returns
 
-`Promise`<`number`\>
+`Promise`<`void`\>
 
 project ID.
 
 #### Defined in
 
-[index.ts:286](https://github.com/google-github-actions/setup-cloud-sdk/blob/75f0480/src/index.ts#L286)
+[index.ts:290](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L290)
 
 ___
 
@@ -297,4 +348,4 @@ project ID.
 
 #### Defined in
 
-[index.ts:307](https://github.com/google-github-actions/setup-cloud-sdk/blob/75f0480/src/index.ts#L307)
+[index.ts:300](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L300)
