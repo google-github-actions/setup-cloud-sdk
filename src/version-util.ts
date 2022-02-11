@@ -48,8 +48,10 @@ async function getGcloudVersion(url: string): Promise<string> {
   try {
     const http = new HttpClient(userAgentString, undefined, { allowRetries: true, maxRetries: 3 });
     const res = await http.getJson<{ version: string }>(url);
-    if (!res.result) {
-      throw new Error(`invalid response: ${res.statusCode}`);
+    if (!res.result || !res.result.version) {
+      throw new Error(
+        `invalid response - result: ${JSON.stringify(res.result)} statusCode: ${res.statusCode}`,
+      );
     }
     return res.result.version;
   } catch (err) {
