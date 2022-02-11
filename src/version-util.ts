@@ -19,6 +19,7 @@
  */
 
 import { HttpClient } from '@actions/http-client';
+import { errorMessage } from '@google-github-actions/actions-utils';
 
 import { userAgentString } from './user-agent-util';
 
@@ -52,6 +53,7 @@ async function getGcloudVersion(url: string): Promise<string> {
     }
     return res.result.version;
   } catch (err) {
-    throw new Error(`failed to retrieve gcloud SDK version from ${url}: ${err}`);
+    const msg = errorMessage(err);
+    throw new Error(`failed to retrieve gcloud SDK version from ${url}: ${msg}`);
   }
 }
