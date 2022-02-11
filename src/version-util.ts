@@ -18,8 +18,7 @@
  * Contains version utility functions.
  */
 
-import https from 'https';
-import { URL } from 'url';
+import * as httpm from '@actions/http-client';
 import { retry } from '@lifeomic/attempt';
 
 import { userAgentString } from './user-agent-util';
@@ -54,44 +53,13 @@ export async function getLatestGcloudSDKVersion(): Promise<string> {
  *
  */
 async function getGcloudVersion(url: string): Promise<string> {
-  const u = new URL(url);
+  const http = new httpm.HttpClient(userAgentString);
+  const res = await http.get(url);
+  if (res.message.statusCode && res.message.statusCode != 200) {
+    throw new Error(`Failed to retrieve gcloud SDK version, statusCode: ${res.message.statusCode}`);
+  }
 
-  const opts = {
-    hostname: u.hostname,
-    port: u.port,
-    path: u.pathname + u.search,
-    method: 'GET',
-    headers: {
-      'User-Agent': userAgentString,
-    },
-  };
-
-  const resp: string = await new Promise((resolve, reject) => {
-    const req = https.request(opts, (res) => {
-      res.setEncoding('utf8');
-
-      let body = '';
-      res.on('data', (data) => {
-        body += data;
-      });
-
-      res.on('end', () => {
-        if (res.statusCode && res.statusCode >= 400) {
-          reject(body);
-        } else {
-          resolve(body);
-        }
-      });
-    });
-
-    req.on('error', (err) => {
-      reject(err);
-    });
-
-    req.end();
-  });
-
-  const body = JSON.parse(resp);
+  const body = JSON.parse(await res.readBody());
   const version = body.version;
   if (!version) {
     throw new Error(`Failed to retrieve gcloud SDK version, invalid response body: ${body}`);
