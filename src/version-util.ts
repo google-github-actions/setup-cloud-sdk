@@ -43,11 +43,15 @@ export async function getLatestGcloudSDKVersion(): Promise<string> {
  * should be called without parameters.
  *
  */
-export async function getGcloudVersion(url: string): Promise<string> {
-  const http = new HttpClient(userAgentString, undefined, { allowRetries: true, maxRetries: 3 });
-  const res = await http.getJson<{ version: string }>(url);
-  if (!res.result) {
-    throw new Error(`Failed to retrieve gcloud SDK version from ${url}: ${res.statusCode}`);
+async function getGcloudVersion(url: string): Promise<string> {
+  try {
+    const http = new HttpClient(userAgentString, undefined, { allowRetries: true, maxRetries: 3 });
+    const res = await http.getJson<{ version: string }>(url);
+    if (!res.result) {
+      throw new Error(`invalid response: ${res.statusCode}`);
+    }
+    return res.result.version;
+  } catch (err) {
+    throw new Error(`failed to retrieve gcloud SDK version from ${url}: ${err}`);
   }
-  return res.result.version;
 }
