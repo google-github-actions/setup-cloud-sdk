@@ -18,8 +18,7 @@
  * Contains version utility functions.
  */
 
-import * as httpm from '@actions/http-client';
-import { retry } from '@lifeomic/attempt';
+import { HttpClient } from '@actions/http-client';
 
 import { userAgentString } from './user-agent-util';
 
@@ -33,15 +32,7 @@ const cloudSDKComponentsURL = 'https://dl.google.com/dl/cloudsdk/channels/rapid/
  * @returns The latest stable version of the gcloud SDK.
  */
 export async function getLatestGcloudSDKVersion(): Promise<string> {
-  const retryOpts = {
-    delay: 200,
-    factor: 2,
-    maxAttempts: 3,
-  };
-
-  return await retry(async () => {
-    return await getGcloudVersion(cloudSDKComponentsURL);
-  }, retryOpts);
+  return await getGcloudVersion(cloudSDKComponentsURL);
 }
 
 /**
@@ -52,17 +43,11 @@ export async function getLatestGcloudSDKVersion(): Promise<string> {
  * should be called without parameters.
  *
  */
-async function getGcloudVersion(url: string): Promise<string> {
-  const http = new httpm.HttpClient(userAgentString);
-  const res = await http.get(url);
-  if (res.message.statusCode && res.message.statusCode != 200) {
-    throw new Error(`Failed to retrieve gcloud SDK version, statusCode: ${res.message.statusCode}`);
+export async function getGcloudVersion(url: string): Promise<string> {
+  const http = new HttpClient(userAgentString, undefined, { allowRetries: true, maxRetries: 3 });
+  const res = await http.getJson<{ version: string }>(url);
+  if (!res.result) {
+    throw new Error(`Failed to retrieve gcloud SDK version from ${url}: ${res.statusCode}`);
   }
-
-  const body = JSON.parse(await res.readBody());
-  const version = body.version;
-  if (!version) {
-    throw new Error(`Failed to retrieve gcloud SDK version, invalid response body: ${body}`);
-  }
-  return version;
+  return res.result.version;
 }
