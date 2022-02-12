@@ -47,13 +47,19 @@ export async function getLatestGcloudSDKVersion(): Promise<string> {
 async function getGcloudVersion(url: string): Promise<string> {
   try {
     const http = new HttpClient(userAgentString, undefined, { allowRetries: true, maxRetries: 3 });
-    const res = await http.getJson<{ version: string }>(url);
-    if (!res.result || !res.result.version) {
-      throw new Error(
-        `invalid response - result: ${JSON.stringify(res.result)} statusCode: ${res.statusCode}`,
-      );
+    const res = await http.get(url);
+
+    const body = await res.readBody();
+    const statusCode = res.message.statusCode || 500;
+    if (statusCode >= 400) {
+      throw new Error(`(${statusCode}) ${body}`);
     }
-    return res.result.version;
+
+    const parsed = JSON.parse(body) as { version: string };
+    if (!parsed.version) {
+      throw new Error(`invalid response - ${body}`);
+    }
+    return parsed.version;
   } catch (err) {
     const msg = errorMessage(err);
     throw new Error(`failed to retrieve gcloud SDK version from ${url}: ${msg}`);
