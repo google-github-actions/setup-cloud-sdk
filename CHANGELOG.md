@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.5.0](https://www.github.com/google-github-actions/setup-cloud-sdk/compare/v0.4.0...v0.5.0) (2022-02-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop support for node 12 and old operating systems (#88)
+
+### Features
+
+* switch to using actions/http-client ([#94](https://www.github.com/google-github-actions/setup-cloud-sdk/issues/94)) ([f15cbfb](https://www.github.com/google-github-actions/setup-cloud-sdk/commit/f15cbfb9aaf926ebf7c9869dd701e09d021c82c8))
+
+
+### Miscellaneous Chores
+
+* drop support for node 12 and old operating systems ([#88](https://www.github.com/google-github-actions/setup-cloud-sdk/issues/88)) ([ca75faf](https://www.github.com/google-github-actions/setup-cloud-sdk/commit/ca75faf4f650a0455ae0622a5fa9dd4a7f30d85d))
+
 ## [0.4.0](https://www.github.com/google-github-actions/setup-cloud-sdk/compare/v0.3.1...v0.4.0) (2022-02-03)
 
 
