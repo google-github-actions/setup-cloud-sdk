@@ -150,7 +150,7 @@ The latest stable version of the gcloud SDK.
 
 #### Defined in
 
-[version-util.ts:36](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/version-util.ts#L36)
+[version-util.ts:35](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/version-util.ts#L35)
 
 ___
 

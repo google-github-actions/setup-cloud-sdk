@@ -18,9 +18,8 @@
  * Contains version utility functions.
  */
 
-import https from 'https';
-import { URL } from 'url';
-import { retry } from '@lifeomic/attempt';
+import { HttpClient } from '@actions/http-client';
+import { errorMessage } from '@google-github-actions/actions-utils';
 
 import { userAgentString } from './user-agent-util';
 
@@ -34,15 +33,7 @@ const cloudSDKComponentsURL = 'https://dl.google.com/dl/cloudsdk/channels/rapid/
  * @returns The latest stable version of the gcloud SDK.
  */
 export async function getLatestGcloudSDKVersion(): Promise<string> {
-  const retryOpts = {
-    delay: 200,
-    factor: 2,
-    maxAttempts: 3,
-  };
-
-  return await retry(async () => {
-    return await getGcloudVersion(cloudSDKComponentsURL);
-  }, retryOpts);
+  return await getGcloudVersion(cloudSDKComponentsURL);
 }
 
 /**
@@ -54,47 +45,23 @@ export async function getLatestGcloudSDKVersion(): Promise<string> {
  *
  */
 async function getGcloudVersion(url: string): Promise<string> {
-  const u = new URL(url);
+  try {
+    const http = new HttpClient(userAgentString, undefined, { allowRetries: true, maxRetries: 3 });
+    const res = await http.get(url);
 
-  const opts = {
-    hostname: u.hostname,
-    port: u.port,
-    path: u.pathname + u.search,
-    method: 'GET',
-    headers: {
-      'User-Agent': userAgentString,
-    },
-  };
+    const body = await res.readBody();
+    const statusCode = res.message.statusCode || 500;
+    if (statusCode >= 400) {
+      throw new Error(`(${statusCode}) ${body}`);
+    }
 
-  const resp: string = await new Promise((resolve, reject) => {
-    const req = https.request(opts, (res) => {
-      res.setEncoding('utf8');
-
-      let body = '';
-      res.on('data', (data) => {
-        body += data;
-      });
-
-      res.on('end', () => {
-        if (res.statusCode && res.statusCode >= 400) {
-          reject(body);
-        } else {
-          resolve(body);
-        }
-      });
-    });
-
-    req.on('error', (err) => {
-      reject(err);
-    });
-
-    req.end();
-  });
-
-  const body = JSON.parse(resp);
-  const version = body.version;
-  if (!version) {
-    throw new Error(`Failed to retrieve gcloud SDK version, invalid response body: ${body}`);
+    const parsed = JSON.parse(body) as { version: string };
+    if (!parsed.version) {
+      throw new Error(`invalid response - ${body}`);
+    }
+    return parsed.version;
+  } catch (err) {
+    const msg = errorMessage(err);
+    throw new Error(`failed to retrieve gcloud SDK version from ${url}: ${msg}`);
   }
-  return version;
 }
