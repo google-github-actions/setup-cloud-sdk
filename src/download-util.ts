@@ -19,6 +19,8 @@
  */
 import * as toolCache from '@actions/tool-cache';
 
+import { userAgentString } from './user-agent-util';
+
 /**
  * Downloads and extracts the tool at the specified URL.
  *
@@ -26,7 +28,9 @@ import * as toolCache from '@actions/tool-cache';
  * @returns The path to the locally extracted tool.
  */
 export async function downloadAndExtractTool(url: string): Promise<string> {
-  const downloadPath = await toolCache.downloadTool(url);
+  const downloadPath = await toolCache.downloadTool(url, undefined, undefined, {
+    'User-Agent': userAgentString,
+  });
   let extractedPath: string;
   if (url.indexOf('.zip') != -1) {
     extractedPath = await toolCache.extractZip(downloadPath);
