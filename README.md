@@ -3,7 +3,7 @@
 Setup Cloud SDK for GitHub Actions API client for Node.js
 
 A comprehensive list of changes in each version may be found in
-[the CHANGELOG](https://github.com/google-github-actions/setup-cloud-sdk/blob/master/CHANGELOG.md).
+[the CHANGELOG](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/CHANGELOG.md).
 
 * [Client API Reference](./docs/modules.md)
 
