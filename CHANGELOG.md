@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://www.github.com/google-github-actions/setup-cloud-sdk/compare/v0.5.0...v0.6.0) (2022-06-21)
+
+
+### Features
+
+* set user-agent when downloading SDK ([#108](https://www.github.com/google-github-actions/setup-cloud-sdk/issues/108)) ([0298c54](https://www.github.com/google-github-actions/setup-cloud-sdk/commit/0298c54ee06afb48d2b383d58b801d8205921a8f))
+
 ## [0.5.0](https://www.github.com/google-github-actions/setup-cloud-sdk/compare/v0.4.0...v0.5.0) (2022-02-14)
 
 
