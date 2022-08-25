@@ -4,7 +4,7 @@
 
 ## Table of contents
 
-### Type aliases
+### Type Aliases
 
 - [ExecOptions](modules.md#execoptions)
 - [ExecOutput](modules.md#execoutput)
@@ -25,7 +25,7 @@
 - [setProject](modules.md#setproject)
 - [setProjectWithKey](modules.md#setprojectwithkey)
 
-## Type aliases
+## Type Aliases
 
 ### ExecOptions
 
