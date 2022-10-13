@@ -26,7 +26,7 @@
   "author": "Google LLC",
   "license": "Apache-2.0",
   "dependencies": {
-    "@actions/core": "^1.9.1",
+    "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.1",
     "@actions/http-client": "^2.0.1",
     "@actions/tool-cache": "^2.0.1",
@@ -34,22 +34,22 @@
   },
   "devDependencies": {
     "@types/chai": "^4.3.x",
-    "@types/mocha": "^9.1.1",
-    "@types/node": "^18.7.13",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^18.8.5",
     "@types/sinon": "^10.0.13",
-    "@typescript-eslint/eslint-plugin": "^5.34.0",
-    "@typescript-eslint/parser": "^5.34.0",
+    "@typescript-eslint/eslint-plugin": "^5.40.0",
+    "@typescript-eslint/parser": "^5.40.0",
     "@vercel/ncc": "^0.34.0",
     "chai": "^4.3.x",
-    "eslint": "^8.22.0",
+    "eslint": "^8.25.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
     "mocha": "^10.0.0",
     "prettier": "^2.7.1",
-    "sinon": "^14.0.0",
+    "sinon": "^14.0.1",
     "ts-node": "^10.9.1",
-    "typedoc": "^0.23.10",
-    "typedoc-plugin-markdown": "^3.13.4",
-    "typescript": "^4.7.4"
+    "typedoc": "^0.23.16",
+    "typedoc-plugin-markdown": "^3.13.6",
+    "typescript": "^4.8.4"
   }
 }
