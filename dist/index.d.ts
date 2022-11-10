@@ -67,20 +67,11 @@ export declare function isAuthenticated(): Promise<boolean>;
  */
 export declare function installGcloudSDK(version: string): Promise<void>;
 /**
- * Parses the service account string into JSON.
+ * Authenticates the gcloud tool using the provided credentials file.
  *
- * @param serviceAccountKey - The service account key used for authentication.
- * @returns ServiceAccountKey as an object.
+ * @param filepath - Path to the credentials file.
  */
-export declare function parseServiceAccountKey(serviceAccountKey: string): ServiceAccountKey;
-/**
- * Authenticates the gcloud tool using a service account key or WIF credential configuration
- * discovered via GOOGLE_GHA_CREDS_PATH environment variable. An optional serviceAccountKey
- * param is supported for legacy Actions and will take precedence over GOOGLE_GHA_CREDS_PATH.
- *
- * @param serviceAccountKey - The service account key used for authentication.
- */
-export declare function authenticateGcloudSDK(serviceAccountKey?: string): Promise<void>;
+export declare function authenticateGcloudSDK(filepath: string): Promise<void>;
 /**
  * Sets the GCP Project Id in the gcloud config.
  *
@@ -89,28 +80,9 @@ export declare function authenticateGcloudSDK(serviceAccountKey?: string): Promi
  */
 export declare function setProject(projectId: string): Promise<void>;
 /**
- * Sets the GCP Project Id in the gcloud config.
- *
- * @param serviceAccountKey - The service account key used for authentication.
- * @returns project ID.
- */
-export declare function setProjectWithKey(serviceAccountKey: string): Promise<string>;
-/**
  * Install a Cloud SDK component.
  *
  * @param component - gcloud component group to install ie alpha, beta.
  * @returns CMD output
  */
 export declare function installComponent(component: string[] | string): Promise<void>;
-interface ServiceAccountKey {
-    type: string;
-    project_id: string;
-    project_key_id: string;
-    private_key: string;
-    client_email: string;
-    client_id: string;
-    auth_uri: string;
-    token_uri: string;
-    auth_provider_x509_cert_url: string;
-    client_x509_cert_url: string;
-}

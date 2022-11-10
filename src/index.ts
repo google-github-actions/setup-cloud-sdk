@@ -23,7 +23,6 @@ import * as downloadUtil from './download-util';
 import * as installUtil from './install-util';
 import { getLatestGcloudSDKVersion } from './version-util';
 import { ExecOptions as ActionsExecOptions } from '@actions/exec/lib/interfaces';
-import { promises as fs } from 'fs';
 
 export { getLatestGcloudSDKVersion };
 
@@ -167,118 +166,12 @@ export async function installGcloudSDK(version: string): Promise<void> {
 }
 
 /**
- * Parses the service account string into JSON.
+ * Authenticates the gcloud tool using the provided credentials file.
  *
- * @param serviceAccountKey - The service account key used for authentication.
- * @returns ServiceAccountKey as an object.
+ * @param filepath - Path to the credentials file.
  */
-export function parseServiceAccountKey(serviceAccountKey: string): ServiceAccountKey {
-  let serviceAccount = serviceAccountKey;
-  // Handle base64-encoded credentials
-  if (!serviceAccountKey.trim().startsWith('{')) {
-    serviceAccount = Buffer.from(serviceAccountKey, 'base64').toString('utf8');
-  }
-  try {
-    return JSON.parse(serviceAccount);
-  } catch (error) {
-    const keyFormat = `
-    {
-      "type": "service_account",
-      "project_id": "project-id",
-      "private_key_id": "key-id",
-      "private_key": "-----BEGIN PRIVATE KEY-----\\nprivate-key\\n-----END PRIVATE KEY-----\\n",
-      "client_email": "service-account-email",
-      "client_id": "client-id",
-      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-      "token_uri": "https://accounts.google.com/o/oauth2/token",
-      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service-account-email"
-    }
-    `;
-    const errMsg = error instanceof Error ? error.message : error;
-    const message =
-      'Error parsing credentials: ' +
-      errMsg +
-      '\nEnsure your credentials are base64 encoded or validate JSON format: ' +
-      keyFormat;
-    throw new Error(message);
-  }
-}
-
-/**
- * Check if a given credential is WIF credential configuration.
- *
- * @param credFile - The  WIF credential configuration.
- * @returns boolean.
- */
-function isWIFCredFile(credFile: string): boolean {
-  try {
-    const creds = JSON.parse(credFile);
-    return 'type' in creds && creds.type == 'external_account';
-  } catch (err) {
-    throw new SyntaxError(`Failed to parse credentials as JSON: ${err}`);
-  }
-}
-
-/**
- * Authenticates the gcloud tool using a service account key or WIF credential configuration
- * discovered via GOOGLE_GHA_CREDS_PATH environment variable. An optional serviceAccountKey
- * param is supported for legacy Actions and will take precedence over GOOGLE_GHA_CREDS_PATH.
- *
- * @param serviceAccountKey - The service account key used for authentication.
- */
-export async function authenticateGcloudSDK(serviceAccountKey?: string): Promise<void> {
-  // Support legacy actions that pass in SA key
-  if (serviceAccountKey) {
-    return authGcloudSAKey(serviceAccountKey);
-  }
-  // Check if GOOGLE_GHA_CREDS_PATH has been set by auth
-  if (process.env.GOOGLE_GHA_CREDS_PATH) {
-    const credFilePath = process.env.GOOGLE_GHA_CREDS_PATH;
-    const credFile = await fs.readFile(credFilePath, 'utf8');
-    // Check if credential is a WIF creds file
-    if (isWIFCredFile(credFile)) {
-      return authGcloudWIFCredsFile(credFilePath);
-    }
-    return authGcloudSAKey(credFile);
-  }
-
-  // One of GOOGLE_GHA_CREDS_PATH or SA key is required
-  throw new Error(
-    'Error authenticating the Cloud SDK. Please use `google-github-actions/auth` to export credentials.',
-  );
-}
-
-/**
- * Authenticates the gcloud tool using a service account key.
- *
- * @param serviceAccountKey - The service account key used for authentication.
- * @returns exit code.
- */
-
-async function authGcloudSAKey(serviceAccountKey: string): Promise<void> {
-  const serviceAccountJson = parseServiceAccountKey(serviceAccountKey);
-  const serviceAccountEmail = serviceAccountJson.client_email;
-
-  // Pass the service account in via stdin
-  const opts = {
-    input: Buffer.from(JSON.stringify(serviceAccountJson)),
-  };
-
-  await gcloudRun(
-    ['--quiet', 'auth', 'activate-service-account', serviceAccountEmail, '--key-file', '-'],
-    opts,
-  );
-}
-
-/**
- * Authenticates the gcloud tool using WIF credential configuration.
- *
- * @param credsFile - The WIF credential configuration path.
- * @returns exit code.
- */
-async function authGcloudWIFCredsFile(credFilePath: string): Promise<void> {
-  await gcloudRun(['--quiet', 'auth', 'login', '--cred-file', credFilePath]);
+export async function authenticateGcloudSDK(filepath: string): Promise<void> {
+  await gcloudRun(['--quiet', 'auth', 'login', '--force', '--cred-file', filepath]);
 }
 
 /**
@@ -289,18 +182,6 @@ async function authGcloudWIFCredsFile(credFilePath: string): Promise<void> {
  */
 export async function setProject(projectId: string): Promise<void> {
   await gcloudRun(['--quiet', 'config', 'set', 'project', projectId]);
-}
-
-/**
- * Sets the GCP Project Id in the gcloud config.
- *
- * @param serviceAccountKey - The service account key used for authentication.
- * @returns project ID.
- */
-export async function setProjectWithKey(serviceAccountKey: string): Promise<string> {
-  const serviceAccountJson = parseServiceAccountKey(serviceAccountKey);
-  await setProject(serviceAccountJson.project_id);
-  return serviceAccountJson.project_id;
 }
 
 /**
@@ -318,17 +199,4 @@ export async function installComponent(component: string[] | string): Promise<vo
   }
 
   await gcloudRun(cmd);
-}
-
-interface ServiceAccountKey {
-  type: string;
-  project_id: string;
-  project_key_id: string;
-  private_key: string;
-  client_email: string;
-  client_id: string;
-  auth_uri: string;
-  token_uri: string;
-  auth_provider_x509_cert_url: string;
-  client_x509_cert_url: string;
 }
