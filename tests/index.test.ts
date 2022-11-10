@@ -28,7 +28,6 @@ import {
   TestToolCache,
   writeTmpFile,
   TEST_TMP_FILES_DIR,
-  TEST_SA_KEY_CREDS_FILE,
   TEST_WIF_CREDS_FILE,
 } from '../src/test-util';
 
@@ -121,18 +120,6 @@ describe.only('#setupCloudSDK', () => {
       });
     });
 
-    describe('#setProjectWithKey', () => {
-      it('sets the project', async function () {
-        if (!KEY) this.skip();
-
-        const parsed = setupCloudSDK.parseServiceAccountKey(KEY);
-
-        await setupCloudSDK.setProjectWithKey(KEY);
-        const output = await setupCloudSDK.gcloudRunJSON(['config', 'get-value', 'core/project']);
-        expect(output).to.eql(parsed.project_id);
-      });
-    });
-
     describe('#isAuthenticated', () => {
       it('returns false when not authenticated', async () => {
         const isAuth = await setupCloudSDK.isAuthenticated();
@@ -142,93 +129,52 @@ describe.only('#setupCloudSDK', () => {
       it('returns true when authenticated', async function () {
         if (!KEY) this.skip();
 
-        await setupCloudSDK.authenticateGcloudSDK(KEY);
+        const credFile = await writeTmpFile(KEY);
+        await setupCloudSDK.authenticateGcloudSDK(credFile);
         const isAuth = await setupCloudSDK.isAuthenticated();
         expect(isAuth).to.eql(true);
       });
     });
 
     describe('#authenticateGcloudSDK', () => {
-      it('authenticates with a key', async function () {
+      it('runs correct authentication command for SAKE', async function () {
         if (!KEY) this.skip();
 
-        const parsed = setupCloudSDK.parseServiceAccountKey(KEY);
-
-        await setupCloudSDK.authenticateGcloudSDK(KEY);
-        const auth = await setupCloudSDK.gcloudRunJSON(['auth', 'list']);
-
-        const { account } = auth.find((entry: { status: string }) => {
-          return entry.status == 'ACTIVE';
-        });
-
-        // Assert the email address is the active account
-        expect(account).to.eql(parsed.client_email);
-      });
-
-      it('runs correct command for WIF Creds via GOOGLE_GHA_CREDS_PATH', async function () {
-        const credFileFixture = await writeTmpFile(TEST_WIF_CREDS_FILE);
-        process.env.GOOGLE_GHA_CREDS_PATH = credFileFixture;
+        const credFile = await writeTmpFile(KEY);
         const execStub = sinon
           .stub(exec, 'getExecOutput')
           .resolves({ exitCode: 0, stdout: '', stderr: '' });
 
-        await setupCloudSDK.authenticateGcloudSDK();
+        await setupCloudSDK.authenticateGcloudSDK(credFile);
 
         expect(execStub.args[0][1]).eql([
           '--quiet',
           'auth',
           'login',
+          '--force',
           '--cred-file',
-          credFileFixture,
+          credFile,
         ]);
       });
 
-      it('runs correct command for SA Key Creds via GOOGLE_GHA_CREDS_PATH', async function () {
-        const credFileFixture = await writeTmpFile(TEST_SA_KEY_CREDS_FILE);
-        process.env.GOOGLE_GHA_CREDS_PATH = credFileFixture;
+      it('runs correct authentication command for WIF', async function () {
+        if (!TEST_WIF_CREDS_FILE) this.skip();
+
+        const credFile = await writeTmpFile(TEST_WIF_CREDS_FILE);
         const execStub = sinon
           .stub(exec, 'getExecOutput')
           .resolves({ exitCode: 0, stdout: '', stderr: '' });
 
-        await setupCloudSDK.authenticateGcloudSDK();
+        await setupCloudSDK.authenticateGcloudSDK(credFile);
 
         expect(execStub.args[0][1]).eql([
           '--quiet',
           'auth',
-          'activate-service-account',
-          'my-service-account@my-project.iam.gserviceaccount.com',
-          '--key-file',
-          '-',
+          'login',
+          '--force',
+          '--cred-file',
+          credFile,
         ]);
-
-        // correct SA key passed via stdin
-        expect(execStub.args[0][2]?.input).eql(
-          Buffer.from(JSON.stringify(JSON.parse(TEST_SA_KEY_CREDS_FILE))),
-        );
-      });
-
-      it('throws an error if GOOGLE_GHA_CREDS_PATH is invalid', async function () {
-        process.env.GOOGLE_GHA_CREDS_PATH = 'invalid';
-
-        try {
-          await setupCloudSDK.authenticateGcloudSDK();
-          throw new Error('expected error');
-        } catch (err) {
-          const message = err instanceof Error ? err.message : err;
-          expect(message).to.include('no such file or directory');
-        }
-      });
-
-      it('throws an error if GOOGLE_GHA_CREDS_PATH is not set and SA key is not provided', async function () {
-        try {
-          await setupCloudSDK.authenticateGcloudSDK();
-          throw new Error('expected error');
-        } catch (err) {
-          const message = err instanceof Error ? err.message : err;
-          expect(message).to.include(
-            'Please use `google-github-actions/auth` to export credentials.',
-          );
-        }
       });
     });
 
@@ -280,27 +226,6 @@ describe.only('#setupCloudSDK', () => {
       sinon.stub(process, 'platform').value('darwin');
       const cmd = setupCloudSDK.getToolCommand();
       expect(cmd).to.eql('gcloud');
-    });
-  });
-
-  describe('#parseServiceAccountKey', () => {
-    it('parses json', () => {
-      const key = setupCloudSDK.parseServiceAccountKey(TEST_SA_KEY_CREDS_FILE);
-      expect(key).to.be;
-    });
-
-    it('parses base64', () => {
-      const b64Key = Buffer.from(TEST_SA_KEY_CREDS_FILE).toString('base64');
-      const key = setupCloudSDK.parseServiceAccountKey(b64Key);
-      expect(key).to.be;
-    });
-
-    it('errors with bad key', () => {
-      try {
-        setupCloudSDK.parseServiceAccountKey('{}');
-      } catch (err) {
-        expect(err).include('parsing credentials');
-      }
     });
   });
 });
