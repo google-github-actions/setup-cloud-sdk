@@ -19,10 +19,8 @@ import { expect } from 'chai';
 
 import * as fs from 'fs';
 import * as os from 'os';
-import * as io from '@actions/io';
 
 import { TestToolCache, TEST_SDK_VERSION } from '../src/test-util';
-const [toolDir, tempDir] = TestToolCache.override();
 
 // Import modules being tested after test setup as run.
 import * as downloadUtil from '../src/download-util';
@@ -34,27 +32,21 @@ describe('#downloadAndExtractTool', function () {
     // Minimize download failure retry times in tests:
     //
     //   https://github.com/actions/toolkit/blob/a1b068ec31a042ff1e10a522d8fdf0b8869d53ca/packages/tool-cache/src/tool-cache.ts#L51
-    const g = global as any;
+    const g = global as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     g['TEST_DOWNLOAD_TOOL_RETRY_MIN_SECONDS'] = '0';
     g['TEST_DOWNLOAD_TOOL_RETRY_MAX_SECONDS'] = '0';
   });
 
   beforeEach(async function () {
-    await io.rmRF(toolDir);
-    await io.rmRF(tempDir);
+    await TestToolCache.start();
   });
 
   afterEach(async function () {
-    try {
-      await io.rmRF(toolDir);
-      await io.rmRF(tempDir);
-    } catch (err) {
-      console.error('Error occurred during test cleanup: ' + err);
-    }
+    await TestToolCache.stop();
   });
 
   after(async function () {
-    const g = global as any;
+    const g = global as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     delete g['TEST_DOWNLOAD_TOOL_RETRY_MIN_SECONDS'];
     delete g['TEST_DOWNLOAD_TOOL_RETRY_MAX_SECONDS'];
   });
@@ -110,7 +102,7 @@ describe('#downloadAndExtractTool', function () {
       throw new Error('expected exception to be throw');
     } catch (err) {
       const msg = err instanceof Error ? err.message : `${err}`;
-      expect(msg).to.include('Invalid URL: fakeUrl');
+      expect(msg).to.include('Invalid URL');
     }
   });
 });

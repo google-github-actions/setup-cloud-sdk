@@ -14,41 +14,47 @@
  * limitations under the License.
  */
 
-import * as setupCloudSDK from '../src/index';
-import * as exec from '@actions/exec';
+import 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import * as io from '@actions/io';
 
 import * as path from 'path';
 import { promises as fs } from 'fs';
 import * as os from 'os';
 
-import {
-  TestToolCache,
-  writeTmpFile,
-  TEST_TMP_FILES_DIR,
-  TEST_WIF_CREDS_FILE,
-} from '../src/test-util';
+import * as core from '@actions/core';
+import * as exec from '@actions/exec';
+import * as io from '@actions/io';
+import { randomFilename, writeSecureFile } from '@google-github-actions/actions-utils';
+
+import * as setupCloudSDK from '../src/index';
+
+import { TestToolCache, TEST_WIF_CREDS_FILE } from '../src/test-util';
 
 const KEY = process.env.KEY || '';
 
-const [toolDir, tempDir] = TestToolCache.override();
-
-describe.only('#setupCloudSDK', () => {
-  before(async () => {
-    await io.rmRF(toolDir);
-    await io.rmRF(tempDir);
-    await io.rmRF(TEST_TMP_FILES_DIR);
+describe('#setupCloudSDK', () => {
+  beforeEach(async () => {
+    sinon.stub(core, 'debug').callsFake(sinon.fake());
+    sinon.stub(core, 'endGroup').callsFake(sinon.fake());
+    sinon.stub(core, 'info').callsFake(sinon.fake());
+    sinon.stub(core, 'startGroup').callsFake(sinon.fake());
+    sinon.stub(core, 'warning').callsFake(sinon.fake());
   });
 
-  after(async () => {
-    await io.rmRF(toolDir);
-    await io.rmRF(tempDir);
-    await io.rmRF(TEST_TMP_FILES_DIR);
+  afterEach(async () => {
+    sinon.restore();
   });
 
   describe('when the SDK is not installed', () => {
+    before(async () => {
+      await TestToolCache.start();
+    });
+
+    after(async () => {
+      await TestToolCache.stop();
+    });
+
     describe('#isInstalled', () => {
       it('returns false', async () => {
         const isInstalled = setupCloudSDK.isInstalled();
@@ -64,6 +70,8 @@ describe.only('#setupCloudSDK', () => {
 
   describe('when the SDK is installed', () => {
     before(async () => {
+      await TestToolCache.start();
+
       const version = await setupCloudSDK.getLatestGcloudSDKVersion();
       await setupCloudSDK.installGcloudSDK(version);
     });
@@ -85,6 +93,10 @@ describe.only('#setupCloudSDK', () => {
       const dir = process.env.CLOUDSDK_CONFIG;
       delete process.env.CLOUDSDK_CONFIG;
       if (dir) await io.rmRF(dir);
+    });
+
+    after(async () => {
+      await TestToolCache.stop();
     });
 
     describe('#isInstalled', () => {
@@ -129,7 +141,10 @@ describe.only('#setupCloudSDK', () => {
       it('returns true when authenticated', async function () {
         if (!KEY) this.skip();
 
-        const credFile = await writeTmpFile(KEY);
+        const credFile = await writeSecureFile(
+          path.join(TestToolCache.tempDir, randomFilename()),
+          KEY,
+        );
         await setupCloudSDK.authenticateGcloudSDK(credFile);
         const isAuth = await setupCloudSDK.isAuthenticated();
         expect(isAuth).to.eql(true);
@@ -140,7 +155,10 @@ describe.only('#setupCloudSDK', () => {
       it('runs correct authentication command for SAKE', async function () {
         if (!KEY) this.skip();
 
-        const credFile = await writeTmpFile(KEY);
+        const credFile = await writeSecureFile(
+          path.join(TestToolCache.tempDir, randomFilename()),
+          KEY,
+        );
         const execStub = sinon
           .stub(exec, 'getExecOutput')
           .resolves({ exitCode: 0, stdout: '', stderr: '' });
@@ -160,7 +178,10 @@ describe.only('#setupCloudSDK', () => {
       it('runs correct authentication command for WIF', async function () {
         if (!TEST_WIF_CREDS_FILE) this.skip();
 
-        const credFile = await writeTmpFile(TEST_WIF_CREDS_FILE);
+        const credFile = await writeSecureFile(
+          path.join(TestToolCache.tempDir, randomFilename()),
+          TEST_WIF_CREDS_FILE,
+        );
         const execStub = sinon
           .stub(exec, 'getExecOutput')
           .resolves({ exitCode: 0, stdout: '', stderr: '' });
@@ -180,7 +201,7 @@ describe.only('#setupCloudSDK', () => {
 
     describe('#installComponent', () => {
       it('installs multiple components', async () => {
-        const expectedComponents = ['alpha', 'gsutil'];
+        const expectedComponents = ['gcloud-crc32c', 'package-go-module'];
         await setupCloudSDK.installComponent(expectedComponents);
         const output = await setupCloudSDK.gcloudRunJSON([
           'components',
@@ -206,10 +227,6 @@ describe.only('#setupCloudSDK', () => {
   });
 
   describe('#getToolCommand', () => {
-    afterEach(() => {
-      sinon.restore();
-    });
-
     it('returns gcloud.cmd on windows', () => {
       sinon.stub(process, 'platform').value('win32');
       const cmd = setupCloudSDK.getToolCommand();
@@ -226,6 +243,15 @@ describe.only('#setupCloudSDK', () => {
       sinon.stub(process, 'platform').value('darwin');
       const cmd = setupCloudSDK.getToolCommand();
       expect(cmd).to.eql('gcloud');
+    });
+  });
+
+  describe('#getLatestGcloudSDKVersion', () => {
+    it('retrieves the latest version', async () => {
+      const semVerPattern = /^[0-9]+\.[0-9]+\.[0-9]+$/;
+      const result = await setupCloudSDK.getLatestGcloudSDKVersion();
+      expect(result).to.be;
+      expect(result).to.match(semVerPattern);
     });
   });
 });

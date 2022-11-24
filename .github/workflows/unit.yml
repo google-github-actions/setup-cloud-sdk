@@ -1,4 +1,4 @@
-name: 'unit'
+name: 'Unit'
 
 on:
   push:
@@ -14,9 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  run:
-    name: 'unit'
-    runs-on: '${{ matrix.os }}'
+  unit:
     strategy:
       fail-fast: false
       matrix:
@@ -27,10 +25,12 @@ jobs:
         - 'macos-latest'
         node:
         - '16.x'
-    steps:
-    - uses: 'actions/checkout@v2'
+    runs-on: '${{ matrix.os }}'
 
-    - uses: 'actions/setup-node@v2'
+    steps:
+    - uses: 'actions/checkout@v3'
+
+    - uses: 'actions/setup-node@v3'
       with:
         node-version: '${{ matrix.node }}'
 

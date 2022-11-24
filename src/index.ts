@@ -14,17 +14,28 @@
  * limitations under the License.
  */
 
+import * as path from 'path';
+import * as os from 'os';
+
+import { ExecOptions as ActionsExecOptions } from '@actions/exec/lib/interfaces';
 import { getExecOutput } from '@actions/exec';
+import { HttpClient } from '@actions/http-client';
 import * as core from '@actions/core';
 import * as toolCache from '@actions/tool-cache';
-import * as os from 'os';
-import { buildReleaseURL } from './format-url';
-import * as downloadUtil from './download-util';
-import * as installUtil from './install-util';
-import { getLatestGcloudSDKVersion } from './version-util';
-import { ExecOptions as ActionsExecOptions } from '@actions/exec/lib/interfaces';
+import { errorMessage } from '@google-github-actions/actions-utils';
 
-export { getLatestGcloudSDKVersion };
+import { buildReleaseURL } from './format-url';
+import { downloadAndExtractTool } from './download-util';
+
+// Do not listen to the linter - this can NOT be rewritten as an ES6 import statement.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { version: appVersion } = require('../package.json');
+
+/**
+ * userAgentString is the UA to use for this installation. It dynamically pulls
+ * the app version from the package declaration.
+ */
+export const userAgentString = `google-github-actions:setup-cloud-sdk/${appVersion}`;
 
 /**
  * Checks if gcloud is installed.
@@ -109,6 +120,7 @@ export async function gcloudRun(cmd: string[], options?: ExecOptions): Promise<E
  *
  * @return Parsed JSON as an object (or array).
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function gcloudRunJSON(cmd: string[], options?: ExecOptions): Promise<any> {
   const jsonCmd = ['--format', 'json'].concat(cmd);
   const output = await gcloudRun(jsonCmd, options);
@@ -149,20 +161,24 @@ export async function isAuthenticated(): Promise<boolean> {
  * @param version - The version being installed.
  * @returns The path of the installed tool.
  */
-export async function installGcloudSDK(version: string): Promise<void> {
+export async function installGcloudSDK(version: string): Promise<string> {
   // Retrieve the release corresponding to the specified version and OS
   const osPlat = os.platform();
   const osArch = os.arch();
   const url = buildReleaseURL(osPlat, osArch, version);
 
   // Download and extract the release
-  const extPath = await downloadUtil.downloadAndExtractTool(url);
+  const extPath = await downloadAndExtractTool(url);
   if (!extPath) {
     throw new Error(`Failed to download release, url: ${url}`);
   }
 
   // Install the downloaded release into the github action env
-  await installUtil.installGcloudSDK(version, extPath);
+  const toolRoot = path.join(extPath, 'google-cloud-sdk');
+  let toolPath = await toolCache.cacheDir(toolRoot, 'gcloud', version);
+  toolPath = path.join(toolPath, 'bin');
+  core.addPath(toolPath);
+  return toolPath;
 }
 
 /**
@@ -200,3 +216,34 @@ export async function installComponent(component: string[] | string): Promise<vo
 
   await gcloudRun(cmd);
 }
+
+/**
+ * getLatestGcloudSDKVersion fetches the latest version number from the API.
+ *
+ * @returns The latest stable version of the gcloud SDK.
+ */
+export async function getLatestGcloudSDKVersion(): Promise<string> {
+  const url = 'https://dl.google.com/dl/cloudsdk/channels/rapid/components-2.json';
+
+  try {
+    const http = new HttpClient(userAgentString, undefined, { allowRetries: true, maxRetries: 3 });
+    const res = await http.get(url);
+
+    const body = await res.readBody();
+    const statusCode = res.message.statusCode || 500;
+    if (statusCode >= 400) {
+      throw new Error(`(${statusCode}) ${body}`);
+    }
+
+    const parsed = JSON.parse(body) as { version: string };
+    if (!parsed.version) {
+      throw new Error(`invalid response - ${body}`);
+    }
+    return parsed.version;
+  } catch (err) {
+    const msg = errorMessage(err);
+    throw new Error(`failed to retrieve gcloud SDK version from ${url}: ${msg}`);
+  }
+}
+
+export * from './test-util';
