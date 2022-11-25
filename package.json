@@ -2,13 +2,14 @@
   "name": "@google-github-actions/setup-cloud-sdk",
   "version": "1.0.0",
   "description": "Utilities to download, install and interact with the Cloud SDK for GitHub Actions",
+  "module": "dist/index.js",
   "main": "dist/index.js",
   "types": "dist/index.d.js",
   "scripts": {
-    "build": "ncc -m build src/index.ts",
-    "lint": "eslint src/ tests/ --ext .ts,.tsx",
-    "format": "prettier --write src/*.ts tests/*.ts",
-    "docs": "typedoc --out docs src/index.ts",
+    "build": "rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write **/*.ts",
+    "docs": "rm -rf docs/ && typedoc",
     "test": "mocha -r ts-node/register -t 600s 'tests/*.ts' --exit"
   },
   "files": [

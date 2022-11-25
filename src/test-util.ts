@@ -18,9 +18,9 @@
  * A collection of utility functions for testing.
  */
 import * as path from 'path';
-import * as os from 'os';
-import * as crypto from 'crypto';
-import { promises as fs } from 'fs';
+import * as fs from 'fs/promises';
+
+import { forceRemove, randomFilename } from '@google-github-actions/actions-utils';
 
 /**
  * Creates an overridden runner cache and tool path. This is slightly
@@ -29,55 +29,41 @@ import { promises as fs } from 'fs';
  * used.
  */
 export class TestToolCache {
-  private static paths: [string, string];
+  public static rootDir: string;
+  public static toolsDir: string;
+  public static tempDir: string;
+
+  static #originalToolsDir?: string;
+  static #originalTempDir?: string;
 
   /**
-   * Creates temporary directories for the runner cache and temp, and configures
-   * the Action's runner to use said directories.
-   *
-   * @returns two strings - first is overridden toolsPath, second is tempPath.
+   * Creates temporary directories for the runner cache and temp.
    */
-  public static override(): [string, string] {
-    if (this.paths?.length > 0) {
-      return this.paths;
-    }
+  public static async start() {
+    this.rootDir = path.join(__dirname, 'runner', randomFilename());
 
-    const rootPath = path.join(__dirname, 'runner', this.randomStr());
+    this.toolsDir = path.join(this.rootDir, 'tools');
+    await fs.mkdir(this.toolsDir, { recursive: true });
+    process.env.RUNNER_TOOL_CACHE = this.toolsDir;
 
-    const toolsPath = path.join(rootPath, 'tools');
-    process.env.RUNNER_TOOL_CACHE = toolsPath;
+    this.tempDir = path.join(this.rootDir, 'temp');
+    await fs.mkdir(this.tempDir, { recursive: true });
+    process.env.RUNNER_TEMP = this.toolsDir;
 
-    const tempPath = path.join(rootPath, 'temp');
-    process.env.RUNNER_TEMP = tempPath;
-
-    this.paths = [toolsPath, tempPath];
-    return this.paths;
+    this.#originalToolsDir = process.env.RUNNER_TOOL_CACHE;
+    this.#originalTempDir = process.env.RUNNER_TEMP;
   }
 
-  private static randomStr(): string {
-    return Math.random().toString(36).substring(8);
+  /**
+   * Restores the Action's runner to use the original directories and deletes
+   * the temporary files.
+   **/
+  public static async stop() {
+    process.env.RUNNER_TOOL_CACHE = this.#originalToolsDir;
+    process.env.RUNNER_TEMP = this.#originalTempDir;
+
+    await forceRemove(this.rootDir);
   }
-}
-
-export const TEST_TMP_FILES_DIR = path.join(os.tmpdir(), 'test-setupcloudsdk');
-
-/**
- * Helper to write test data to disk.
- */
-export async function writeTmpFile(data: string): Promise<string> {
-  const tmpDir = await fs.mkdtemp(TEST_TMP_FILES_DIR);
-  // Generate a random filename to store the data. 12 bytes is 24
-  // characters in hex. It's not the ideal entropy, but we have to be under
-  // the 255 character limit for Windows filenames (which includes their
-  // entire leading path).
-  const uniqueName = crypto.randomBytes(12).toString('hex');
-  const pth = path.join(tmpDir, uniqueName);
-
-  // Write the file as 0640 so the owner has RW, group as R, and the file is
-  // otherwise unreadable. Also write with EXCL to prevent a symlink attack.
-  await fs.writeFile(pth, data, { mode: 0o640, flag: 'wx' });
-
-  return pth;
 }
 
 /**

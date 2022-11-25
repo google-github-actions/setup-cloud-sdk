@@ -1,6 +1,9 @@
-import { getLatestGcloudSDKVersion } from './version-util';
 import { ExecOptions as ActionsExecOptions } from '@actions/exec/lib/interfaces';
-export { getLatestGcloudSDKVersion };
+/**
+ * userAgentString is the UA to use for this installation. It dynamically pulls
+ * the app version from the package declaration.
+ */
+export declare const userAgentString: string;
 /**
  * Checks if gcloud is installed.
  *
@@ -65,7 +68,7 @@ export declare function isAuthenticated(): Promise<boolean>;
  * @param version - The version being installed.
  * @returns The path of the installed tool.
  */
-export declare function installGcloudSDK(version: string): Promise<void>;
+export declare function installGcloudSDK(version: string): Promise<string>;
 /**
  * Authenticates the gcloud tool using the provided credentials file.
  *
@@ -86,3 +89,10 @@ export declare function setProject(projectId: string): Promise<void>;
  * @returns CMD output
  */
 export declare function installComponent(component: string[] | string): Promise<void>;
+/**
+ * getLatestGcloudSDKVersion fetches the latest version number from the API.
+ *
+ * @returns The latest stable version of the gcloud SDK.
+ */
+export declare function getLatestGcloudSDKVersion(): Promise<string>;
+export * from './test-util';

@@ -19,7 +19,7 @@
  */
 import * as toolCache from '@actions/tool-cache';
 
-import { userAgentString } from './user-agent-util';
+import { userAgentString } from './index';
 
 /**
  * Downloads and extracts the tool at the specified URL.

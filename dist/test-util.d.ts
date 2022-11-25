@@ -5,21 +5,20 @@
  * used.
  */
 export declare class TestToolCache {
-    private static paths;
+    #private;
+    static rootDir: string;
+    static toolsDir: string;
+    static tempDir: string;
     /**
-     * Creates temporary directories for the runner cache and temp, and configures
-     * the Action's runner to use said directories.
-     *
-     * @returns two strings - first is overridden toolsPath, second is tempPath.
+     * Creates temporary directories for the runner cache and temp.
      */
-    static override(): [string, string];
-    private static randomStr;
+    static start(): Promise<void>;
+    /**
+     * Restores the Action's runner to use the original directories and deletes
+     * the temporary files.
+     **/
+    static stop(): Promise<void>;
 }
-export declare const TEST_TMP_FILES_DIR: string;
-/**
- * Helper to write test data to disk.
- */
-export declare function writeTmpFile(data: string): Promise<string>;
 /**
  * The version of the gcloud SDK being tested against.
  */
