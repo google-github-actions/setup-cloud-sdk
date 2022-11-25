@@ -1,6 +1,6 @@
 {
   "name": "@google-github-actions/setup-cloud-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Utilities to download, install and interact with the Cloud SDK for GitHub Actions",
   "module": "dist/index.js",
   "main": "dist/index.js",
@@ -36,21 +36,21 @@
   "devDependencies": {
     "@types/chai": "^4.3.x",
     "@types/mocha": "^10.0.0",
-    "@types/node": "^18.8.5",
+    "@types/node": "^18.11.9",
     "@types/sinon": "^10.0.13",
-    "@typescript-eslint/eslint-plugin": "^5.40.0",
-    "@typescript-eslint/parser": "^5.40.0",
+    "@typescript-eslint/eslint-plugin": "^5.44.0",
+    "@typescript-eslint/parser": "^5.44.0",
     "@vercel/ncc": "^0.34.0",
     "chai": "^4.3.x",
-    "eslint": "^8.25.0",
+    "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "mocha": "^10.0.0",
-    "prettier": "^2.7.1",
-    "sinon": "^14.0.1",
+    "mocha": "^10.1.0",
+    "prettier": "^2.8.0",
+    "sinon": "^14.0.2",
     "ts-node": "^10.9.1",
-    "typedoc": "^0.23.16",
+    "typedoc": "^0.23.21",
     "typedoc-plugin-markdown": "^3.13.6",
-    "typescript": "^4.8.4"
+    "typescript": "^4.9.3"
   }
 }
