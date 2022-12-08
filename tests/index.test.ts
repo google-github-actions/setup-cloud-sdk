@@ -31,7 +31,7 @@ import * as setupCloudSDK from '../src/index';
 
 import { TestToolCache, TEST_WIF_CREDS_FILE } from '../src/test-util';
 
-const KEY = process.env.KEY || '';
+const SERVICE_ACCOUNT_KEY_JSON = process.env.SERVICE_ACCOUNT_KEY_JSON || '';
 
 describe('#setupCloudSDK', () => {
   beforeEach(async () => {
@@ -139,11 +139,11 @@ describe('#setupCloudSDK', () => {
       });
 
       it('returns true when authenticated', async function () {
-        if (!KEY) this.skip();
+        if (!SERVICE_ACCOUNT_KEY_JSON) this.skip();
 
         const credFile = await writeSecureFile(
           path.join(TestToolCache.tempDir, randomFilename()),
-          KEY,
+          SERVICE_ACCOUNT_KEY_JSON,
         );
         await setupCloudSDK.authenticateGcloudSDK(credFile);
         const isAuth = await setupCloudSDK.isAuthenticated();
@@ -153,11 +153,11 @@ describe('#setupCloudSDK', () => {
 
     describe('#authenticateGcloudSDK', () => {
       it('runs correct authentication command for SAKE', async function () {
-        if (!KEY) this.skip();
+        if (!SERVICE_ACCOUNT_KEY_JSON) this.skip();
 
         const credFile = await writeSecureFile(
           path.join(TestToolCache.tempDir, randomFilename()),
-          KEY,
+          SERVICE_ACCOUNT_KEY_JSON,
         );
         const execStub = sinon
           .stub(exec, 'getExecOutput')

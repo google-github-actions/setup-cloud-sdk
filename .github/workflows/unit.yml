@@ -45,7 +45,5 @@ jobs:
 
     - name: 'npm test'
       env:
-        KEY: '${{ secrets.SETUP_SDK_CRED_SA_KEY_JSON }}'
-        B64_KEY: '${{ secrets.SETUP_SDK_CRED_SA_KEY_B64 }}'
-        PROJECT_ID: '${{ secrets.SETUP_SDK_CRED_PROJECT_ID }}'
+        SERVICE_ACCOUNT_KEY_JSON: '${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}'
       run: 'npm run test'
