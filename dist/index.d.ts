@@ -20,11 +20,11 @@ export declare function getToolCommand(): string;
 /**
  * ExecOptions is a type alias to core/exec ExecOptions.
  */
-export declare type ExecOptions = ActionsExecOptions;
+export type ExecOptions = ActionsExecOptions;
 /**
  * ExecOutput is the output returned from a gcloud exec.
  */
-export declare type ExecOutput = {
+export type ExecOutput = {
     stderr: string;
     stdout: string;
     output: string;
