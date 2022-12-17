@@ -70,6 +70,24 @@ export declare function isAuthenticated(): Promise<boolean>;
  */
 export declare function installGcloudSDK(version: string): Promise<string>;
 /**
+ * computeGcloudVersion computes the appropriate gcloud version for the given
+ * string. If the string is the empty string or the special value "latest", it
+ * returns the latest known version of the Google Cloud SDK. Otherwise it
+ * returns the provided string. It does not validate that the string is a valid
+ * version.
+ *
+ * This is most useful when accepting user input which should default to
+ * "latest" or the empty string when you want the latest version to be
+ * installed, but still want users to be able to choose a specific version to
+ * install as a customization.
+ *
+ * @param version String (or undefined) version. The empty string or other
+ * falsey values will return the latest gcloud version.
+ *
+ * @return String representing the latest version.
+ */
+export declare function computeGcloudVersion(version?: string): Promise<string>;
+/**
  * Authenticates the gcloud tool using the provided credentials file.
  *
  * @param filepath - Path to the credentials file.

@@ -24,6 +24,7 @@
 ### Functions
 
 - [authenticateGcloudSDK](index.md#authenticategcloudsdk)
+- [computeGcloudVersion](index.md#computegcloudversion)
 - [gcloudRun](index.md#gcloudrun)
 - [gcloudRunJSON](index.md#gcloudrunjson)
 - [getLatestGcloudSDKVersion](index.md#getlatestgcloudsdkversion)
@@ -130,7 +131,40 @@ Authenticates the gcloud tool using the provided credentials file.
 
 #### Defined in
 
-[index.ts:189](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L189)
+[index.ts:214](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L214)
+
+___
+
+### computeGcloudVersion
+
+▸ **computeGcloudVersion**(`version?`): `Promise`<`string`\>
+
+computeGcloudVersion computes the appropriate gcloud version for the given
+string. If the string is the empty string or the special value "latest", it
+returns the latest known version of the Google Cloud SDK. Otherwise it
+returns the provided string. It does not validate that the string is a valid
+version.
+
+This is most useful when accepting user input which should default to
+"latest" or the empty string when you want the latest version to be
+installed, but still want users to be able to choose a specific version to
+install as a customization.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `version?` | `string` | String (or undefined) version. The empty string or other falsey values will return the latest gcloud version. |
+
+#### Returns
+
+`Promise`<`string`\>
+
+String representing the latest version.
+
+#### Defined in
+
+[index.ts:201](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L201)
 
 ___
 
@@ -201,7 +235,7 @@ The latest stable version of the gcloud SDK.
 
 #### Defined in
 
-[index.ts:225](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L225)
+[index.ts:250](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L250)
 
 ___
 
@@ -243,7 +277,7 @@ CMD output
 
 #### Defined in
 
-[index.ts:209](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L209)
+[index.ts:234](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L234)
 
 ___
 
@@ -351,4 +385,4 @@ project ID.
 
 #### Defined in
 
-[index.ts:199](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L199)
+[index.ts:224](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L224)

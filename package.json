@@ -31,25 +31,25 @@
     "@actions/exec": "^1.1.1",
     "@actions/http-client": "^2.0.1",
     "@actions/tool-cache": "^2.0.1",
-    "@google-github-actions/actions-utils": "^0.4.4"
+    "@google-github-actions/actions-utils": "^0.4.6"
   },
   "devDependencies": {
     "@types/chai": "^4.3.x",
     "@types/mocha": "^10.0.1",
-    "@types/node": "^18.11.12",
+    "@types/node": "^18.11.17",
     "@types/sinon": "^10.0.13",
-    "@typescript-eslint/eslint-plugin": "^5.46.0",
-    "@typescript-eslint/parser": "^5.46.0",
+    "@typescript-eslint/eslint-plugin": "^5.46.1",
+    "@typescript-eslint/parser": "^5.46.1",
     "@vercel/ncc": "^0.36.0",
     "chai": "^4.3.x",
-    "eslint": "^8.29.0",
+    "eslint": "^8.30.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "mocha": "^10.1.0",
+    "mocha": "^10.2.0",
     "prettier": "^2.8.1",
-    "sinon": "^15.0.0",
+    "sinon": "^15.0.1",
     "ts-node": "^10.9.1",
-    "typedoc": "^0.23.21",
+    "typedoc": "^0.23.22",
     "typedoc-plugin-markdown": "^3.14.0",
     "typescript": "^4.9.4"
   }
