@@ -24,6 +24,7 @@ import * as os from 'os';
 
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
+import { HttpClient } from '@actions/http-client';
 import * as io from '@actions/io';
 import { randomFilename, writeSecureFile } from '@google-github-actions/actions-utils';
 
@@ -222,6 +223,68 @@ describe('#setupCloudSDK', () => {
           const message = err instanceof Error ? err.message : err;
           expect(message).include('failed to execute command');
         }
+      });
+    });
+  });
+
+  describe('#computeGcloudVersion', () => {
+    beforeEach(async () => {
+      sinon.stub(HttpClient.prototype, 'get').resolves({
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore - There are many, many other fields (50+). Instead of
+        // stubbing them all, ignore the TypeScript property errors and only
+        // define the specific ones we need.
+        message: {
+          statusCode: 200,
+        },
+        readBody: async (): Promise<string> => {
+          return `{"version":"1.2.3"}`;
+        },
+      });
+    });
+
+    afterEach(async () => {
+      sinon.restore();
+    });
+
+    const cases: {
+      only?: boolean;
+      name: string;
+      input: string | undefined;
+      expected?: string;
+    }[] = [
+      {
+        name: 'empty string',
+        input: '',
+        expected: '1.2.3',
+      },
+      {
+        name: 'padded string',
+        input: '   ',
+        expected: '1.2.3',
+      },
+      {
+        name: 'latest',
+        input: 'latest',
+        expected: '1.2.3',
+      },
+      {
+        name: 'custom',
+        input: '5.6.7',
+        expected: '5.6.7',
+      },
+      {
+        name: 'custom padded',
+        input: ' 5.6.7  ',
+        expected: '5.6.7',
+      },
+    ];
+
+    cases.forEach((tc) => {
+      const fn = tc.only ? it.only : it;
+      fn(tc.name, async () => {
+        const version = await setupCloudSDK.computeGcloudVersion(tc.input);
+        expect(version).to.eql(tc.expected);
       });
     });
   });

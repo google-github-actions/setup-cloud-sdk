@@ -4262,6 +4262,67 @@ exports.fromBase64 = fromBase64;
 
 /***/ }),
 
+/***/ 1996:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.stubEnv = void 0;
+/**
+ * stubEnv accepts an input dictionary and sets the provided environment
+ * variables in the current process environment. Values set to "undefined" are
+ * deleted from the environment.
+ *
+ * The function is only safe for concurrent use if the target is safe for
+ * concurrent use. The function itself provides no locking.
+ *
+ * @param input Map of string value pairs to set in the new environment.
+ * @param target Target map to set and restore (defaults to `process.env`).
+ *
+ * @return Function that restores the environment.
+ */
+function stubEnv(input, target = process.env) {
+    const restore = {};
+    for (const name in input) {
+        restore[name] = target[name];
+        if (input[name] !== undefined) {
+            target[name] = input[name];
+        }
+        else {
+            delete target[name];
+        }
+    }
+    return () => {
+        for (const name in restore) {
+            if (restore[name] !== undefined) {
+                target[name] = restore[name];
+            }
+            else {
+                delete target[name];
+            }
+        }
+    };
+}
+exports.stubEnv = stubEnv;
+
+
+/***/ }),
+
 /***/ 6976:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -4747,10 +4808,12 @@ __exportStar(__nccwpck_require2_(3497), exports);
 __exportStar(__nccwpck_require2_(1848), exports);
 __exportStar(__nccwpck_require2_(7962), exports);
 __exportStar(__nccwpck_require2_(3102), exports);
+__exportStar(__nccwpck_require2_(1996), exports);
 __exportStar(__nccwpck_require2_(6976), exports);
 __exportStar(__nccwpck_require2_(3252), exports);
 __exportStar(__nccwpck_require2_(9219), exports);
 __exportStar(__nccwpck_require2_(546), exports);
+__exportStar(__nccwpck_require2_(6747), exports);
 __exportStar(__nccwpck_require2_(575), exports);
 __exportStar(__nccwpck_require2_(9497), exports);
 __exportStar(__nccwpck_require2_(5737), exports);
@@ -4760,6 +4823,51 @@ __exportStar(__nccwpck_require2_(9017), exports);
 __exportStar(__nccwpck_require2_(7575), exports);
 __exportStar(__nccwpck_require2_(596), exports);
 __exportStar(__nccwpck_require2_(9324), exports);
+
+
+/***/ }),
+
+/***/ 6747:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/*
+ * Copyright 2022 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.parseBoolean = void 0;
+const truths = {
+    '1': true,
+    't': true,
+    'T': true,
+    'true': true,
+    'True': true,
+    'TRUE': true,
+};
+/**
+ * parseBoolean converts a string into a boolean. Unparseable or invalid values
+ * return false.
+ *
+ * @param input The value to check
+ * @return boolean
+ */
+function parseBoolean(input) {
+    const trimmed = (input || '').trim();
+    return !!truths[trimmed];
+}
+exports.parseBoolean = parseBoolean;
 
 
 /***/ }),
@@ -16609,7 +16717,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getLatestGcloudSDKVersion = exports.installComponent = exports.setProject = exports.authenticateGcloudSDK = exports.installGcloudSDK = exports.isAuthenticated = exports.isProjectIdSet = exports.gcloudRunJSON = exports.gcloudRun = exports.getToolCommand = exports.isInstalled = exports.userAgentString = void 0;
+exports.getLatestGcloudSDKVersion = exports.installComponent = exports.setProject = exports.authenticateGcloudSDK = exports.computeGcloudVersion = exports.installGcloudSDK = exports.isAuthenticated = exports.isProjectIdSet = exports.gcloudRunJSON = exports.gcloudRun = exports.getToolCommand = exports.isInstalled = exports.userAgentString = void 0;
 const path = __importStar(__nccwpck_require__(1017));
 const os = __importStar(__nccwpck_require__(2037));
 const exec_1 = __nccwpck_require__(1514);
@@ -16761,6 +16869,33 @@ function installGcloudSDK(version) {
     });
 }
 exports.installGcloudSDK = installGcloudSDK;
+/**
+ * computeGcloudVersion computes the appropriate gcloud version for the given
+ * string. If the string is the empty string or the special value "latest", it
+ * returns the latest known version of the Google Cloud SDK. Otherwise it
+ * returns the provided string. It does not validate that the string is a valid
+ * version.
+ *
+ * This is most useful when accepting user input which should default to
+ * "latest" or the empty string when you want the latest version to be
+ * installed, but still want users to be able to choose a specific version to
+ * install as a customization.
+ *
+ * @param version String (or undefined) version. The empty string or other
+ * falsey values will return the latest gcloud version.
+ *
+ * @return String representing the latest version.
+ */
+function computeGcloudVersion(version) {
+    return __awaiter(this, void 0, void 0, function* () {
+        version = (version || '').trim();
+        if (version === '' || version === 'latest') {
+            return yield getLatestGcloudSDKVersion();
+        }
+        return version;
+    });
+}
+exports.computeGcloudVersion = computeGcloudVersion;
 /**
  * Authenticates the gcloud tool using the provided credentials file.
  *
@@ -17130,7 +17265,7 @@ module.exports = require("v8");
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.0.1","description":"Utilities to download, install and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint . --ext .ts,.tsx","format":"prettier --write **/*.ts","docs":"rm -rf docs/ && typedoc","test":"mocha -r ts-node/register -t 600s \'tests/*.ts\' --exit"},"files":["dist/**/*"],"repository":{"type":"git","url":"https://github.com/google-github-actions/setup-cloud-sdk"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.10.0","@actions/exec":"^1.1.1","@actions/http-client":"^2.0.1","@actions/tool-cache":"^2.0.1","@google-github-actions/actions-utils":"^0.4.4"},"devDependencies":{"@types/chai":"^4.3.x","@types/mocha":"^10.0.1","@types/node":"^18.11.12","@types/sinon":"^10.0.13","@typescript-eslint/eslint-plugin":"^5.46.0","@typescript-eslint/parser":"^5.46.0","@vercel/ncc":"^0.36.0","chai":"^4.3.x","eslint":"^8.29.0","eslint-config-prettier":"^8.5.0","eslint-plugin-prettier":"^4.2.1","mocha":"^10.1.0","prettier":"^2.8.1","sinon":"^15.0.0","ts-node":"^10.9.1","typedoc":"^0.23.21","typedoc-plugin-markdown":"^3.14.0","typescript":"^4.9.4"}}');
+module.exports = JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.0.1","description":"Utilities to download, install and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint . --ext .ts,.tsx","format":"prettier --write **/*.ts","docs":"rm -rf docs/ && typedoc","test":"mocha -r ts-node/register -t 600s \'tests/*.ts\' --exit"},"files":["dist/**/*"],"repository":{"type":"git","url":"https://github.com/google-github-actions/setup-cloud-sdk"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.10.0","@actions/exec":"^1.1.1","@actions/http-client":"^2.0.1","@actions/tool-cache":"^2.0.1","@google-github-actions/actions-utils":"^0.4.6"},"devDependencies":{"@types/chai":"^4.3.x","@types/mocha":"^10.0.1","@types/node":"^18.11.17","@types/sinon":"^10.0.13","@typescript-eslint/eslint-plugin":"^5.46.1","@typescript-eslint/parser":"^5.46.1","@vercel/ncc":"^0.36.0","chai":"^4.3.x","eslint":"^8.30.0","eslint-config-prettier":"^8.5.0","eslint-plugin-prettier":"^4.2.1","mocha":"^10.2.0","prettier":"^2.8.1","sinon":"^15.0.1","ts-node":"^10.9.1","typedoc":"^0.23.22","typedoc-plugin-markdown":"^3.14.0","typescript":"^4.9.4"}}');
 
 /***/ })
 
