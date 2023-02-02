@@ -20017,7 +20017,7 @@ function installGcloudSDK(version) {
         }
         // Install the downloaded release into the github action env
         const toolRoot = path.join(extPath, 'google-cloud-sdk');
-        let toolPath = yield toolCache.cacheDir(toolRoot, 'gcloud', version);
+        let toolPath = yield toolCache.cacheDir(toolRoot, 'gcloud', resolvedVersion);
         toolPath = path.join(toolPath, 'bin');
         core.addPath(toolPath);
         return toolPath;
