@@ -25,7 +25,10 @@ jobs:
     - name: 'Authenticate gcloud'
       run: |-
         CRED_FILE="${RUNNER_TEMP}/creds.json"
-        echo "${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}" > ${CRED_FILE}
+        cat <<EOF > ${CRED_FILE}
+        ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}
+        EOF
+
         gcloud auth login --update-adc --force --cred-file "${CRED_FILE}"
 
     - name: 'Get versions list'
