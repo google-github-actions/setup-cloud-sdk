@@ -22,6 +22,7 @@ import { getExecOutput } from '@actions/exec';
 import { HttpClient } from '@actions/http-client';
 import * as core from '@actions/core';
 import * as toolCache from '@actions/tool-cache';
+import * as semver from 'semver';
 import { errorMessage } from '@google-github-actions/actions-utils';
 
 import { buildReleaseURL } from './format-url';
@@ -30,6 +31,9 @@ import { downloadAndExtractTool } from './download-util';
 // Do not listen to the linter - this can NOT be rewritten as an ES6 import statement.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version: appVersion } = require('../package.json');
+
+// versionsURL is the URL to the artifact where version information is stored.
+const versionsURL = `https://raw.githubusercontent.com/google-github-actions/setup-cloud-sdk/main/data/versions.json`;
 
 /**
  * userAgentString is the UA to use for this installation. It dynamically pulls
@@ -158,14 +162,19 @@ export async function isAuthenticated(): Promise<boolean> {
 /**
  * Installs the gcloud SDK into the actions environment.
  *
- * @param version - The version being installed.
+ * @param version - The version or version specification to install. If a
+ * specification is given, the most recent version that still matches the
+ * specification is installed.
  * @returns The path of the installed tool.
  */
 export async function installGcloudSDK(version: string): Promise<string> {
   // Retrieve the release corresponding to the specified version and OS
   const osPlat = os.platform();
   const osArch = os.arch();
-  const url = buildReleaseURL(osPlat, osArch, version);
+  const resolvedVersion = toolCache.isExplicitVersion(version)
+    ? version
+    : await bestVersion(version);
+  const url = buildReleaseURL(osPlat, osArch, resolvedVersion);
 
   // Download and extract the release
   const extPath = await downloadAndExtractTool(url);
@@ -192,6 +201,8 @@ export async function installGcloudSDK(version: string): Promise<string> {
  * "latest" or the empty string when you want the latest version to be
  * installed, but still want users to be able to choose a specific version to
  * install as a customization.
+ *
+ * @deprecated Callers should use `installGcloudSDK('> 0.0.0.')` instead.
  *
  * @param version String (or undefined) version. The empty string or other
  * falsey values will return the latest gcloud version.
@@ -248,11 +259,21 @@ export async function installComponent(component: string[] | string): Promise<vo
  * @returns The latest stable version of the gcloud SDK.
  */
 export async function getLatestGcloudSDKVersion(): Promise<string> {
-  const url = 'https://dl.google.com/dl/cloudsdk/channels/rapid/components-2.json';
+  return await bestVersion('> 0.0.0');
+}
 
+/**
+ * bestVersion takes a version constraint and gets the latest available version
+ * that satisfies the constraint.
+ *
+ * @param spec Version specification
+ * @return Resolved version
+ */
+export async function bestVersion(spec: string): Promise<string> {
+  let versions: string[];
   try {
     const http = new HttpClient(userAgentString, undefined, { allowRetries: true, maxRetries: 3 });
-    const res = await http.get(url);
+    const res = await http.get(versionsURL);
 
     const body = await res.readBody();
     const statusCode = res.message.statusCode || 500;
@@ -260,15 +281,44 @@ export async function getLatestGcloudSDKVersion(): Promise<string> {
       throw new Error(`(${statusCode}) ${body}`);
     }
 
-    const parsed = JSON.parse(body) as { version: string };
-    if (!parsed.version) {
-      throw new Error(`invalid response - ${body}`);
-    }
-    return parsed.version;
+    versions = JSON.parse(body) as string[];
   } catch (err) {
     const msg = errorMessage(err);
-    throw new Error(`failed to retrieve gcloud SDK version from ${url}: ${msg}`);
+    throw new Error(`failed to retrieve versions from ${versionsURL}: ${msg}`);
   }
+
+  return computeBestVersion(spec, versions);
+}
+
+/**
+ * computeBestVersion computes the latest available version that still satisfies
+ * the spec. This is a helper function and is only exported for testing.
+ *
+ * @param versions List of versions
+ * @param spec Version specification
+ *
+ * @return Best version or an error if no matches are found
+ */
+export function computeBestVersion(spec: string, versions: string[]): string {
+  // Sort all versions
+  versions = versions.sort((a, b) => {
+    return semver.gt(a, b) ? 1 : -1;
+  });
+
+  // Find the latest version that still satisfies the spec.
+  let resolved = '';
+  for (let i = versions.length - 1; i >= 0; i--) {
+    const candidate = versions[i];
+    if (semver.satisfies(candidate, spec)) {
+      resolved = candidate;
+      break;
+    }
+  }
+
+  if (!resolved) {
+    throw new Error(`failed to find any versions matching "${spec}"`);
+  }
+  return resolved;
 }
 
 export * from './test-util';
