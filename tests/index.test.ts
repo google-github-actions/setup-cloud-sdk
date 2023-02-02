@@ -26,7 +26,11 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import { HttpClient } from '@actions/http-client';
 import * as io from '@actions/io';
-import { randomFilename, writeSecureFile } from '@google-github-actions/actions-utils';
+import {
+  errorMessage,
+  randomFilename,
+  writeSecureFile,
+} from '@google-github-actions/actions-utils';
 
 import * as setupCloudSDK from '../src/index';
 
@@ -238,7 +242,7 @@ describe('#setupCloudSDK', () => {
           statusCode: 200,
         },
         readBody: async (): Promise<string> => {
-          return `{"version":"1.2.3"}`;
+          return `["1.1.1", "1.1.2", "1.2.3"]`;
         },
       });
     });
@@ -315,6 +319,38 @@ describe('#setupCloudSDK', () => {
       const result = await setupCloudSDK.getLatestGcloudSDKVersion();
       expect(result).to.be;
       expect(result).to.match(semVerPattern);
+    });
+  });
+
+  describe('#computeBestVersion', () => {
+    it('returns the latest available version', () => {
+      const result = setupCloudSDK.computeBestVersion('> 1.2.3', [
+        '1.0.0',
+        '1.2.2',
+        '1.2.3',
+        '1.2.4',
+      ]);
+      expect(result).to.eql('1.2.4');
+    });
+
+    it('returns an exact version', () => {
+      const result = setupCloudSDK.computeBestVersion('1.2.2', [
+        '1.0.0',
+        '1.2.2',
+        '1.2.3',
+        '1.2.4',
+      ]);
+      expect(result).to.eql('1.2.2');
+    });
+
+    it('throws an error when there are no matches', () => {
+      try {
+        setupCloudSDK.computeBestVersion('> 50.1', ['1.0.0', '1.2.2', '1.2.3', '1.2.4']);
+        throw new Error(`no exception`);
+      } catch (e) {
+        const msg = errorMessage(e);
+        expect(msg).to.eql('failed to find any versions matching "> 50.1"');
+      }
     });
   });
 });

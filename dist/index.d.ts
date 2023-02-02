@@ -65,7 +65,9 @@ export declare function isAuthenticated(): Promise<boolean>;
 /**
  * Installs the gcloud SDK into the actions environment.
  *
- * @param version - The version being installed.
+ * @param version - The version or version specification to install. If a
+ * specification is given, the most recent version that still matches the
+ * specification is installed.
  * @returns The path of the installed tool.
  */
 export declare function installGcloudSDK(version: string): Promise<string>;
@@ -80,6 +82,8 @@ export declare function installGcloudSDK(version: string): Promise<string>;
  * "latest" or the empty string when you want the latest version to be
  * installed, but still want users to be able to choose a specific version to
  * install as a customization.
+ *
+ * @deprecated Callers should use `installGcloudSDK('> 0.0.0.')` instead.
  *
  * @param version String (or undefined) version. The empty string or other
  * falsey values will return the latest gcloud version.
@@ -113,4 +117,22 @@ export declare function installComponent(component: string[] | string): Promise<
  * @returns The latest stable version of the gcloud SDK.
  */
 export declare function getLatestGcloudSDKVersion(): Promise<string>;
+/**
+ * bestVersion takes a version constraint and gets the latest available version
+ * that satisfies the constraint.
+ *
+ * @param spec Version specification
+ * @return Resolved version
+ */
+export declare function bestVersion(spec: string): Promise<string>;
+/**
+ * computeBestVersion computes the latest available version that still satisfies
+ * the spec. This is a helper function and is only exported for testing.
+ *
+ * @param versions List of versions
+ * @param spec Version specification
+ *
+ * @return Best version or an error if no matches are found
+ */
+export declare function computeBestVersion(spec: string, versions: string[]): string;
 export * from './test-util';

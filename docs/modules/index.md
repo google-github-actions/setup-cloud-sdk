@@ -24,6 +24,8 @@
 ### Functions
 
 - [authenticateGcloudSDK](index.md#authenticategcloudsdk)
+- [bestVersion](index.md#bestversion)
+- [computeBestVersion](index.md#computebestversion)
 - [computeGcloudVersion](index.md#computegcloudversion)
 - [gcloudRun](index.md#gcloudrun)
 - [gcloudRunJSON](index.md#gcloudrunjson)
@@ -76,7 +78,7 @@ ExecOptions is a type alias to core/exec ExecOptions.
 
 #### Defined in
 
-[index.ts:74](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L74)
+[index.ts:78](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L78)
 
 ___
 
@@ -96,7 +98,7 @@ ExecOutput is the output returned from a gcloud exec.
 
 #### Defined in
 
-[index.ts:79](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L79)
+[index.ts:83](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L83)
 
 ## Variables
 
@@ -109,7 +111,7 @@ the app version from the package declaration.
 
 #### Defined in
 
-[index.ts:38](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L38)
+[index.ts:42](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L42)
 
 ## Functions
 
@@ -131,7 +133,58 @@ Authenticates the gcloud tool using the provided credentials file.
 
 #### Defined in
 
-[index.ts:214](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L214)
+[index.ts:225](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L225)
+
+___
+
+### bestVersion
+
+▸ **bestVersion**(`spec`): `Promise`<`string`\>
+
+bestVersion takes a version constraint and gets the latest available version
+that satisfies the constraint.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `spec` | `string` | Version specification |
+
+#### Returns
+
+`Promise`<`string`\>
+
+Resolved version
+
+#### Defined in
+
+[index.ts:272](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L272)
+
+___
+
+### computeBestVersion
+
+▸ **computeBestVersion**(`spec`, `versions`): `string`
+
+computeBestVersion computes the latest available version that still satisfies
+the spec. This is a helper function and is only exported for testing.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `spec` | `string` | Version specification |
+| `versions` | `string`[] | List of versions |
+
+#### Returns
+
+`string`
+
+Best version or an error if no matches are found
+
+#### Defined in
+
+[index.ts:302](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L302)
 
 ___
 
@@ -150,6 +203,10 @@ This is most useful when accepting user input which should default to
 installed, but still want users to be able to choose a specific version to
 install as a customization.
 
+**`Deprecated`**
+
+Callers should use `installGcloudSDK('> 0.0.0.')` instead.
+
 #### Parameters
 
 | Name | Type | Description |
@@ -164,7 +221,7 @@ String representing the latest version.
 
 #### Defined in
 
-[index.ts:201](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L201)
+[index.ts:212](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L212)
 
 ___
 
@@ -191,7 +248,7 @@ ExecOutput
 
 #### Defined in
 
-[index.ts:95](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L95)
+[index.ts:99](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L99)
 
 ___
 
@@ -217,7 +274,7 @@ Parsed JSON as an object (or array).
 
 #### Defined in
 
-[index.ts:124](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L124)
+[index.ts:128](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L128)
 
 ___
 
@@ -235,7 +292,7 @@ The latest stable version of the gcloud SDK.
 
 #### Defined in
 
-[index.ts:250](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L250)
+[index.ts:261](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L261)
 
 ___
 
@@ -253,7 +310,7 @@ gcloud command.
 
 #### Defined in
 
-[index.ts:61](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L61)
+[index.ts:65](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L65)
 
 ___
 
@@ -277,7 +334,7 @@ CMD output
 
 #### Defined in
 
-[index.ts:234](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L234)
+[index.ts:245](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L245)
 
 ___
 
@@ -291,7 +348,7 @@ Installs the gcloud SDK into the actions environment.
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `version` | `string` | The version being installed. |
+| `version` | `string` | The version or version specification to install. If a specification is given, the most recent version that still matches the specification is installed. |
 
 #### Returns
 
@@ -301,7 +358,7 @@ The path of the installed tool.
 
 #### Defined in
 
-[index.ts:164](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L164)
+[index.ts:170](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L170)
 
 ___
 
@@ -319,7 +376,7 @@ true is gcloud is authenticated.
 
 #### Defined in
 
-[index.ts:153](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L153)
+[index.ts:157](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L157)
 
 ___
 
@@ -343,7 +400,7 @@ true if gcloud is found in toolpath.
 
 #### Defined in
 
-[index.ts:46](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L46)
+[index.ts:50](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L50)
 
 ___
 
@@ -361,7 +418,7 @@ true is project Id is set.
 
 #### Defined in
 
-[index.ts:143](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L143)
+[index.ts:147](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L147)
 
 ___
 
@@ -385,4 +442,4 @@ project ID.
 
 #### Defined in
 
-[index.ts:224](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L224)
+[index.ts:235](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L235)
