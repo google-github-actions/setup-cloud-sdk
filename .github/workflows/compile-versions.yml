@@ -43,12 +43,18 @@ jobs:
           | jq -R -s 'split("\n") | map(select(length > 0))' \
           > ./data/versions.json
 
-    - name: 'Update versions list'
+        echo "Computed versions:"
+        cat ./data/versions.json
+
+    - id: 'updates'
+      name: 'Update versions list'
       run: |-
-        if [ -z "$(git diff ./data/versions.json)" ]; then
-          echo "No version changes - nothing to do."
+        if git diff --exit-code ./data/versions.json; then
+          echo "No changes"
           exit 0
         fi
+
+        echo "had_changes=true" >> ${GITHUB_OUTPUT}
 
         git config user.name "google-github-actions-bot"
         git config user.email "github-actions-bot@google.com"
