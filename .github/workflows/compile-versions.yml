@@ -65,6 +65,7 @@ jobs:
         git push -f origin "${{ env.PR_BRANCH }}"
 
     - name: 'Create Pull Request'
+      if: '${{ steps.updates.outputs.had_changes == 'true' }}'
       uses: 'actions/github-script@v6'
       with:
         github-token: '${{ secrets.ACTIONS_BOT_TOKEN }}'
