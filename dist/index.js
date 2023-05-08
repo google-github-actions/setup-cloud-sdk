@@ -2461,6 +2461,10 @@ function checkBypass(reqUrl) {
     if (!reqUrl.hostname) {
         return false;
     }
+    const reqHost = reqUrl.hostname;
+    if (isLoopbackAddress(reqHost)) {
+        return true;
+    }
     const noProxy = process.env['no_proxy'] || process.env['NO_PROXY'] || '';
     if (!noProxy) {
         return false;
@@ -2486,13 +2490,24 @@ function checkBypass(reqUrl) {
         .split(',')
         .map(x => x.trim().toUpperCase())
         .filter(x => x)) {
-        if (upperReqHosts.some(x => x === upperNoProxyItem)) {
+        if (upperNoProxyItem === '*' ||
+            upperReqHosts.some(x => x === upperNoProxyItem ||
+                x.endsWith(`.${upperNoProxyItem}`) ||
+                (upperNoProxyItem.startsWith('.') &&
+                    x.endsWith(`${upperNoProxyItem}`)))) {
             return true;
         }
     }
     return false;
 }
 exports.checkBypass = checkBypass;
+function isLoopbackAddress(host) {
+    const hostLower = host.toLowerCase();
+    return (hostLower === 'localhost' ||
+        hostLower.startsWith('127.') ||
+        hostLower.startsWith('[::1]') ||
+        hostLower.startsWith('[0:0:0:0:0:0:0:1]'));
+}
 //# sourceMappingURL=proxy.js.map
 
 /***/ }),
@@ -6498,11 +6513,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseKVStringAndFile = exports.parseKVYAML = exports.parseKVJSON = exports.parseKVFile = exports.parseKVString = void 0;
+exports.parseKVStringAndFile = exports.parseKVYAML = exports.parseKVJSON = exports.parseKVFile = exports.parseKVString = exports.joinKVString = void 0;
 const yaml_1 = __importDefault(__nccwpck_require2_(4083));
 const fs_1 = __nccwpck_require2_(7147);
 const errors_1 = __nccwpck_require2_(6976);
 const validations_1 = __nccwpck_require2_(596);
+/**
+ * joinKVString joins the given KVPair using the provided separator.
+ *
+ * @param input KVPair to serialize.
+ * @param separator Join separator.
+ */
+function joinKVString(input, separator = ',') {
+    return Object.entries(input)
+        .map(([k, v]) => {
+        return `${k}=${v}`;
+    })
+        .join(separator);
+}
+exports.joinKVString = joinKVString;
 /**
  * parseKVString parses a string of the format "KEY1=VALUE1,KEY2=VALUE2" or
  * "KEY1=VALUE1\nKEY2=VALUE2". Keys or values that contain a separator must be
@@ -9787,7 +9816,7 @@ const prettifyError = (src, lc) => (error) => {
         let count = 1;
         const end = error.linePos[1];
         if (end && end.line === line && end.col > col) {
-            count = Math.min(end.col - col, 80 - ci);
+            count = Math.max(1, Math.min(end.col - col, 80 - ci));
         }
         const pointer = ' '.repeat(ci) + '^'.repeat(count);
         error.message += `:\n\n${lineStr}\n${pointer}\n`;
@@ -10321,12 +10350,12 @@ function findPair(items, key) {
     return undefined;
 }
 class YAMLMap extends Collection.Collection {
+    static get tagName() {
+        return 'tag:yaml.org,2002:map';
+    }
     constructor(schema) {
         super(Node.MAP, schema);
         this.items = [];
-    }
-    static get tagName() {
-        return 'tag:yaml.org,2002:map';
     }
     /**
      * Adds a value to the collection.
@@ -10434,12 +10463,12 @@ var Scalar = __nccwpck_require2_(9338);
 var toJS = __nccwpck_require2_(2463);
 
 class YAMLSeq extends Collection.Collection {
+    static get tagName() {
+        return 'tag:yaml.org,2002:seq';
+    }
     constructor(schema) {
         super(Node.SEQ, schema);
         this.items = [];
-    }
-    static get tagName() {
-        return 'tag:yaml.org,2002:seq';
     }
     add(value) {
         this.items.push(value);
@@ -14400,6 +14429,7 @@ function createStringifyContext(doc, options) {
         doubleQuotedAsJSON: false,
         doubleQuotedMinMultiLineLength: 40,
         falseStr: 'false',
+        flowCollectionPadding: true,
         indentSeq: true,
         lineWidth: 80,
         minContentWidth: 20,
@@ -14423,6 +14453,7 @@ function createStringifyContext(doc, options) {
     return {
         anchors: new Set(),
         doc,
+        flowCollectionPadding: opt.flowCollectionPadding ? ' ' : '',
         indent: '',
         indentStep: typeof opt.indent === 'number' ? ' '.repeat(opt.indent) : '  ',
         inFlow,
@@ -14579,7 +14610,7 @@ function stringifyBlockCollection({ comment, items }, ctx, { blockItemPrefix, fl
     return str;
 }
 function stringifyFlowCollection({ comment, items }, ctx, { flowChars, itemIndent, onComment }) {
-    const { indent, indentStep, options: { commentString } } = ctx;
+    const { indent, indentStep, flowCollectionPadding: fcPadding, options: { commentString } } = ctx;
     itemIndent += indentStep;
     const itemCtx = Object.assign({}, ctx, {
         indent: itemIndent,
@@ -14648,11 +14679,11 @@ function stringifyFlowCollection({ comment, items }, ctx, { flowChars, itemInden
             str += `\n${indent}${end}`;
         }
         else {
-            str = `${start} ${lines.join(' ')} ${end}`;
+            str = `${start}${fcPadding}${lines.join(' ')}${fcPadding}${end}`;
         }
     }
     if (comment) {
-        str += stringifyComment.lineComment(str, commentString(comment), indent);
+        str += stringifyComment.lineComment(str, indent, commentString(comment));
         if (onComment)
             onComment();
     }
@@ -14900,19 +14931,18 @@ function stringifyPair({ key, value }, ctx, onComment, onChompKeep) {
         if (keyComment)
             str += stringifyComment.lineComment(str, ctx.indent, commentString(keyComment));
     }
-    let vcb = '';
-    let valueComment = null;
+    let vsb, vcb, valueComment;
     if (Node.isNode(value)) {
-        if (value.spaceBefore)
-            vcb = '\n';
-        if (value.commentBefore) {
-            const cs = commentString(value.commentBefore);
-            vcb += `\n${stringifyComment.indentComment(cs, ctx.indent)}`;
-        }
+        vsb = !!value.spaceBefore;
+        vcb = value.commentBefore;
         valueComment = value.comment;
     }
-    else if (value && typeof value === 'object') {
-        value = doc.createNode(value);
+    else {
+        vsb = false;
+        vcb = null;
+        valueComment = null;
+        if (value && typeof value === 'object')
+            value = doc.createNode(value);
     }
     ctx.implicitKey = false;
     if (!explicitKey && !keyComment && Node.isScalar(value))
@@ -14927,24 +14957,50 @@ function stringifyPair({ key, value }, ctx, onComment, onChompKeep) {
         !value.tag &&
         !value.anchor) {
         // If indentSeq === false, consider '- ' as part of indentation where possible
-        ctx.indent = ctx.indent.substr(2);
+        ctx.indent = ctx.indent.substring(2);
     }
     let valueCommentDone = false;
     const valueStr = stringify.stringify(value, ctx, () => (valueCommentDone = true), () => (chompKeep = true));
     let ws = ' ';
-    if (vcb || keyComment) {
-        if (valueStr === '' && !ctx.inFlow)
-            ws = vcb === '\n' ? '\n\n' : vcb;
-        else
-            ws = `${vcb}\n${ctx.indent}`;
+    if (keyComment || vsb || vcb) {
+        ws = vsb ? '\n' : '';
+        if (vcb) {
+            const cs = commentString(vcb);
+            ws += `\n${stringifyComment.indentComment(cs, ctx.indent)}`;
+        }
+        if (valueStr === '' && !ctx.inFlow) {
+            if (ws === '\n')
+                ws = '\n\n';
+        }
+        else {
+            ws += `\n${ctx.indent}`;
+        }
     }
     else if (!explicitKey && Node.isCollection(value)) {
-        const flow = valueStr[0] === '[' || valueStr[0] === '{';
-        if (!flow || valueStr.includes('\n'))
-            ws = `\n${ctx.indent}`;
+        const vs0 = valueStr[0];
+        const nl0 = valueStr.indexOf('\n');
+        const hasNewline = nl0 !== -1;
+        const flow = ctx.inFlow ?? value.flow ?? value.items.length === 0;
+        if (hasNewline || !flow) {
+            let hasPropsLine = false;
+            if (hasNewline && (vs0 === '&' || vs0 === '!')) {
+                let sp0 = valueStr.indexOf(' ');
+                if (vs0 === '&' &&
+                    sp0 !== -1 &&
+                    sp0 < nl0 &&
+                    valueStr[sp0 + 1] === '!') {
+                    sp0 = valueStr.indexOf(' ', sp0 + 1);
+                }
+                if (sp0 === -1 || nl0 < sp0)
+                    hasPropsLine = true;
+            }
+            if (!hasPropsLine)
+                ws = `\n${ctx.indent}`;
+        }
     }
-    else if (valueStr === '' || valueStr[0] === '\n')
+    else if (valueStr === '' || valueStr[0] === '\n') {
         ws = '';
+    }
     str += ws + valueStr;
     if (ctx.inFlow) {
         if (valueCommentDone && onComment)
@@ -14972,8 +15028,8 @@ exports.stringifyPair = stringifyPair;
 var Scalar = __nccwpck_require2_(9338);
 var foldFlowLines = __nccwpck_require2_(2889);
 
-const getFoldOptions = (ctx) => ({
-    indentAtStart: ctx.indentAtStart,
+const getFoldOptions = (ctx, isBlock) => ({
+    indentAtStart: isBlock ? ctx.indent.length : ctx.indentAtStart,
     lineWidth: ctx.options.lineWidth,
     minContentWidth: ctx.options.minContentWidth
 });
@@ -15086,7 +15142,7 @@ function doubleQuotedString(value, ctx) {
     str = start ? str + json.slice(start) : json;
     return implicitKey
         ? str
-        : foldFlowLines.foldFlowLines(str, indent, foldFlowLines.FOLD_QUOTED, getFoldOptions(ctx));
+        : foldFlowLines.foldFlowLines(str, indent, foldFlowLines.FOLD_QUOTED, getFoldOptions(ctx, false));
 }
 function singleQuotedString(value, ctx) {
     if (ctx.options.singleQuote === false ||
@@ -15098,7 +15154,7 @@ function singleQuotedString(value, ctx) {
     const res = "'" + value.replace(/'/g, "''").replace(/\n+/g, `$&\n${indent}`) + "'";
     return ctx.implicitKey
         ? res
-        : foldFlowLines.foldFlowLines(res, indent, foldFlowLines.FOLD_FLOW, getFoldOptions(ctx));
+        : foldFlowLines.foldFlowLines(res, indent, foldFlowLines.FOLD_FLOW, getFoldOptions(ctx, false));
 }
 function quotedString(value, ctx) {
     const { singleQuote } = ctx.options;
@@ -15196,12 +15252,12 @@ function blockString({ comment, type, value }, ctx, onComment, onChompKeep) {
         .replace(/(?:^|\n)([\t ].*)(?:([\n\t ]*)\n(?![\n\t ]))?/g, '$1$2') // more-indented lines aren't folded
         //                ^ more-ind. ^ empty     ^ capture next empty lines only at end of indent
         .replace(/\n+/g, `$&${indent}`);
-    const body = foldFlowLines.foldFlowLines(`${start}${value}${end}`, indent, foldFlowLines.FOLD_BLOCK, getFoldOptions(ctx));
+    const body = foldFlowLines.foldFlowLines(`${start}${value}${end}`, indent, foldFlowLines.FOLD_BLOCK, getFoldOptions(ctx, true));
     return `${header}\n${indent}${body}`;
 }
 function plainString(item, ctx, onComment, onChompKeep) {
     const { type, value } = item;
-    const { actualString, implicitKey, indent, inFlow } = ctx;
+    const { actualString, implicitKey, indent, indentStep, inFlow } = ctx;
     if ((implicitKey && /[\n[\]{},]/.test(value)) ||
         (inFlow && /[[\]{},]/.test(value))) {
         return quotedString(value, ctx);
@@ -15225,9 +15281,14 @@ function plainString(item, ctx, onComment, onChompKeep) {
         // Where allowed & type not set explicitly, prefer block style for multiline strings
         return blockString(item, ctx, onComment, onChompKeep);
     }
-    if (indent === '' && containsDocumentMarker(value)) {
-        ctx.forceBlockIndent = true;
-        return blockString(item, ctx, onComment, onChompKeep);
+    if (containsDocumentMarker(value)) {
+        if (indent === '') {
+            ctx.forceBlockIndent = true;
+            return blockString(item, ctx, onComment, onChompKeep);
+        }
+        else if (implicitKey && indent === indentStep) {
+            return quotedString(value, ctx);
+        }
     }
     const str = value.replace(/\n+/g, `$&\n${indent}`);
     // Verify that output will be parsed as a string, as e.g. plain numbers and
@@ -15241,7 +15302,7 @@ function plainString(item, ctx, onComment, onChompKeep) {
     }
     return implicitKey
         ? str
-        : foldFlowLines.foldFlowLines(str, indent, foldFlowLines.FOLD_FLOW, getFoldOptions(ctx));
+        : foldFlowLines.foldFlowLines(str, indent, foldFlowLines.FOLD_FLOW, getFoldOptions(ctx, false));
 }
 function stringifyString(item, ctx, onComment, onChompKeep) {
     const { implicitKey, inFlow } = ctx;
@@ -16006,13 +16067,6 @@ class Comparator {
       throw new TypeError('a Comparator is required')
     }
 
-    if (!options || typeof options !== 'object') {
-      options = {
-        loose: !!options,
-        includePrerelease: false,
-      }
-    }
-
     if (this.operator === '') {
       if (this.value === '') {
         return true
@@ -16025,32 +16079,43 @@ class Comparator {
       return new Range(this.value, options).test(comp.semver)
     }
 
-    const sameDirectionIncreasing =
-      (this.operator === '>=' || this.operator === '>') &&
-      (comp.operator === '>=' || comp.operator === '>')
-    const sameDirectionDecreasing =
-      (this.operator === '<=' || this.operator === '<') &&
-      (comp.operator === '<=' || comp.operator === '<')
-    const sameSemVer = this.semver.version === comp.semver.version
-    const differentDirectionsInclusive =
-      (this.operator === '>=' || this.operator === '<=') &&
-      (comp.operator === '>=' || comp.operator === '<=')
-    const oppositeDirectionsLessThan =
-      cmp(this.semver, '<', comp.semver, options) &&
-      (this.operator === '>=' || this.operator === '>') &&
-        (comp.operator === '<=' || comp.operator === '<')
-    const oppositeDirectionsGreaterThan =
-      cmp(this.semver, '>', comp.semver, options) &&
-      (this.operator === '<=' || this.operator === '<') &&
-        (comp.operator === '>=' || comp.operator === '>')
+    options = parseOptions(options)
 
-    return (
-      sameDirectionIncreasing ||
-      sameDirectionDecreasing ||
-      (sameSemVer && differentDirectionsInclusive) ||
-      oppositeDirectionsLessThan ||
-      oppositeDirectionsGreaterThan
-    )
+    // Special cases where nothing can possibly be lower
+    if (options.includePrerelease &&
+      (this.value === '<0.0.0-0' || comp.value === '<0.0.0-0')) {
+      return false
+    }
+    if (!options.includePrerelease &&
+      (this.value.startsWith('<0.0.0') || comp.value.startsWith('<0.0.0'))) {
+      return false
+    }
+
+    // Same direction increasing (> or >=)
+    if (this.operator.startsWith('>') && comp.operator.startsWith('>')) {
+      return true
+    }
+    // Same direction decreasing (< or <=)
+    if (this.operator.startsWith('<') && comp.operator.startsWith('<')) {
+      return true
+    }
+    // same SemVer and both sides are inclusive (<= or >=)
+    if (
+      (this.semver.version === comp.semver.version) &&
+      this.operator.includes('=') && comp.operator.includes('=')) {
+      return true
+    }
+    // opposite directions less than
+    if (cmp(this.semver, '<', comp.semver, options) &&
+      this.operator.startsWith('>') && comp.operator.startsWith('<')) {
+      return true
+    }
+    // opposite directions greater than
+    if (cmp(this.semver, '>', comp.semver, options) &&
+      this.operator.startsWith('<') && comp.operator.startsWith('>')) {
+      return true
+    }
+    return false
   }
 }
 
@@ -16152,8 +16217,10 @@ class Range {
 
     // memoize range parsing for performance.
     // this is a very hot path, and fully deterministic.
-    const memoOpts = Object.keys(this.options).join(',')
-    const memoKey = `parseRange:${memoOpts}:${range}`
+    const memoOpts =
+      (this.options.includePrerelease && FLAG_INCLUDE_PRERELEASE) |
+      (this.options.loose && FLAG_LOOSE)
+    const memoKey = memoOpts + ':' + range
     const cached = cache.get(memoKey)
     if (cached) {
       return cached
@@ -16261,6 +16328,7 @@ class Range {
     return false
   }
 }
+
 module.exports = Range
 
 const LRU = __nccwpck_require__(7129)
@@ -16277,6 +16345,7 @@ const {
   tildeTrimReplace,
   caretTrimReplace,
 } = __nccwpck_require__(9523)
+const { FLAG_INCLUDE_PRERELEASE, FLAG_LOOSE } = __nccwpck_require__(2293)
 
 const isNullSet = c => c.value === '<0.0.0-0'
 const isAny = c => c.value === ''
@@ -16616,7 +16685,7 @@ class SemVer {
         version = version.version
       }
     } else if (typeof version !== 'string') {
-      throw new TypeError(`Invalid Version: ${version}`)
+      throw new TypeError(`Invalid Version: ${(__nccwpck_require__(3837).inspect)(version)}`)
     }
 
     if (version.length > MAX_LENGTH) {
@@ -16775,36 +16844,36 @@ class SemVer {
 
   // preminor will bump the version up to the next minor release, and immediately
   // down to pre-release. premajor and prepatch work the same way.
-  inc (release, identifier) {
+  inc (release, identifier, identifierBase) {
     switch (release) {
       case 'premajor':
         this.prerelease.length = 0
         this.patch = 0
         this.minor = 0
         this.major++
-        this.inc('pre', identifier)
+        this.inc('pre', identifier, identifierBase)
         break
       case 'preminor':
         this.prerelease.length = 0
         this.patch = 0
         this.minor++
-        this.inc('pre', identifier)
+        this.inc('pre', identifier, identifierBase)
         break
       case 'prepatch':
         // If this is already a prerelease, it will bump to the next version
         // drop any prereleases that might already exist, since they are not
         // relevant at this point.
         this.prerelease.length = 0
-        this.inc('patch', identifier)
-        this.inc('pre', identifier)
+        this.inc('patch', identifier, identifierBase)
+        this.inc('pre', identifier, identifierBase)
         break
       // If the input is a non-prerelease version, this acts the same as
       // prepatch.
       case 'prerelease':
         if (this.prerelease.length === 0) {
-          this.inc('patch', identifier)
+          this.inc('patch', identifier, identifierBase)
         }
-        this.inc('pre', identifier)
+        this.inc('pre', identifier, identifierBase)
         break
 
       case 'major':
@@ -16846,9 +16915,15 @@ class SemVer {
         break
       // This probably shouldn't be used publicly.
       // 1.0.0 'pre' would become 1.0.0-0 which is the wrong direction.
-      case 'pre':
+      case 'pre': {
+        const base = Number(identifierBase) ? 1 : 0
+
+        if (!identifier && identifierBase === false) {
+          throw new Error('invalid increment argument: identifier is empty')
+        }
+
         if (this.prerelease.length === 0) {
-          this.prerelease = [0]
+          this.prerelease = [base]
         } else {
           let i = this.prerelease.length
           while (--i >= 0) {
@@ -16859,22 +16934,29 @@ class SemVer {
           }
           if (i === -1) {
             // didn't increment anything
-            this.prerelease.push(0)
+            if (identifier === this.prerelease.join('.') && identifierBase === false) {
+              throw new Error('invalid increment argument: identifier already exists')
+            }
+            this.prerelease.push(base)
           }
         }
         if (identifier) {
           // 1.2.0-beta.1 bumps to 1.2.0-beta.2,
           // 1.2.0-beta.fooblz or 1.2.0-beta bumps to 1.2.0-beta.0
+          let prerelease = [identifier, base]
+          if (identifierBase === false) {
+            prerelease = [identifier]
+          }
           if (compareIdentifiers(this.prerelease[0], identifier) === 0) {
             if (isNaN(this.prerelease[1])) {
-              this.prerelease = [identifier, 0]
+              this.prerelease = prerelease
             }
           } else {
-            this.prerelease = [identifier, 0]
+            this.prerelease = prerelease
           }
         }
         break
-
+      }
       default:
         throw new Error(`invalid increment argument: ${release}`)
     }
@@ -17060,27 +17142,58 @@ module.exports = compare
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const parse = __nccwpck_require__(5925)
-const eq = __nccwpck_require__(1898)
 
 const diff = (version1, version2) => {
-  if (eq(version1, version2)) {
+  const v1 = parse(version1, null, true)
+  const v2 = parse(version2, null, true)
+  const comparison = v1.compare(v2)
+
+  if (comparison === 0) {
     return null
-  } else {
-    const v1 = parse(version1)
-    const v2 = parse(version2)
-    const hasPre = v1.prerelease.length || v2.prerelease.length
-    const prefix = hasPre ? 'pre' : ''
-    const defaultResult = hasPre ? 'prerelease' : ''
-    for (const key in v1) {
-      if (key === 'major' || key === 'minor' || key === 'patch') {
-        if (v1[key] !== v2[key]) {
-          return prefix + key
-        }
-      }
-    }
-    return defaultResult // may be undefined
   }
+
+  const v1Higher = comparison > 0
+  const highVersion = v1Higher ? v1 : v2
+  const lowVersion = v1Higher ? v2 : v1
+  const highHasPre = !!highVersion.prerelease.length
+
+  // add the `pre` prefix if we are going to a prerelease version
+  const prefix = highHasPre ? 'pre' : ''
+
+  if (v1.major !== v2.major) {
+    return prefix + 'major'
+  }
+
+  if (v1.minor !== v2.minor) {
+    return prefix + 'minor'
+  }
+
+  if (v1.patch !== v2.patch) {
+    return prefix + 'patch'
+  }
+
+  // at this point we know stable versions match but overall versions are not equal,
+  // so either they are both prereleases, or the lower version is a prerelease
+
+  if (highHasPre) {
+    // high and low are preleases
+    return 'prerelease'
+  }
+
+  if (lowVersion.patch) {
+    // anything higher than a patch bump would result in the wrong version
+    return 'patch'
+  }
+
+  if (lowVersion.minor) {
+    // anything higher than a minor bump would result in the wrong version
+    return 'minor'
+  }
+
+  // bumping major/minor/patch all have same result
+  return 'major'
 }
+
 module.exports = diff
 
 
@@ -17121,8 +17234,9 @@ module.exports = gte
 
 const SemVer = __nccwpck_require__(8088)
 
-const inc = (version, release, options, identifier) => {
+const inc = (version, release, options, identifier, identifierBase) => {
   if (typeof (options) === 'string') {
+    identifierBase = identifier
     identifier = options
     options = undefined
   }
@@ -17131,7 +17245,7 @@ const inc = (version, release, options, identifier) => {
     return new SemVer(
       version instanceof SemVer ? version.version : version,
       options
-    ).inc(release, identifier).version
+    ).inc(release, identifier, identifierBase).version
   } catch (er) {
     return null
   }
@@ -17194,35 +17308,18 @@ module.exports = neq
 /***/ 5925:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const { MAX_LENGTH } = __nccwpck_require__(2293)
-const { re, t } = __nccwpck_require__(9523)
 const SemVer = __nccwpck_require__(8088)
-
-const parseOptions = __nccwpck_require__(785)
-const parse = (version, options) => {
-  options = parseOptions(options)
-
+const parse = (version, options, throwErrors = false) => {
   if (version instanceof SemVer) {
     return version
   }
-
-  if (typeof version !== 'string') {
-    return null
-  }
-
-  if (version.length > MAX_LENGTH) {
-    return null
-  }
-
-  const r = options.loose ? re[t.LOOSE] : re[t.FULL]
-  if (!r.test(version)) {
-    return null
-  }
-
   try {
     return new SemVer(version, options)
   } catch (er) {
-    return null
+    if (!throwErrors) {
+      return null
+    }
+    throw er
   }
 }
 
@@ -17402,6 +17499,7 @@ module.exports = {
   src: internalRe.src,
   tokens: internalRe.t,
   SEMVER_SPEC_VERSION: constants.SEMVER_SPEC_VERSION,
+  RELEASE_TYPES: constants.RELEASE_TYPES,
   compareIdentifiers: identifiers.compareIdentifiers,
   rcompareIdentifiers: identifiers.rcompareIdentifiers,
 }
@@ -17423,11 +17521,24 @@ const MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER ||
 // Max safe segment length for coercion.
 const MAX_SAFE_COMPONENT_LENGTH = 16
 
+const RELEASE_TYPES = [
+  'major',
+  'premajor',
+  'minor',
+  'preminor',
+  'patch',
+  'prepatch',
+  'prerelease',
+]
+
 module.exports = {
-  SEMVER_SPEC_VERSION,
   MAX_LENGTH,
-  MAX_SAFE_INTEGER,
   MAX_SAFE_COMPONENT_LENGTH,
+  MAX_SAFE_INTEGER,
+  RELEASE_TYPES,
+  SEMVER_SPEC_VERSION,
+  FLAG_INCLUDE_PRERELEASE: 0b001,
+  FLAG_LOOSE: 0b010,
 }
 
 
@@ -17482,16 +17593,20 @@ module.exports = {
 /***/ 785:
 /***/ ((module) => {
 
-// parse out just the options we care about so we always get a consistent
-// obj with keys in a consistent order.
-const opts = ['includePrerelease', 'loose', 'rtl']
-const parseOptions = options =>
-  !options ? {}
-  : typeof options !== 'object' ? { loose: true }
-  : opts.filter(k => options[k]).reduce((o, k) => {
-    o[k] = true
-    return o
-  }, {})
+// parse out just the options we care about
+const looseOption = Object.freeze({ loose: true })
+const emptyOpts = Object.freeze({ })
+const parseOptions = options => {
+  if (!options) {
+    return emptyOpts
+  }
+
+  if (typeof options !== 'object') {
+    return looseOption
+  }
+
+  return options
+}
 module.exports = parseOptions
 
 
@@ -17704,7 +17819,7 @@ const Range = __nccwpck_require__(9828)
 const intersects = (r1, r2, options) => {
   r1 = new Range(r1, options)
   r2 = new Range(r2, options)
-  return r1.intersects(r2)
+  return r1.intersects(r2, options)
 }
 module.exports = intersects
 
@@ -18067,6 +18182,9 @@ const subset = (sub, dom, options = {}) => {
   return true
 }
 
+const minimumVersionWithPreRelease = [new Comparator('>=0.0.0-0')]
+const minimumVersion = [new Comparator('>=0.0.0')]
+
 const simpleSubset = (sub, dom, options) => {
   if (sub === dom) {
     return true
@@ -18076,9 +18194,9 @@ const simpleSubset = (sub, dom, options) => {
     if (dom.length === 1 && dom[0].semver === ANY) {
       return true
     } else if (options.includePrerelease) {
-      sub = [new Comparator('>=0.0.0-0')]
+      sub = minimumVersionWithPreRelease
     } else {
-      sub = [new Comparator('>=0.0.0')]
+      sub = minimumVersion
     }
   }
 
@@ -18086,7 +18204,7 @@ const simpleSubset = (sub, dom, options) => {
     if (options.includePrerelease) {
       return true
     } else {
-      dom = [new Comparator('>=0.0.0')]
+      dom = minimumVersion
     }
   }
 
@@ -20461,7 +20579,7 @@ module.exports = require("v8");
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.1.1","description":"Utilities to download, install and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint . --ext .ts,.tsx","format":"prettier --write **/*.ts","docs":"rm -rf docs/ && typedoc","test":"mocha -r ts-node/register -t 600s \'tests/*.ts\' --exit"},"files":["dist/**/*"],"repository":{"type":"git","url":"https://github.com/google-github-actions/setup-cloud-sdk"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.10.0","@actions/exec":"^1.1.1","@actions/http-client":"^2.0.1","@actions/tool-cache":"^2.0.1","@google-github-actions/actions-utils":"^0.4.6","semver":"^7.3.8"},"devDependencies":{"@types/chai":"^4.3.x","@types/mocha":"^10.0.1","@types/node":"^18.11.18","@types/sinon":"^10.0.13","@typescript-eslint/eslint-plugin":"^5.50.0","@typescript-eslint/parser":"^5.50.0","@vercel/ncc":"^0.36.1","chai":"^4.3.x","eslint":"^8.33.0","eslint-config-prettier":"^8.6.0","eslint-plugin-prettier":"^4.2.1","mocha":"^10.2.0","prettier":"^2.8.3","sinon":"^15.0.1","ts-node":"^10.9.1","typedoc":"^0.23.24","typedoc-plugin-markdown":"^3.14.0","typescript":"^4.9.5"}}');
+module.exports = JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.1.1","description":"Utilities to download, install and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint . --ext .ts,.tsx","format":"prettier --write **/*.ts","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"mocha -r ts-node/register -t 600s \'tests/*.ts\' --exit"},"files":["dist/**/*"],"repository":{"type":"git","url":"https://github.com/google-github-actions/setup-cloud-sdk"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.10.0","@actions/exec":"^1.1.1","@actions/http-client":"^2.1.0","@actions/tool-cache":"^2.0.1","@google-github-actions/actions-utils":"^0.4.8","semver":"^7.5.0"},"devDependencies":{"@types/chai":"^4.3.x","@types/mocha":"^10.0.1","@types/node":"^20.1.0","@types/sinon":"^10.0.14","@typescript-eslint/eslint-plugin":"^5.59.2","@typescript-eslint/parser":"^5.59.2","@vercel/ncc":"^0.36.1","chai":"^4.3.x","eslint":"^8.40.0","eslint-config-prettier":"^8.8.0","eslint-plugin-prettier":"^4.2.1","mocha":"^10.2.0","prettier":"^2.8.8","sinon":"^15.0.4","ts-node":"^10.9.1","typedoc":"^0.24.7","typedoc-plugin-markdown":"^3.15.3","typescript":"^5.0.4"}}');
 
 /***/ })
 
