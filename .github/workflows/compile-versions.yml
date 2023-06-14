@@ -1,6 +1,7 @@
 name: 'Compile versions'
 
 on:
+  pull_request:
   schedule:
     - cron: '0 */12 * * *'
   workflow_dispatch:
@@ -18,30 +19,13 @@ jobs:
 
     steps:
     - uses: 'actions/checkout@v3'
-
-    # We don't want a circular dependency on setup-gcloud. We don't actually
-    # need authentication for this (the bucket is public), but gcloud refuses to
-    # run without auth.
-    - name: 'Authenticate gcloud'
-      run: |-
-        CRED_FILE="${RUNNER_TEMP}/creds.json"
-        cat <<EOF > ${CRED_FILE}
-        ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}
-        EOF
-
-        gcloud auth login --update-adc --force --cred-file "${CRED_FILE}"
+      with:
+        ref: 'main'
 
     - name: 'Get versions list'
       run: |-
         mkdir -p ./data
-        gcloud storage objects list "gs://cloud-sdk-release" \
-          --format='value(name)' \
-          --page-size=1000 \
-          | grep -Po '(\d)+\.(\d)+\.(\d)+' \
-          | sort -h \
-          | uniq \
-          | jq -R -s 'split("\n") | map(select(length > 0))' \
-          > ./data/versions.json
+        echo "{}" > ./data/versions.json # TODO
 
         echo "Computed versions:"
         cat ./data/versions.json
@@ -70,42 +54,50 @@ jobs:
       with:
         github-token: '${{ secrets.ACTIONS_BOT_TOKEN }}'
         script: |-
-          const baseBranch = `${{ github.ref_name }}`;
+          const owner = context.repo.owner;
+          const repo = context.repo.repo;
+          const baseRef = `${{ github.base_ref }}`;
           const prBranch = `${{ env.PR_BRANCH }}`;
           const prBody = `Update latest gcloud versions`;
 
-          try {
-            const listResponse = await github.rest.pulls.list({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: `open`,
-              head: `${context.repo.owner}:${prBranch}`,
-              base: baseBranch,
+          console.log({
+            owner,
+            repo,
+            baseRef,
+            prBranch,
+            prBody,
+          });
+
+          const listResponse = await github.rest.pulls.list({
+            owner: owner,
+            repo: repo,
+            state: `open`,
+            head: `${owner}:${prBranch}`,
+            base: baseRef,
+          });
+
+          console.log({listResponse});
+
+          if(!listResponse.data.length) {
+            core.info(`Attempting to create new PR...`)
+            const createResponse = await github.rest.pulls.create({
+              owner: owner,
+              repo: repo,
+              title: `Update gcloud versions`,
+              body: prBody,
+              head: prBranch,
+              base: baseRef,
             });
-
-            core.isDebug() && console.log(listResponse);
-
-            if(!listResponse.data.length) {
-              const createResponse = await github.rest.pulls.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: `Update gcloud versions`,
-                body: prBody,
-                head: prBranch,
-                base: baseBranch,
-              });
-              core.info(`Created PR #${createResponse.data.number} at ${createResponse.data.html_url}`);
-            } else {
-              const updateResponse = await github.rest.pulls.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: listResponse.data[0].number,
-                title: `Update gcloud versions`,
-                body: prBody,
-              });
-              core.info(`Updated PR #${updateResponse.data.number} at ${updateResponse.data.html_url}`);
-            }
-          } catch(err) {
-            console.error(err);
-            core.setFailed(`Failed to create pull request: ${err}`);
+            core.info(`Created PR #${createResponse.data.number} at ${createResponse.data.html_url}`);
+          } else {
+            const instance = listResponse.data[0];
+            core.info(`Attempting to update existing PR #${instance.number}...`)
+            const updateResponse = await github.rest.pulls.update({
+              owner: owner,
+              repo: repo,
+              pull_number: instance.number,
+              title: `Update gcloud versions`,
+              body: prBody,
+            });
+            core.info(`Updated PR #${updateResponse.data.number} at ${updateResponse.data.html_url}`);
           }
