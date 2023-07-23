@@ -1,4 +1,4 @@
-name: 'Compile versions'
+name: '[![Compile versions](https://github.com/google-github-actions/setup-cloud-sdk/actions/workflows/compile-versions.yml/badge.svg?branch=main&event=schedule)](https://github.com/google-github-actions/setup-cloud-sdk/actions/workflows/compile-versions.yml)'
 
 on:
   schedule:
