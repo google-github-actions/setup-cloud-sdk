@@ -5,6 +5,7 @@ go 1.20
 require (
 	cloud.google.com/go/storage v1.31.0
 	github.com/maruel/natural v1.1.0
+	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090
 	google.golang.org/api v0.126.0
 )
 

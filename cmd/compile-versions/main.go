@@ -13,6 +13,7 @@ import (
 
 	"cloud.google.com/go/storage"
 	"github.com/maruel/natural"
+	"golang.org/x/exp/maps"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -76,10 +77,7 @@ func realMain(ctx context.Context) error {
 	}
 
 	// Do a natural sort so that it looks good to humans instead of machines.
-	versions := make([]string, 0, len(versionsMap))
-	for version := range versionsMap {
-		versions = append(versions, version)
-	}
+	versions := maps.Keys(versionsMap)
 	sort.Sort(natural.StringSlice(versions))
 
 	// Print it out.
