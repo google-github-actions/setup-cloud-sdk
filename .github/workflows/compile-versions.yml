@@ -19,29 +19,14 @@ jobs:
     steps:
     - uses: 'actions/checkout@v3'
 
-    # We don't want a circular dependency on setup-gcloud. We don't actually
-    # need authentication for this (the bucket is public), but gcloud refuses to
-    # run without auth.
-    - name: 'Authenticate gcloud'
-      run: |-
-        CRED_FILE="${RUNNER_TEMP}/creds.json"
-        cat <<EOF > ${CRED_FILE}
-        ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}
-        EOF
-
-        gcloud auth login --update-adc --force --cred-file "${CRED_FILE}"
+    - uses: 'actions/setup-go@v4'
+      with:
+        go-version: '1.20'
 
     - name: 'Get versions list'
       run: |-
         mkdir -p ./data
-        gcloud storage objects list "gs://cloud-sdk-release" \
-          --format='value(name)' \
-          --page-size=1000 \
-          | grep -Po '(\d)+\.(\d)+\.(\d)+' \
-          | sort -h \
-          | uniq \
-          | jq -R -s 'split("\n") | map(select(length > 0))' \
-          > ./data/versions.json
+        go run ./cmd/compile-versions/main.go > ./data/versions.json
 
         echo "Computed versions:"
         cat ./data/versions.json
