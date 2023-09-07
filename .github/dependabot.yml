@@ -1,4 +1,4 @@
-version: 2
+commit 52e8ce645c0cbaf506f3406bb7760ead1a0b9a47version: 2
 updates:
   - package-ecosystem: 'npm'
     directory: '/'
