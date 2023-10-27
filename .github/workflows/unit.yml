@@ -20,17 +20,16 @@ jobs:
       matrix:
         os:
         - 'ubuntu-latest'
-        - 'windows-2019'
         - 'windows-2022'
         - 'macos-latest'
         node:
-        - '16.x'
+        - '20.x'
     runs-on: '${{ matrix.os }}'
 
     steps:
-    - uses: 'actions/checkout@v3'
+    - uses: 'actions/checkout@v4'
 
-    - uses: 'actions/setup-node@v3'
+    - uses: 'actions/setup-node@v4'
       with:
         node-version: '${{ matrix.node }}'
 

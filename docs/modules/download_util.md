@@ -12,13 +12,9 @@
 
 ### downloadAndExtractTool
 
-▸ **downloadAndExtractTool**(`url`): `Promise`<`string`\>
+▸ **downloadAndExtractTool**(`url`): `Promise`\<`string`\>
 
 Downloads and extracts the tool at the specified URL.
-
-**`Url`**
-
-The URL of the tool to be downloaded.
 
 #### Parameters
 
@@ -28,9 +24,13 @@ The URL of the tool to be downloaded.
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 The path to the locally extracted tool.
+
+**`Url`**
+
+The URL of the tool to be downloaded.
 
 #### Defined in
 

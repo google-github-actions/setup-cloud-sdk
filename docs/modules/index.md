@@ -117,7 +117,7 @@ the app version from the package declaration.
 
 ### authenticateGcloudSDK
 
-▸ **authenticateGcloudSDK**(`filepath`): `Promise`<`void`\>
+▸ **authenticateGcloudSDK**(`filepath`): `Promise`\<`void`\>
 
 Authenticates the gcloud tool using the provided credentials file.
 
@@ -129,7 +129,7 @@ Authenticates the gcloud tool using the provided credentials file.
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
@@ -139,7 +139,7 @@ ___
 
 ### bestVersion
 
-▸ **bestVersion**(`spec`): `Promise`<`string`\>
+▸ **bestVersion**(`spec`): `Promise`\<`string`\>
 
 bestVersion takes a version constraint and gets the latest available version
 that satisfies the constraint.
@@ -152,7 +152,7 @@ that satisfies the constraint.
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 Resolved version
 
@@ -190,7 +190,7 @@ ___
 
 ### computeGcloudVersion
 
-▸ **computeGcloudVersion**(`version?`): `Promise`<`string`\>
+▸ **computeGcloudVersion**(`version?`): `Promise`\<`string`\>
 
 computeGcloudVersion computes the appropriate gcloud version for the given
 string. If the string is the empty string or the special value "latest", it
@@ -203,10 +203,6 @@ This is most useful when accepting user input which should default to
 installed, but still want users to be able to choose a specific version to
 install as a customization.
 
-**`Deprecated`**
-
-Callers should use `installGcloudSDK('> 0.0.0.')` instead.
-
 #### Parameters
 
 | Name | Type | Description |
@@ -215,9 +211,13 @@ Callers should use `installGcloudSDK('> 0.0.0.')` instead.
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 String representing the latest version.
+
+**`Deprecated`**
+
+Callers should use `installGcloudSDK('> 0.0.0.')` instead.
 
 #### Defined in
 
@@ -227,7 +227,7 @@ ___
 
 ### gcloudRun
 
-▸ **gcloudRun**(`cmd`, `options?`): `Promise`<[`ExecOutput`](index.md#execoutput)\>
+▸ **gcloudRun**(`cmd`, `options?`): `Promise`\<[`ExecOutput`](index.md#execoutput)\>
 
 gcloudRun executes the given gcloud command using actions/exec under the
 hood. It handles non-zero exit codes and throws a more semantic error on
@@ -242,7 +242,7 @@ failure.
 
 #### Returns
 
-`Promise`<[`ExecOutput`](index.md#execoutput)\>
+`Promise`\<[`ExecOutput`](index.md#execoutput)\>
 
 ExecOutput
 
@@ -254,7 +254,7 @@ ___
 
 ### gcloudRunJSON
 
-▸ **gcloudRunJSON**(`cmd`, `options?`): `Promise`<`any`\>
+▸ **gcloudRunJSON**(`cmd`, `options?`): `Promise`\<`any`\>
 
 gcloudRunJSON runs the gcloud command with JSON output and parses the result
 as JSON. If the parsing fails, it throws an error.
@@ -268,7 +268,7 @@ as JSON. If the parsing fails, it throws an error.
 
 #### Returns
 
-`Promise`<`any`\>
+`Promise`\<`any`\>
 
 Parsed JSON as an object (or array).
 
@@ -280,13 +280,13 @@ ___
 
 ### getLatestGcloudSDKVersion
 
-▸ **getLatestGcloudSDKVersion**(): `Promise`<`string`\>
+▸ **getLatestGcloudSDKVersion**(): `Promise`\<`string`\>
 
 getLatestGcloudSDKVersion fetches the latest version number from the API.
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 The latest stable version of the gcloud SDK.
 
@@ -316,7 +316,7 @@ ___
 
 ### installComponent
 
-▸ **installComponent**(`component`): `Promise`<`void`\>
+▸ **installComponent**(`component`): `Promise`\<`void`\>
 
 Install a Cloud SDK component.
 
@@ -328,7 +328,7 @@ Install a Cloud SDK component.
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 CMD output
 
@@ -340,7 +340,7 @@ ___
 
 ### installGcloudSDK
 
-▸ **installGcloudSDK**(`version`): `Promise`<`string`\>
+▸ **installGcloudSDK**(`version`): `Promise`\<`string`\>
 
 Installs the gcloud SDK into the actions environment.
 
@@ -352,7 +352,7 @@ Installs the gcloud SDK into the actions environment.
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`\<`string`\>
 
 The path of the installed tool.
 
@@ -364,13 +364,13 @@ ___
 
 ### isAuthenticated
 
-▸ **isAuthenticated**(): `Promise`<`boolean`\>
+▸ **isAuthenticated**(): `Promise`\<`boolean`\>
 
 Checks if gcloud is authenticated.
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 true is gcloud is authenticated.
 
@@ -406,13 +406,13 @@ ___
 
 ### isProjectIdSet
 
-▸ **isProjectIdSet**(): `Promise`<`boolean`\>
+▸ **isProjectIdSet**(): `Promise`\<`boolean`\>
 
 Checks if the project Id is set in the gcloud config.
 
 #### Returns
 
-`Promise`<`boolean`\>
+`Promise`\<`boolean`\>
 
 true is project Id is set.
 
@@ -424,7 +424,7 @@ ___
 
 ### setProject
 
-▸ **setProject**(`projectId`): `Promise`<`void`\>
+▸ **setProject**(`projectId`): `Promise`\<`void`\>
 
 Sets the GCP Project Id in the gcloud config.
 
@@ -436,7 +436,7 @@ Sets the GCP Project Id in the gcloud config.
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 project ID.
 
