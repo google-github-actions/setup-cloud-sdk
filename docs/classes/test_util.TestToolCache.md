@@ -32,7 +32,11 @@ used.
 
 ### constructor
 
-• **new TestToolCache**()
+• **new TestToolCache**(): [`TestToolCache`](test_util.TestToolCache.md)
+
+#### Returns
+
+[`TestToolCache`](test_util.TestToolCache.md)
 
 ## Properties
 
@@ -88,13 +92,13 @@ ___
 
 ### start
 
-▸ `Static` **start**(): `Promise`<`void`\>
+▸ **start**(): `Promise`\<`void`\>
 
 Creates temporary directories for the runner cache and temp.
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
@@ -104,14 +108,14 @@ ___
 
 ### stop
 
-▸ `Static` **stop**(): `Promise`<`void`\>
+▸ **stop**(): `Promise`\<`void`\>
 
 Restores the Action's runner to use the original directories and deletes
 the temporary files.
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`\<`void`\>
 
 #### Defined in
 
