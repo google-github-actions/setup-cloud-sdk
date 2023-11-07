@@ -17,7 +17,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/google-github-actions/setup-cloud-sdk"
+    "url": "git+https://github.com/google-github-actions/setup-cloud-sdk.git"
   },
   "keywords": [
     "Cloud SDK",
