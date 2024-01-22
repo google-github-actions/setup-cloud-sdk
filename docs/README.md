@@ -39,10 +39,10 @@ import * as setupGcloud from '@google-github-actions/setup-cloud-sdk';
 const gcloudVersion = await setupGcloud.getLatestGcloudSDKVersion();
 
 if (!setupGcloud.isInstalled(gcloudVersion)) {
-    await setupGcloud.installGcloudSDK(gcloudVersion);
+  await setupGcloud.installGcloudSDK(gcloudVersion);
 } else {
-    const toolPath = toolCache.find('gcloud', gcloudVersion);
-    core.addPath(path.join(toolPath, 'bin'));
+  const toolPath = toolCache.find('gcloud', gcloudVersion);
+  core.addPath(path.join(toolPath, 'bin'));
 }
 
 // Authenticate gcloud SDK.
@@ -50,7 +50,7 @@ if (credentials) await setupGcloud.authenticateGcloudSDK(credentials);
 
 const authenticated = await setupGcloud.isAuthenticated();
 if (!authenticated) {
-    throw new Error('Error authenticating the Cloud SDK.');
+  throw new Error('Error authenticating the Cloud SDK.');
 }
 
 const toolCommand = setupGcloud.getToolCommand();

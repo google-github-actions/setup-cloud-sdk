@@ -25,4 +25,8 @@ module.exports = {
     'plugin:prettier/recommended',
   ],
   ignorePatterns: ['**/dist/*'],
+
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'off',
+  },
 };
