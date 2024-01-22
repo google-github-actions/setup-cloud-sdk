@@ -107,7 +107,7 @@ test('#downloadAndExtractTool', async (suite) => {
   );
 
   await suite.test('errors on download not found', async () => {
-    assert.rejects(async () => {
+    await assert.rejects(async () => {
       await downloadUtil.downloadAndExtractTool('fakeUrl');
     }, /Invalid URL/);
   });
