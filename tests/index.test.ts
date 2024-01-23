@@ -25,23 +25,17 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import { HttpClient } from '@actions/http-client';
 import * as io from '@actions/io';
-import { randomFilename, writeSecureFile } from '@google-github-actions/actions-utils';
+import {
+  randomFilename,
+  skipIfMissingEnv,
+  writeSecureFile,
+} from '@google-github-actions/actions-utils';
 
 import * as setupCloudSDK from '../src/index';
 
 import { TestToolCache, TEST_WIF_CREDS_FILE } from '../src/test-util';
 
 const SERVICE_ACCOUNT_KEY_JSON = process.env.SERVICE_ACCOUNT_KEY_JSON || '';
-
-const skipIfMissingEnv = (...envs: string[]): string | boolean => {
-  for (const env of envs) {
-    if (!(env in process.env)) {
-      return `missing $${env}`;
-    }
-  }
-
-  return false;
-};
 
 test('#setupCloudSDK', async (suite) => {
   suite.before(() => {
@@ -222,7 +216,7 @@ test('#setupCloudSDK', async (suite) => {
     });
 
     await t.test('errors with bad components', async () => {
-      assert.rejects(async () => {
+      await assert.rejects(async () => {
         await setupCloudSDK.installComponent('not-a-component');
       }, /failed to execute command/);
     });

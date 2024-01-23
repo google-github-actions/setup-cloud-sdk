@@ -6970,7 +6970,7 @@ const path_1 = __nccwpck_require2_(1017);
  * toPosixPath converts the given path to the posix form. On Windows, \\ will be
  * replaced with /.
  *
- * @param pth. Path to transform.
+ * @param pth Path to transform.
  * @return string Posix path.
  */
 function toPosixPath(pth) {
@@ -6981,7 +6981,7 @@ exports.toPosixPath = toPosixPath;
  * toWin32Path converts the given path to the win32 form. On Linux, / will be
  * replaced with \\.
  *
- * @param pth. Path to transform.
+ * @param pth Path to transform.
  * @return string Win32 path.
  */
 function toWin32Path(pth) {
@@ -7100,8 +7100,8 @@ const DEFAULT_BACKOFF_MILLISECONDS = 100;
 /**
  * withRetry implements a retry mechanism with fibonacci backoff
  *
- * @param fn. A function to retry on failure
- * @param opts. The retry options
+ * @param fn A function to retry on failure
+ * @param opts The retry options
  * @returns fn. A function to start the retry process as a promise
  * @throws {Error}
  */
@@ -7152,7 +7152,7 @@ exports.withRetries = withRetries;
 /***/ }),
 
 /***/ 9017:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require2_) {
 
 
 /*
@@ -7170,8 +7170,12 @@ exports.withRetries = withRetries;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.clearEnv = exports.clearInputs = exports.setInputs = exports.setInput = void 0;
+exports.assertMembers = exports.skipIfMissingEnv = exports.clearEnv = exports.clearInputs = exports.setInputs = exports.setInput = void 0;
+const node_assert_1 = __importDefault(__nccwpck_require2_(8061));
 /**
  * setInput sets the given name as a GitHub Actions input. It uses the reverse
  * logic for how GitHub Actions searches for a named input.
@@ -7215,6 +7219,50 @@ function clearEnv(fn) {
     });
 }
 exports.clearEnv = clearEnv;
+/**
+ * skipIfMissingEnv is a helper function for skipping a test if an environment
+ * variable is missing (unset).
+ *
+ * @param envs List of environment variables
+ * @return false or string indicating the test was skipped
+ */
+function skipIfMissingEnv(...envs) {
+    for (const env of envs) {
+        if (!(env in process.env)) {
+            return `missing $${env}`;
+        }
+    }
+    return false;
+}
+exports.skipIfMissingEnv = skipIfMissingEnv;
+/**
+ * assertMembers is an assertion that verifies the expected contains all of the
+ * given members, in the order in which they were expected.
+ *
+ * @param actual The value to check again
+ * @param expected The subset of values to assert
+ */
+function assertMembers(actual, expected) {
+    for (let i = 0; i <= actual.length - expected.length; i++) {
+        let found = true;
+        for (let j = 0; j < expected.length; j++) {
+            if (actual[i + j] !== expected[j]) {
+                found = false;
+                break;
+            }
+        }
+        if (found) {
+            return;
+        }
+    }
+    throw new node_assert_1.default.AssertionError({
+        message: 'elements from expected are not in actual',
+        actual: actual,
+        expected: expected,
+        operator: 'subArray',
+    });
+}
+exports.assertMembers = assertMembers;
 
 
 /***/ }),
@@ -7311,7 +7359,7 @@ exports.parseDuration = parseDuration;
 /**
  * sleep waits for a specified duration in milliseconds as a promise.
  *
- * @param ms. Duration in milliseconds to sleep.
+ * @param ms Duration in milliseconds to sleep.
  */
 function sleep(ms = 0) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -7483,6 +7531,13 @@ module.exports = __nccwpck_require__(6113);
 /***/ ((module) => {
 
 module.exports = __nccwpck_require__(7147);
+
+/***/ }),
+
+/***/ 8061:
+/***/ ((module) => {
+
+module.exports = __nccwpck_require__(8061);
 
 /***/ }),
 
@@ -42823,6 +42878,14 @@ module.exports = require("net");
 
 /***/ }),
 
+/***/ 8061:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:assert");
+
+/***/ }),
+
 /***/ 5673:
 /***/ ((module) => {
 
@@ -44590,7 +44653,7 @@ module.exports = parseParams
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.1.3","description":"Utilities to download, install and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint . --ext .ts,.tsx","format":"eslint . --ext .ts,.tsx --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.10.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.0","@actions/tool-cache":"^2.0.1","@google-github-actions/actions-utils":"^0.6.0","semver":"^7.5.4"},"devDependencies":{"@types/node":"^20.11.5","@typescript-eslint/eslint-plugin":"^6.19.0","@typescript-eslint/parser":"^6.19.0","@vercel/ncc":"^0.38.1","eslint":"^8.56.0","eslint-config-prettier":"^9.1.0","eslint-plugin-prettier":"^5.1.3","prettier":"^3.2.4","ts-node":"^10.9.2","typedoc":"^0.25.7","typedoc-plugin-markdown":"^3.17.1","typescript":"^5.3.3"}}');
+module.exports = JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.1.3","description":"Utilities to download, install and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint . --ext .ts,.tsx","format":"eslint . --ext .ts,.tsx --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.10.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.0","@actions/tool-cache":"^2.0.1","@google-github-actions/actions-utils":"^0.7.0","semver":"^7.5.4"},"devDependencies":{"@types/node":"^20.11.5","@typescript-eslint/eslint-plugin":"^6.19.1","@typescript-eslint/parser":"^6.19.1","@vercel/ncc":"^0.38.1","eslint":"^8.56.0","eslint-config-prettier":"^9.1.0","eslint-plugin-prettier":"^5.1.3","prettier":"^3.2.4","ts-node":"^10.9.2","typedoc":"^0.25.7","typedoc-plugin-markdown":"^3.17.1","typescript":"^5.3.3"}}');
 
 /***/ })
 
