@@ -31,7 +31,7 @@
     "@actions/exec": "^1.1.1",
     "@actions/http-client": "^2.2.1",
     "@actions/tool-cache": "^2.0.1",
-    "@google-github-actions/actions-utils": "^0.7.2",
+    "@google-github-actions/actions-utils": "^0.7.3",
     "semver": "^7.6.0"
   },
   "devDependencies": {
