@@ -31,7 +31,7 @@ jobs:
 
       - uses: 'actions/setup-node@v4'
         with:
-          node-version: '20.x'
+          node-version: '20.12.x' # https://github.com/nodejs/node/issues/53033
 
       - name: 'npm build'
         run: 'npm ci && npm run build'
@@ -43,6 +43,4 @@ jobs:
         run: 'npm run lint'
 
       - name: 'npm test'
-        env:
-          SERVICE_ACCOUNT_KEY_JSON: '${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}'
         run: 'npm run test'

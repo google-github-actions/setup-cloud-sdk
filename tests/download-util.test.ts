@@ -17,35 +17,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
 
-import * as fs from 'fs';
-import * as os from 'os';
-
+import * as toolCache from '@actions/tool-cache';
 import * as core from '@actions/core';
 
-import { TestToolCache, TEST_SDK_VERSION } from '../src/test-util';
+import { downloadAndExtractTool } from '../src/download-util';
 
-// Import modules being tested after test setup as run.
-import * as downloadUtil from '../src/download-util';
-
-import { buildReleaseURL } from '../src/format-url';
-
-const skipIfWindows = (): string | boolean => {
-  if (os.platform() === 'win32') {
-    return 'skipping on Windows';
-  }
-
-  return false;
-};
-
-test('#downloadAndExtractTool', async (suite) => {
+test('#downloadAndExtractTool', { concurrency: true }, async (suite) => {
   suite.before(async () => {
-    // Minimize download failure retry times in tests:
-    //
-    //   https://github.com/actions/toolkit/blob/a1b068ec31a042ff1e10a522d8fdf0b8869d53ca/packages/tool-cache/src/tool-cache.ts#L51
-    const g = global as any;
-    g['TEST_DOWNLOAD_TOOL_RETRY_MIN_SECONDS'] = '0';
-    g['TEST_DOWNLOAD_TOOL_RETRY_MAX_SECONDS'] = '0';
-
     suite.mock.method(core, 'debug', () => {});
     suite.mock.method(core, 'info', () => {});
     suite.mock.method(core, 'warning', () => {});
@@ -58,57 +36,39 @@ test('#downloadAndExtractTool', async (suite) => {
     suite.mock.method(core, 'exportVariable', () => {});
   });
 
-  suite.beforeEach(async () => {
-    await TestToolCache.start();
-  });
-
-  suite.afterEach(async () => {
-    await TestToolCache.stop();
-  });
-
-  suite.after(async () => {
-    const g = global as any;
-    delete g['TEST_DOWNLOAD_TOOL_RETRY_MIN_SECONDS'];
-    delete g['TEST_DOWNLOAD_TOOL_RETRY_MAX_SECONDS'];
-  });
-
-  await suite.test('downloads and extracts linux version', { skip: skipIfWindows() }, async () => {
-    const url = buildReleaseURL('linux', 'x86_64', TEST_SDK_VERSION);
-    const extPath = await downloadUtil.downloadAndExtractTool(url);
-    assert.ok(extPath);
-    assert.ok(fs.existsSync(extPath));
-  });
-
-  await suite.test('downloads and extracts windows version', async () => {
-    // Use an older version of the Windows release, as the current release is
-    // 200MB+ and takes too long to download.
-    const url = buildReleaseURL('win32', 'x86_64', '0.9.83');
-    const extPath = await downloadUtil.downloadAndExtractTool(url);
-    assert.ok(extPath);
-    assert.ok(fs.existsSync(extPath));
-  });
-
-  await suite.test('downloads and extracts darwin version', { skip: skipIfWindows() }, async () => {
-    const url = buildReleaseURL('darwin', 'x86_64', TEST_SDK_VERSION);
-    const extPath = await downloadUtil.downloadAndExtractTool(url);
-    assert.ok(extPath);
-    assert.ok(fs.existsSync(extPath));
-  });
-
-  await suite.test(
-    'downloads and extracts mac ARM version',
-    { skip: skipIfWindows() },
-    async () => {
-      const url = buildReleaseURL('darwin', 'arm64', TEST_SDK_VERSION);
-      const extPath = await downloadUtil.downloadAndExtractTool(url);
-      assert.ok(extPath);
-      assert.ok(fs.existsSync(extPath));
+  const cases = [
+    {
+      name: 'file.7z',
+      exp: 'extract7z',
     },
-  );
+    {
+      name: 'file.tar.gz',
+      exp: 'extractTar',
+    },
+    {
+      name: 'file.zip',
+      exp: 'extractZip',
+    },
+  ];
 
-  await suite.test('errors on download not found', async () => {
-    await assert.rejects(async () => {
-      await downloadUtil.downloadAndExtractTool('fakeUrl');
-    }, /Invalid URL/);
-  });
+  for await (const tc of cases) {
+    await suite.test(tc.name, async (t) => {
+      const result = () => {
+        return tc.name;
+      };
+
+      const mocks = {
+        downloadTool: t.mock.method(toolCache, 'downloadTool', result),
+        extract7z: t.mock.method(toolCache, 'extract7z', result),
+        extractTar: t.mock.method(toolCache, 'extractTar', result),
+        extractZip: t.mock.method(toolCache, 'extractZip', result),
+      };
+
+      const actual = await downloadAndExtractTool(tc.name);
+      assert.deepStrictEqual(actual, tc.name);
+
+      const mock = mocks[tc.exp as keyof typeof mocks];
+      assert.deepStrictEqual(mock.mock.callCount(), 1);
+    });
+  }
 });

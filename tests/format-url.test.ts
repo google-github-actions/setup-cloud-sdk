@@ -19,7 +19,7 @@ import assert from 'node:assert';
 
 import { buildReleaseURL } from '../src/format-url';
 
-test('#buildReleaseURL', async (suite) => {
+test('#buildReleaseURL', { concurrency: true }, async (suite) => {
   const cases = [
     {
       name: 'unknown os',
