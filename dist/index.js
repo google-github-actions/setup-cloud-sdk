@@ -5968,6 +5968,54 @@ exports.fromBase64 = fromBase64;
 
 /***/ }),
 
+/***/ 6215:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.toEnum = void 0;
+/**
+ * toEnum converts the input value to the best enum value. If no enum value
+ * exists, it throws an error.
+ *
+ * @param e Enum to check against.
+ * @param s String to enumerize.
+ * @returns string
+ */
+function toEnum(e, s) {
+    const originalValue = (s || '').toUpperCase();
+    const mutatedValue = originalValue.replace(/[\s-]+/g, '_');
+    if (originalValue in e) {
+        return e[originalValue];
+    }
+    else if (mutatedValue in e) {
+        return e[mutatedValue];
+    }
+    else {
+        const keys = Object.keys(e);
+        throw new Error(`Invalid value ${s}, valid values are ${JSON.stringify(keys)}`);
+    }
+}
+exports.toEnum = toEnum;
+
+
+/***/ }),
+
 /***/ 1996:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -6219,6 +6267,22 @@ function parseFlags(input) {
     }
     if (current !== '') {
         result.push(current);
+    }
+    // Post-process and remove any super-quoted strings.
+    for (let i = 0; i < result.length; i++) {
+        for (;;) {
+            const v = result[i];
+            if (v.length < 2) {
+                break;
+            }
+            const first = v.at(0);
+            const last = v.at(-1);
+            if ((first === `'` || first === `"`) && first === last) {
+                result[i] = v.slice(1, -1);
+                continue;
+            }
+            break;
+        }
     }
     return result;
 }
@@ -6514,6 +6578,7 @@ __exportStar(__nccwpck_require2_(3497), exports);
 __exportStar(__nccwpck_require2_(1848), exports);
 __exportStar(__nccwpck_require2_(7962), exports);
 __exportStar(__nccwpck_require2_(3102), exports);
+__exportStar(__nccwpck_require2_(6215), exports);
 __exportStar(__nccwpck_require2_(1996), exports);
 __exportStar(__nccwpck_require2_(6976), exports);
 __exportStar(__nccwpck_require2_(3252), exports);
@@ -6527,6 +6592,7 @@ __exportStar(__nccwpck_require2_(570), exports);
 __exportStar(__nccwpck_require2_(1043), exports);
 __exportStar(__nccwpck_require2_(9017), exports);
 __exportStar(__nccwpck_require2_(7575), exports);
+__exportStar(__nccwpck_require2_(7167), exports);
 __exportStar(__nccwpck_require2_(596), exports);
 __exportStar(__nccwpck_require2_(9324), exports);
 
@@ -6616,7 +6682,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseKVStringAndFile = exports.parseKVYAML = exports.parseKVJSON = exports.parseKVFile = exports.parseKVString = exports.joinKVStringForGCloud = exports.joinKVString = void 0;
 const yaml_1 = __importDefault(__nccwpck_require2_(4083));
 const fs_1 = __nccwpck_require2_(7147);
-const crypto_1 = __nccwpck_require2_(6113);
 const errors_1 = __nccwpck_require2_(6976);
 const validations_1 = __nccwpck_require2_(596);
 /**
@@ -6639,36 +6704,28 @@ exports.joinKVString = joinKVString;
  * string.
  *
  * @param input KVPair to serialize.
- * @param rand String of random characters to use; override for testing.
+ * @param chars String of characters to use.
  */
-function joinKVStringForGCloud(input, rand = (0, crypto_1.randomBytes)(128).toString('hex')) {
-    const initial = Object.entries(input).join('');
+function joinKVStringForGCloud(input, chars = ',.!@#$%&*()_=+~`[]{}|:;<>?🚀🍪🐼\u200B') {
+    const initial = joinKVString(input, '');
     if (initial === '') {
         return '';
     }
+    const initialMap = {};
+    for (let i = 0; i < initial.length; i++) {
+        initialMap[initial[i]] = true;
+    }
     let delim = '';
-    // Build an increasingly longer delimiter.
-    for (let i = 0; i < rand.length; i++) {
-        const ch = rand[i];
-        // The first character in the delimiter cannot match the last character of
-        // any values because gcloud parses left-to-right:
-        //
-        //     https://github.com/google-github-actions/deploy-cloudrun/issues/503
-        //
-        if (delim === '' && Object.values(input).some((v) => v.endsWith(ch))) {
-            continue;
+    for (let i = 0; i < chars.length; i++) {
+        const ch = chars[i];
+        if (!(ch in initialMap)) {
+            delim = ch;
+            break;
         }
-        delim += ch;
-        if (initial.includes(delim)) {
-            continue;
-        }
-        // If we got this far, then the delimiter is not found in the string.
-        break;
     }
     if (delim === '' || initial.includes(delim)) {
-        throw new Error(`Something extremely probabilistically unlikely has occured - one of ` +
-            `the KV pairs exactly matched 128 randomly-generated bytes. Please ` +
-            `retry, or use smaller KV pairs with non-conflicting values.`);
+        throw new Error(`Something extremely probabilistically unlikely has occured - none of ` +
+            `the possible delimiters is viable for the input.`);
     }
     return `^${delim}^` + joinKVString(input, delim);
 }
@@ -6679,6 +6736,9 @@ exports.joinKVStringForGCloud = joinKVStringForGCloud;
  * escaped with a backslash ("\,", "\\n"). All leading and trailing whitespace
  * is trimmed.
  *
+ * If the input is the literal string "{}", this returns the empty object. This
+ * is useful when trying to delete all upstream values.
+ *
  * @param input String with key/value pairs to parse.
  */
 function parseKVString(input) {
@@ -6687,6 +6747,9 @@ function parseKVString(input) {
         return {};
     }
     const result = {};
+    if (input === '{}') {
+        return result;
+    }
     let currentKey = '';
     let currentValue = '';
     let backslashIdx = -1;
@@ -7373,6 +7436,53 @@ function sleep() {
     });
 }
 exports.sleep = sleep;
+
+
+/***/ }),
+
+/***/ 7167:
+/***/ ((__unused_webpack_module, exports) => {
+
+
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.expandUniverseEndpoints = void 0;
+/**
+ * expandUniverseEndpoints takes a list of universe endpoints using the
+ * {universe} template and returns the interolated values.
+ *
+ * @param endpoints is an array of endpoints to universify
+ * @param universe is the universe to use
+ */
+function expandUniverseEndpoints(endpoints, universe = 'googleapis.com') {
+    const result = Object.assign({});
+    for (const key in endpoints) {
+        const envOverrideKey = `GHA_ENDPOINT_OVERRIDE_${key}`;
+        const envOverrideValue = process.env[envOverrideKey];
+        if (envOverrideValue && envOverrideValue !== '') {
+            result[key] = envOverrideValue.replace(/\/+$/, '');
+        }
+        else {
+            result[key] = endpoints[key].replace(/{universe}/g, universe).replace(/\/+$/, '');
+        }
+    }
+    return result;
+}
+exports.expandUniverseEndpoints = expandUniverseEndpoints;
 
 
 /***/ }),
@@ -14000,7 +14110,7 @@ const falseTag = {
     identify: value => value === false,
     default: true,
     tag: 'tag:yaml.org,2002:bool',
-    test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/i,
+    test: /^(?:N|n|[Nn]o|NO|[Ff]alse|FALSE|[Oo]ff|OFF)$/,
     resolve: () => new Scalar.Scalar(false),
     stringify: boolStringify
 };
@@ -15975,348 +16085,6 @@ exports.visitAsync = visitAsync;
 
 /***/ }),
 
-/***/ 7129:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-
-// A linked list to keep track of recently-used-ness
-const Yallist = __nccwpck_require__(665)
-
-const MAX = Symbol('max')
-const LENGTH = Symbol('length')
-const LENGTH_CALCULATOR = Symbol('lengthCalculator')
-const ALLOW_STALE = Symbol('allowStale')
-const MAX_AGE = Symbol('maxAge')
-const DISPOSE = Symbol('dispose')
-const NO_DISPOSE_ON_SET = Symbol('noDisposeOnSet')
-const LRU_LIST = Symbol('lruList')
-const CACHE = Symbol('cache')
-const UPDATE_AGE_ON_GET = Symbol('updateAgeOnGet')
-
-const naiveLength = () => 1
-
-// lruList is a yallist where the head is the youngest
-// item, and the tail is the oldest.  the list contains the Hit
-// objects as the entries.
-// Each Hit object has a reference to its Yallist.Node.  This
-// never changes.
-//
-// cache is a Map (or PseudoMap) that matches the keys to
-// the Yallist.Node object.
-class LRUCache {
-  constructor (options) {
-    if (typeof options === 'number')
-      options = { max: options }
-
-    if (!options)
-      options = {}
-
-    if (options.max && (typeof options.max !== 'number' || options.max < 0))
-      throw new TypeError('max must be a non-negative number')
-    // Kind of weird to have a default max of Infinity, but oh well.
-    const max = this[MAX] = options.max || Infinity
-
-    const lc = options.length || naiveLength
-    this[LENGTH_CALCULATOR] = (typeof lc !== 'function') ? naiveLength : lc
-    this[ALLOW_STALE] = options.stale || false
-    if (options.maxAge && typeof options.maxAge !== 'number')
-      throw new TypeError('maxAge must be a number')
-    this[MAX_AGE] = options.maxAge || 0
-    this[DISPOSE] = options.dispose
-    this[NO_DISPOSE_ON_SET] = options.noDisposeOnSet || false
-    this[UPDATE_AGE_ON_GET] = options.updateAgeOnGet || false
-    this.reset()
-  }
-
-  // resize the cache when the max changes.
-  set max (mL) {
-    if (typeof mL !== 'number' || mL < 0)
-      throw new TypeError('max must be a non-negative number')
-
-    this[MAX] = mL || Infinity
-    trim(this)
-  }
-  get max () {
-    return this[MAX]
-  }
-
-  set allowStale (allowStale) {
-    this[ALLOW_STALE] = !!allowStale
-  }
-  get allowStale () {
-    return this[ALLOW_STALE]
-  }
-
-  set maxAge (mA) {
-    if (typeof mA !== 'number')
-      throw new TypeError('maxAge must be a non-negative number')
-
-    this[MAX_AGE] = mA
-    trim(this)
-  }
-  get maxAge () {
-    return this[MAX_AGE]
-  }
-
-  // resize the cache when the lengthCalculator changes.
-  set lengthCalculator (lC) {
-    if (typeof lC !== 'function')
-      lC = naiveLength
-
-    if (lC !== this[LENGTH_CALCULATOR]) {
-      this[LENGTH_CALCULATOR] = lC
-      this[LENGTH] = 0
-      this[LRU_LIST].forEach(hit => {
-        hit.length = this[LENGTH_CALCULATOR](hit.value, hit.key)
-        this[LENGTH] += hit.length
-      })
-    }
-    trim(this)
-  }
-  get lengthCalculator () { return this[LENGTH_CALCULATOR] }
-
-  get length () { return this[LENGTH] }
-  get itemCount () { return this[LRU_LIST].length }
-
-  rforEach (fn, thisp) {
-    thisp = thisp || this
-    for (let walker = this[LRU_LIST].tail; walker !== null;) {
-      const prev = walker.prev
-      forEachStep(this, fn, walker, thisp)
-      walker = prev
-    }
-  }
-
-  forEach (fn, thisp) {
-    thisp = thisp || this
-    for (let walker = this[LRU_LIST].head; walker !== null;) {
-      const next = walker.next
-      forEachStep(this, fn, walker, thisp)
-      walker = next
-    }
-  }
-
-  keys () {
-    return this[LRU_LIST].toArray().map(k => k.key)
-  }
-
-  values () {
-    return this[LRU_LIST].toArray().map(k => k.value)
-  }
-
-  reset () {
-    if (this[DISPOSE] &&
-        this[LRU_LIST] &&
-        this[LRU_LIST].length) {
-      this[LRU_LIST].forEach(hit => this[DISPOSE](hit.key, hit.value))
-    }
-
-    this[CACHE] = new Map() // hash of items by key
-    this[LRU_LIST] = new Yallist() // list of items in order of use recency
-    this[LENGTH] = 0 // length of items in the list
-  }
-
-  dump () {
-    return this[LRU_LIST].map(hit =>
-      isStale(this, hit) ? false : {
-        k: hit.key,
-        v: hit.value,
-        e: hit.now + (hit.maxAge || 0)
-      }).toArray().filter(h => h)
-  }
-
-  dumpLru () {
-    return this[LRU_LIST]
-  }
-
-  set (key, value, maxAge) {
-    maxAge = maxAge || this[MAX_AGE]
-
-    if (maxAge && typeof maxAge !== 'number')
-      throw new TypeError('maxAge must be a number')
-
-    const now = maxAge ? Date.now() : 0
-    const len = this[LENGTH_CALCULATOR](value, key)
-
-    if (this[CACHE].has(key)) {
-      if (len > this[MAX]) {
-        del(this, this[CACHE].get(key))
-        return false
-      }
-
-      const node = this[CACHE].get(key)
-      const item = node.value
-
-      // dispose of the old one before overwriting
-      // split out into 2 ifs for better coverage tracking
-      if (this[DISPOSE]) {
-        if (!this[NO_DISPOSE_ON_SET])
-          this[DISPOSE](key, item.value)
-      }
-
-      item.now = now
-      item.maxAge = maxAge
-      item.value = value
-      this[LENGTH] += len - item.length
-      item.length = len
-      this.get(key)
-      trim(this)
-      return true
-    }
-
-    const hit = new Entry(key, value, len, now, maxAge)
-
-    // oversized objects fall out of cache automatically.
-    if (hit.length > this[MAX]) {
-      if (this[DISPOSE])
-        this[DISPOSE](key, value)
-
-      return false
-    }
-
-    this[LENGTH] += hit.length
-    this[LRU_LIST].unshift(hit)
-    this[CACHE].set(key, this[LRU_LIST].head)
-    trim(this)
-    return true
-  }
-
-  has (key) {
-    if (!this[CACHE].has(key)) return false
-    const hit = this[CACHE].get(key).value
-    return !isStale(this, hit)
-  }
-
-  get (key) {
-    return get(this, key, true)
-  }
-
-  peek (key) {
-    return get(this, key, false)
-  }
-
-  pop () {
-    const node = this[LRU_LIST].tail
-    if (!node)
-      return null
-
-    del(this, node)
-    return node.value
-  }
-
-  del (key) {
-    del(this, this[CACHE].get(key))
-  }
-
-  load (arr) {
-    // reset the cache
-    this.reset()
-
-    const now = Date.now()
-    // A previous serialized cache has the most recent items first
-    for (let l = arr.length - 1; l >= 0; l--) {
-      const hit = arr[l]
-      const expiresAt = hit.e || 0
-      if (expiresAt === 0)
-        // the item was created without expiration in a non aged cache
-        this.set(hit.k, hit.v)
-      else {
-        const maxAge = expiresAt - now
-        // dont add already expired items
-        if (maxAge > 0) {
-          this.set(hit.k, hit.v, maxAge)
-        }
-      }
-    }
-  }
-
-  prune () {
-    this[CACHE].forEach((value, key) => get(this, key, false))
-  }
-}
-
-const get = (self, key, doUse) => {
-  const node = self[CACHE].get(key)
-  if (node) {
-    const hit = node.value
-    if (isStale(self, hit)) {
-      del(self, node)
-      if (!self[ALLOW_STALE])
-        return undefined
-    } else {
-      if (doUse) {
-        if (self[UPDATE_AGE_ON_GET])
-          node.value.now = Date.now()
-        self[LRU_LIST].unshiftNode(node)
-      }
-    }
-    return hit.value
-  }
-}
-
-const isStale = (self, hit) => {
-  if (!hit || (!hit.maxAge && !self[MAX_AGE]))
-    return false
-
-  const diff = Date.now() - hit.now
-  return hit.maxAge ? diff > hit.maxAge
-    : self[MAX_AGE] && (diff > self[MAX_AGE])
-}
-
-const trim = self => {
-  if (self[LENGTH] > self[MAX]) {
-    for (let walker = self[LRU_LIST].tail;
-      self[LENGTH] > self[MAX] && walker !== null;) {
-      // We know that we're about to delete this one, and also
-      // what the next least recently used key will be, so just
-      // go ahead and set it now.
-      const prev = walker.prev
-      del(self, walker)
-      walker = prev
-    }
-  }
-}
-
-const del = (self, node) => {
-  if (node) {
-    const hit = node.value
-    if (self[DISPOSE])
-      self[DISPOSE](hit.key, hit.value)
-
-    self[LENGTH] -= hit.length
-    self[CACHE].delete(hit.key)
-    self[LRU_LIST].removeNode(node)
-  }
-}
-
-class Entry {
-  constructor (key, value, length, now, maxAge) {
-    this.key = key
-    this.value = value
-    this.length = length
-    this.now = now
-    this.maxAge = maxAge || 0
-  }
-}
-
-const forEachStep = (self, fn, node, thisp) => {
-  let hit = node.value
-  if (isStale(self, hit)) {
-    del(self, node)
-    if (!self[ALLOW_STALE])
-      hit = undefined
-  }
-  if (hit)
-    fn.call(thisp, hit.value, hit.key, self)
-}
-
-module.exports = LRUCache
-
-
-/***/ }),
-
 /***/ 1532:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -16668,8 +16436,8 @@ class Range {
 
 module.exports = Range
 
-const LRU = __nccwpck_require__(7129)
-const cache = new LRU({ max: 1000 })
+const LRU = __nccwpck_require__(5339)
+const cache = new LRU()
 
 const parseOptions = __nccwpck_require__(785)
 const Comparator = __nccwpck_require__(1532)
@@ -16940,9 +16708,10 @@ const replaceGTE0 = (comp, options) => {
 // 1.2 - 3.4.5 => >=1.2.0 <=3.4.5
 // 1.2.3 - 3.4 => >=1.2.0 <3.5.0-0 Any 3.4.x will do
 // 1.2 - 3.4 => >=1.2.0 <3.5.0-0
+// TODO build?
 const hyphenReplace = incPr => ($0,
   from, fM, fm, fp, fpr, fb,
-  to, tM, tm, tp, tpr, tb) => {
+  to, tM, tm, tp, tpr) => {
   if (isX(fM)) {
     from = ''
   } else if (isX(fm)) {
@@ -17174,7 +16943,7 @@ class SemVer {
     do {
       const a = this.build[i]
       const b = other.build[i]
-      debug('prerelease compare', i, a, b)
+      debug('build compare', i, a, b)
       if (a === undefined && b === undefined) {
         return 0
       } else if (b === undefined) {
@@ -17959,6 +17728,53 @@ module.exports = {
   compareIdentifiers,
   rcompareIdentifiers,
 }
+
+
+/***/ }),
+
+/***/ 5339:
+/***/ ((module) => {
+
+class LRUCache {
+  constructor () {
+    this.max = 1000
+    this.map = new Map()
+  }
+
+  get (key) {
+    const value = this.map.get(key)
+    if (value === undefined) {
+      return undefined
+    } else {
+      // Remove the key from the map and add it to the end
+      this.map.delete(key)
+      this.map.set(key, value)
+      return value
+    }
+  }
+
+  delete (key) {
+    return this.map.delete(key)
+  }
+
+  set (key, value) {
+    const deleted = this.delete(key)
+
+    if (!deleted && value !== undefined) {
+      // If cache is full, delete the least recently used item
+      if (this.map.size >= this.max) {
+        const firstKey = this.map.keys().next().value
+        this.delete(firstKey)
+      }
+
+      this.map.set(key, value)
+    }
+
+    return this
+  }
+}
+
+module.exports = LRUCache
 
 
 /***/ }),
@@ -41890,456 +41706,6 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 4091:
-/***/ ((module) => {
-
-"use strict";
-
-module.exports = function (Yallist) {
-  Yallist.prototype[Symbol.iterator] = function* () {
-    for (let walker = this.head; walker; walker = walker.next) {
-      yield walker.value
-    }
-  }
-}
-
-
-/***/ }),
-
-/***/ 665:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-"use strict";
-
-module.exports = Yallist
-
-Yallist.Node = Node
-Yallist.create = Yallist
-
-function Yallist (list) {
-  var self = this
-  if (!(self instanceof Yallist)) {
-    self = new Yallist()
-  }
-
-  self.tail = null
-  self.head = null
-  self.length = 0
-
-  if (list && typeof list.forEach === 'function') {
-    list.forEach(function (item) {
-      self.push(item)
-    })
-  } else if (arguments.length > 0) {
-    for (var i = 0, l = arguments.length; i < l; i++) {
-      self.push(arguments[i])
-    }
-  }
-
-  return self
-}
-
-Yallist.prototype.removeNode = function (node) {
-  if (node.list !== this) {
-    throw new Error('removing node which does not belong to this list')
-  }
-
-  var next = node.next
-  var prev = node.prev
-
-  if (next) {
-    next.prev = prev
-  }
-
-  if (prev) {
-    prev.next = next
-  }
-
-  if (node === this.head) {
-    this.head = next
-  }
-  if (node === this.tail) {
-    this.tail = prev
-  }
-
-  node.list.length--
-  node.next = null
-  node.prev = null
-  node.list = null
-
-  return next
-}
-
-Yallist.prototype.unshiftNode = function (node) {
-  if (node === this.head) {
-    return
-  }
-
-  if (node.list) {
-    node.list.removeNode(node)
-  }
-
-  var head = this.head
-  node.list = this
-  node.next = head
-  if (head) {
-    head.prev = node
-  }
-
-  this.head = node
-  if (!this.tail) {
-    this.tail = node
-  }
-  this.length++
-}
-
-Yallist.prototype.pushNode = function (node) {
-  if (node === this.tail) {
-    return
-  }
-
-  if (node.list) {
-    node.list.removeNode(node)
-  }
-
-  var tail = this.tail
-  node.list = this
-  node.prev = tail
-  if (tail) {
-    tail.next = node
-  }
-
-  this.tail = node
-  if (!this.head) {
-    this.head = node
-  }
-  this.length++
-}
-
-Yallist.prototype.push = function () {
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    push(this, arguments[i])
-  }
-  return this.length
-}
-
-Yallist.prototype.unshift = function () {
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    unshift(this, arguments[i])
-  }
-  return this.length
-}
-
-Yallist.prototype.pop = function () {
-  if (!this.tail) {
-    return undefined
-  }
-
-  var res = this.tail.value
-  this.tail = this.tail.prev
-  if (this.tail) {
-    this.tail.next = null
-  } else {
-    this.head = null
-  }
-  this.length--
-  return res
-}
-
-Yallist.prototype.shift = function () {
-  if (!this.head) {
-    return undefined
-  }
-
-  var res = this.head.value
-  this.head = this.head.next
-  if (this.head) {
-    this.head.prev = null
-  } else {
-    this.tail = null
-  }
-  this.length--
-  return res
-}
-
-Yallist.prototype.forEach = function (fn, thisp) {
-  thisp = thisp || this
-  for (var walker = this.head, i = 0; walker !== null; i++) {
-    fn.call(thisp, walker.value, i, this)
-    walker = walker.next
-  }
-}
-
-Yallist.prototype.forEachReverse = function (fn, thisp) {
-  thisp = thisp || this
-  for (var walker = this.tail, i = this.length - 1; walker !== null; i--) {
-    fn.call(thisp, walker.value, i, this)
-    walker = walker.prev
-  }
-}
-
-Yallist.prototype.get = function (n) {
-  for (var i = 0, walker = this.head; walker !== null && i < n; i++) {
-    // abort out of the list early if we hit a cycle
-    walker = walker.next
-  }
-  if (i === n && walker !== null) {
-    return walker.value
-  }
-}
-
-Yallist.prototype.getReverse = function (n) {
-  for (var i = 0, walker = this.tail; walker !== null && i < n; i++) {
-    // abort out of the list early if we hit a cycle
-    walker = walker.prev
-  }
-  if (i === n && walker !== null) {
-    return walker.value
-  }
-}
-
-Yallist.prototype.map = function (fn, thisp) {
-  thisp = thisp || this
-  var res = new Yallist()
-  for (var walker = this.head; walker !== null;) {
-    res.push(fn.call(thisp, walker.value, this))
-    walker = walker.next
-  }
-  return res
-}
-
-Yallist.prototype.mapReverse = function (fn, thisp) {
-  thisp = thisp || this
-  var res = new Yallist()
-  for (var walker = this.tail; walker !== null;) {
-    res.push(fn.call(thisp, walker.value, this))
-    walker = walker.prev
-  }
-  return res
-}
-
-Yallist.prototype.reduce = function (fn, initial) {
-  var acc
-  var walker = this.head
-  if (arguments.length > 1) {
-    acc = initial
-  } else if (this.head) {
-    walker = this.head.next
-    acc = this.head.value
-  } else {
-    throw new TypeError('Reduce of empty list with no initial value')
-  }
-
-  for (var i = 0; walker !== null; i++) {
-    acc = fn(acc, walker.value, i)
-    walker = walker.next
-  }
-
-  return acc
-}
-
-Yallist.prototype.reduceReverse = function (fn, initial) {
-  var acc
-  var walker = this.tail
-  if (arguments.length > 1) {
-    acc = initial
-  } else if (this.tail) {
-    walker = this.tail.prev
-    acc = this.tail.value
-  } else {
-    throw new TypeError('Reduce of empty list with no initial value')
-  }
-
-  for (var i = this.length - 1; walker !== null; i--) {
-    acc = fn(acc, walker.value, i)
-    walker = walker.prev
-  }
-
-  return acc
-}
-
-Yallist.prototype.toArray = function () {
-  var arr = new Array(this.length)
-  for (var i = 0, walker = this.head; walker !== null; i++) {
-    arr[i] = walker.value
-    walker = walker.next
-  }
-  return arr
-}
-
-Yallist.prototype.toArrayReverse = function () {
-  var arr = new Array(this.length)
-  for (var i = 0, walker = this.tail; walker !== null; i++) {
-    arr[i] = walker.value
-    walker = walker.prev
-  }
-  return arr
-}
-
-Yallist.prototype.slice = function (from, to) {
-  to = to || this.length
-  if (to < 0) {
-    to += this.length
-  }
-  from = from || 0
-  if (from < 0) {
-    from += this.length
-  }
-  var ret = new Yallist()
-  if (to < from || to < 0) {
-    return ret
-  }
-  if (from < 0) {
-    from = 0
-  }
-  if (to > this.length) {
-    to = this.length
-  }
-  for (var i = 0, walker = this.head; walker !== null && i < from; i++) {
-    walker = walker.next
-  }
-  for (; walker !== null && i < to; i++, walker = walker.next) {
-    ret.push(walker.value)
-  }
-  return ret
-}
-
-Yallist.prototype.sliceReverse = function (from, to) {
-  to = to || this.length
-  if (to < 0) {
-    to += this.length
-  }
-  from = from || 0
-  if (from < 0) {
-    from += this.length
-  }
-  var ret = new Yallist()
-  if (to < from || to < 0) {
-    return ret
-  }
-  if (from < 0) {
-    from = 0
-  }
-  if (to > this.length) {
-    to = this.length
-  }
-  for (var i = this.length, walker = this.tail; walker !== null && i > to; i--) {
-    walker = walker.prev
-  }
-  for (; walker !== null && i > from; i--, walker = walker.prev) {
-    ret.push(walker.value)
-  }
-  return ret
-}
-
-Yallist.prototype.splice = function (start, deleteCount, ...nodes) {
-  if (start > this.length) {
-    start = this.length - 1
-  }
-  if (start < 0) {
-    start = this.length + start;
-  }
-
-  for (var i = 0, walker = this.head; walker !== null && i < start; i++) {
-    walker = walker.next
-  }
-
-  var ret = []
-  for (var i = 0; walker && i < deleteCount; i++) {
-    ret.push(walker.value)
-    walker = this.removeNode(walker)
-  }
-  if (walker === null) {
-    walker = this.tail
-  }
-
-  if (walker !== this.head && walker !== this.tail) {
-    walker = walker.prev
-  }
-
-  for (var i = 0; i < nodes.length; i++) {
-    walker = insert(this, walker, nodes[i])
-  }
-  return ret;
-}
-
-Yallist.prototype.reverse = function () {
-  var head = this.head
-  var tail = this.tail
-  for (var walker = head; walker !== null; walker = walker.prev) {
-    var p = walker.prev
-    walker.prev = walker.next
-    walker.next = p
-  }
-  this.head = tail
-  this.tail = head
-  return this
-}
-
-function insert (self, node, value) {
-  var inserted = node === self.head ?
-    new Node(value, null, node, self) :
-    new Node(value, node, node.next, self)
-
-  if (inserted.next === null) {
-    self.tail = inserted
-  }
-  if (inserted.prev === null) {
-    self.head = inserted
-  }
-
-  self.length++
-
-  return inserted
-}
-
-function push (self, item) {
-  self.tail = new Node(item, self.tail, null, self)
-  if (!self.head) {
-    self.head = self.tail
-  }
-  self.length++
-}
-
-function unshift (self, item) {
-  self.head = new Node(item, null, self.head, self)
-  if (!self.tail) {
-    self.tail = self.head
-  }
-  self.length++
-}
-
-function Node (value, prev, next, list) {
-  if (!(this instanceof Node)) {
-    return new Node(value, prev, next, list)
-  }
-
-  this.list = list
-  this.value = value
-
-  if (prev) {
-    prev.next = this
-    this.prev = prev
-  } else {
-    this.prev = null
-  }
-
-  if (next) {
-    next.prev = this
-    this.next = next
-  } else {
-    this.next = null
-  }
-}
-
-try {
-  // add if support for Symbol.iterator is present
-  __nccwpck_require__(4091)(Yallist)
-} catch (er) {}
-
-
-/***/ }),
-
 /***/ 208:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -42407,9 +41773,7 @@ const index_1 = __nccwpck_require__(6144);
  */
 function downloadAndExtractTool(url) {
     return __awaiter(this, void 0, void 0, function* () {
-        const downloadPath = yield toolCache.downloadTool(url, undefined, undefined, {
-            'User-Agent': index_1.userAgentString,
-        });
+        const downloadPath = yield downloadTool(url);
         let extractedPath;
         if (url.indexOf('.zip') != -1) {
             extractedPath = yield toolCache.extractZip(downloadPath);
@@ -42427,6 +41791,22 @@ function downloadAndExtractTool(url) {
     });
 }
 exports.downloadAndExtractTool = downloadAndExtractTool;
+/**
+ * downloadTool is a temporary hack until native support for module mocking
+ * lands:
+ *
+ *     https://github.com/nodejs/node/pull/52848
+ *
+ * For some unknown reason, moving this call into another function makes the
+ * toolCache mockable /shrug.
+ */
+function downloadTool(url) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield toolCache.downloadTool(url, undefined, undefined, {
+            'User-Agent': index_1.userAgentString,
+        });
+    });
+}
 
 
 /***/ }),
@@ -42919,12 +42299,12 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 };
 var _a, _TestToolCache_originalToolsDir, _TestToolCache_originalTempDir;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.TEST_SA_KEY_CREDS_FILE = exports.TEST_WIF_CREDS_FILE = exports.TEST_SDK_VERSION = exports.TEST_SDK_VERSIONS = exports.TestToolCache = void 0;
+exports.TestToolCache = void 0;
 /**
  * A collection of utility functions for testing.
  */
-const path = __importStar(__nccwpck_require__(1017));
 const fs = __importStar(__nccwpck_require__(3292));
+const path = __importStar(__nccwpck_require__(1017));
 const actions_utils_1 = __nccwpck_require__(308);
 /**
  * Creates an overridden runner cache and tool path. This is slightly
@@ -42938,6 +42318,10 @@ class TestToolCache {
      */
     static start() {
         return __awaiter(this, void 0, void 0, function* () {
+            __classPrivateFieldSet(this, _a, process.env.RUNNER_TOOL_CACHE, "f", _TestToolCache_originalToolsDir);
+            __classPrivateFieldSet(this, _a, process.env.RUNNER_TEMP, "f", _TestToolCache_originalTempDir);
+            this.setGlobal('TEST_DOWNLOAD_TOOL_RETRY_MIN_SECONDS', '0');
+            this.setGlobal('TEST_DOWNLOAD_TOOL_RETRY_MAX_SECONDS', '0');
             this.rootDir = path.join(__dirname, 'runner', (0, actions_utils_1.randomFilename)());
             this.toolsDir = path.join(this.rootDir, 'tools');
             yield fs.mkdir(this.toolsDir, { recursive: true });
@@ -42945,8 +42329,6 @@ class TestToolCache {
             this.tempDir = path.join(this.rootDir, 'temp');
             yield fs.mkdir(this.tempDir, { recursive: true });
             process.env.RUNNER_TEMP = this.toolsDir;
-            __classPrivateFieldSet(this, _a, process.env.RUNNER_TOOL_CACHE, "f", _TestToolCache_originalToolsDir);
-            __classPrivateFieldSet(this, _a, process.env.RUNNER_TEMP, "f", _TestToolCache_originalTempDir);
         });
     }
     /**
@@ -42957,52 +42339,27 @@ class TestToolCache {
         return __awaiter(this, void 0, void 0, function* () {
             process.env.RUNNER_TOOL_CACHE = __classPrivateFieldGet(this, _a, "f", _TestToolCache_originalToolsDir);
             process.env.RUNNER_TEMP = __classPrivateFieldGet(this, _a, "f", _TestToolCache_originalTempDir);
+            delete process.env.TEST_DOWNLOAD_TOOL_RESPONSE_MESSAGE_FACTORY;
+            this.setGlobal('TEST_DOWNLOAD_TOOL_RETRY_MIN_SECONDS', undefined);
+            this.setGlobal('TEST_DOWNLOAD_TOOL_RETRY_MAX_SECONDS', undefined);
+            this.setGlobal('TEST_DOWNLOAD_TOOL_RESPONSE_MESSAGE_FACTORY', undefined);
             yield (0, actions_utils_1.forceRemove)(this.rootDir);
         });
+    }
+    static setGlobal(k, v) {
+        const g = global;
+        if (v === undefined) {
+            delete g[k];
+        }
+        else {
+            g[k] = v;
+        }
     }
 }
 exports.TestToolCache = TestToolCache;
 _a = TestToolCache;
 _TestToolCache_originalToolsDir = { value: void 0 };
 _TestToolCache_originalTempDir = { value: void 0 };
-/**
- * The version of the gcloud SDK being tested against.
- */
-exports.TEST_SDK_VERSIONS = ['0.9.83', '270.0.0', '272.0.0', '275.0.0', '349.0.0'];
-exports.TEST_SDK_VERSION = exports.TEST_SDK_VERSIONS[exports.TEST_SDK_VERSIONS.length - 1];
-exports.TEST_WIF_CREDS_FILE = `
-{
-  "audience": "//iam.googleapis.com/my-provider",
-  "credential_source": {
-    "format": {
-      "subject_token_field_name": "value",
-      "type": "json"
-    },
-    "headers": {
-      "Authorization": "Bearer github-token"
-    },
-    "url": "https://actions-token.url/?audience=my-aud"
-  },
-  "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/my-service@my-project.iam.gserviceaccount.com:generateAccessToken",
-  "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
-  "token_url": "https://sts.googleapis.com/v1/token",
-  "type": "external_account"
-}
-`;
-exports.TEST_SA_KEY_CREDS_FILE = `
-{
-  "type": "service_account",
-  "project_id": "my-project",
-  "private_key_id": "1234567890abcdefghijklmnopqrstuvwxyzaabb",
-  "private_key": "-----BEGIN PRIVATE KEY-----\\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCRVYIJRuxdujaX\\nUfyY9mXT1O0M3PwyT+FnPJVY+6Md7KMiPKpZRYt7okj51Ln1FLcb9mY17LzPEAxS\\nBPn1LWNpSJpmttI/D3U+bG/znf/E89ErVopYWpaynbYrb/Mu478IE9TgvnqJMlkj\\nlQbaxnZ7qhnbI5h6p/HINWfY7xBDGZM1sc2FK9KbNfEzLdW1YiK/lWAwtfM7rbiO\\nZj+LnWm2dgwZxu0h8m68qYYMywzLcV3NTe35qdAznasc1WQvJikY+N82Wu+HjsPa\\nH0fLE3gN5r+BzDYQxEQnWANgxlsHeN9mg5LAg5fyTBwTS7Ato/qQ07da0CSoS1M0\\nriYvuCzhAgMBAAECggEAAai+m9fG5B03kIMLpY5O7Rv9AM+ufb91hx6Nwkp7r4M5\\nt11vY7I96wuYJ92iBu8m4XR6fGw0Xz3gkcQ69ZCu5320hBdPrJsrqXwMhgxgoGcq\\nWuB8aJEWASi+T9hGENA++eDQFMupWV6HafzCdxd4NKAfmZ/xf1OFUu0TVpvxKlAD\\ne6Njz/5+QFdUcNioi7iGy1Qz7xdpClEWdVin8VWe3p6UsCLfHmQfPPuLXOvpBj6k\\niFu9dl93z+8vlDLoAyXSaDeYyRMBGVOBM36cICuVpxfV1s/corEZXhz3aI8mlYiQ\\n6YXTcEnllt+NTJDIL99CnYn+WBVzeIGXtr0EKAyM6QKBgQDCU6FDvU0P8qt45BDm\\nSP2V7uMoI32mjEA3plJzqqSZ9ritxFmylrOttOoTYH2FVjrKPZZsLihSjpmm+wEz\\nGfjd75eSJYAb/m7GNOqbJjqAJIbIMaHfVcH6ODT2b0Tc8v/CK0PZy/jzgt68TdtF\\no462tr8isj7yLpCGdoLq9iq4gwKBgQC/dWTGFnaI08v1uqx6derf+qikSsjlYh4L\\nDdTlI8/eaTR90PFPQ4a8LE8pmhMhkJNg87jAF5VF29sPmlpfKbOC87C2iI8uIHcn\\nu0sTdhn6SukyUSN/eeb1KSDJuxDvIgPRTZj6XMlUulADeLRnlAoWOe0tu/wqpse6\\nB0Qu2oAfywKBgQCMWukESyro1OZit585JQj7jQJG0HOFopETYK722g5vIdM7trDu\\nm4iFc0EJ48xlTOXDgv4tfp0jG9oA0BSKuzyT1+RK64j/LyMFR90XWGIyga9T0v1O\\nmNs1BfnC8JT1XRG7RZKJMZjLEQAdU8KHJt4CPDYLMmDifR1n8RsX59rtTwKBgQCS\\nnAmsKn1gb5cqt2Tmba+LDj3feSj3hjftTQ0u3kqKTNOWWM7AXLwrEl8YQ1TNChHh\\nVyCtcCGtmhrYiuETKDK/X259iHrj3paABUsLPw/Le1uxXTKqpiV2rKTf9XCVPd3g\\ng+RWK4E8cWNeFStIebNzq630rJP/8TDWQkQzALzGGwKBgQC5bnlmipIGhtX2pP92\\niBM8fJC7QXbyYyamriyFjC3o250hHy7mZZG7bd0bH3gw0NdC+OZIBNv7AoNhjsvP\\nuE0Qp/vQXpgHEeYFyfWn6PyHGzqKLFMZ/+iCTuy8Iebs1p5DZY8RMXpx4tv6NfRy\\nbxHUjlOgP7xmXM+OZpNymFlRkg==\\n-----END PRIVATE KEY-----\\n",
-  "client_email": "my-service-account@my-project.iam.gserviceaccount.com",
-  "client_id": "123456789098765432101",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/my-service-account%40my-project.iam.gserviceaccount.com"
-}
-`;
 
 
 /***/ }),
@@ -44900,7 +44257,7 @@ module.exports = parseParams
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.1.6","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint . --ext .ts,.tsx","format":"eslint . --ext .ts,.tsx --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.10.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.1","@actions/tool-cache":"^2.0.1","@google-github-actions/actions-utils":"^0.7.3","semver":"^7.6.0"},"devDependencies":{"@types/node":"^20.12.7","@typescript-eslint/eslint-plugin":"^7.6.0","@typescript-eslint/parser":"^7.6.0","@vercel/ncc":"^0.38.1","eslint":"^8.57.0","eslint-config-prettier":"^9.1.0","eslint-plugin-prettier":"^5.1.3","prettier":"^3.2.5","ts-node":"^10.9.2","typedoc":"^0.25.13","typedoc-plugin-markdown":"^3.17.1","typescript":"^5.4.5"}}');
+module.exports = JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.1.6","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint . --ext .ts,.tsx","format":"eslint . --ext .ts,.tsx --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.10.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.1","@actions/tool-cache":"^2.0.1","@google-github-actions/actions-utils":"^0.8.0","semver":"^7.6.2"},"devDependencies":{"@types/node":"^20.12.12","@types/semver":"^7.5.8","@typescript-eslint/eslint-plugin":"^7.10.0","@typescript-eslint/parser":"^7.10.0","@vercel/ncc":"^0.38.1","eslint-config-prettier":"^9.1.0","eslint-plugin-prettier":"^5.1.3","eslint":"^8.57.0","prettier":"^3.2.5","ts-node":"^10.9.2","typedoc-plugin-markdown":"^4.0.2","typedoc":"^0.25.13","typescript":"^5.4.5"}}');
 
 /***/ })
 

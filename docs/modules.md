@@ -1,12 +1,12 @@
-[@google-github-actions/setup-cloud-sdk](README.md) / Exports
+[**@google-github-actions/setup-cloud-sdk**](README.md) • **Docs**
+
+***
 
 # @google-github-actions/setup-cloud-sdk
 
-## Table of contents
+## Modules
 
-### Modules
-
-- [download-util](modules/download_util.md)
-- [format-url](modules/format_url.md)
-- [index](modules/index.md)
-- [test-util](modules/test_util.md)
+- [download-util](download-util/README.md)
+- [format-url](format-url/README.md)
+- [index](index/README.md)
+- [test-util](test-util/README.md)

@@ -10,17 +10,20 @@ jobs:
   release:
     if: |-
       ${{ startsWith(github.event.head_commit.message, 'Release: v') }}
-    uses: 'google-github-actions/.github/.github/workflows/release.yml@v0'
+    uses: 'google-github-actions/.github/.github/workflows/release.yml@v0' # ratchet:exclude
 
   publish:
     needs:
       - 'release'
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     runs-on: 'ubuntu-latest'
 
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: 'actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29' # ratchet:actions/checkout@v4
 
-      - uses: 'actions/setup-node@v4'
+      - uses: 'actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8' # ratchet:actions/setup-node@v4
         with:
           node-version: '20.x'
           registry-url: 'https://wombat-dressing-room.appspot.com/'
@@ -28,4 +31,4 @@ jobs:
       - env:
           NODE_AUTH_TOKEN: '${{ secrets.NODE_AUTH_TOKEN }}'
         run: |-
-          npm publish
+          npm publish --provenance --access public
