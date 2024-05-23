@@ -1,4 +1,6 @@
-@google-github-actions/setup-cloud-sdk / [Exports](modules.md)
+**@google-github-actions/setup-cloud-sdk** • [**Docs**](modules.md)
+
+***
 
 # [Google GitHub actions: Setup Cloud SDK Client](https://github.com/google-github-actions)
 

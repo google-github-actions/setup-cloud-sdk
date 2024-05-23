@@ -17,11 +17,11 @@ jobs:
     runs-on: 'ubuntu-latest'
 
     steps:
-      - uses: 'actions/checkout@v4'
+      - uses: 'actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29' # ratchet:actions/checkout@v4
 
-      - uses: 'actions/setup-go@v5'
+      - uses: 'actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7' # ratchet:actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version-file: 'go.mod'
 
       - name: 'Get versions list'
         run: |-
@@ -51,7 +51,7 @@ jobs:
 
       - name: 'Create Pull Request'
         if: steps.updates.outputs.had_changes == 'true'
-        uses: 'actions/github-script@v7'
+        uses: 'actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea' # ratchet:actions/github-script@v7
         with:
           github-token: '${{ secrets.ACTIONS_BOT_TOKEN }}'
           script: |-
