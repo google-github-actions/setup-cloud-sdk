@@ -23,15 +23,19 @@ jobs:
         with:
           go-version-file: 'go.mod'
 
-      # This ensures the remote branch is check out or a new local branch is created.
-      # This allows us to diff against existing changes to prevet uneccessary PR updates.
       - name: 'Setup git'
         run: |-
           git config user.name "google-github-actions-bot"
           git config user.email "github-actions-bot@google.com"
 
-          # fetch the PR branch and switch to it, if it doesnt exist a new local branch is created
-          noop=$(git fetch origin "${{ env.PR_BRANCH }}")
+      # Fetch the existing PR branch, continue if not exists
+      - name: 'Fetch remote'
+        continue-on-error: true
+        run: |-
+          git fetch origin "${{ env.PR_BRANCH }}"
+
+      - name: 'Use PR_BRANCH'
+        run: |-
           git switch -c "${{ env.PR_BRANCH }}"
 
       - name: 'Get versions list'
