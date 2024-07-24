@@ -17,26 +17,13 @@ jobs:
     runs-on: 'ubuntu-latest'
 
     steps:
-      - uses: 'actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29' # ratchet:actions/checkout@v4
+      - name: 'Checkout'
+        uses: 'actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29' # ratchet:actions/checkout@v4
 
-      - uses: 'actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7' # ratchet:actions/setup-go@v5
+      - name: 'Setup Go'
+        uses: 'actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7' # ratchet:actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
-
-      - name: 'Setup git'
-        run: |-
-          git config user.name "google-github-actions-bot"
-          git config user.email "github-actions-bot@google.com"
-
-      # Fetch the existing PR branch, continue if not exists
-      - name: 'Fetch remote'
-        continue-on-error: true
-        run: |-
-          git fetch origin "${{ env.PR_BRANCH }}"
-
-      - name: 'Use PR_BRANCH'
-        run: |-
-          git switch -c "${{ env.PR_BRANCH }}"
 
       - name: 'Get versions list'
         run: |-
@@ -56,52 +43,18 @@ jobs:
 
           echo "had_changes=true" >> ${GITHUB_OUTPUT}
 
-          git add ./data/versions.json
-          git commit -m "Update gcloud versions ($(date --iso-8601=h))"
-          git push -f origin "${{ env.PR_BRANCH }}"
-
-      - name: 'Create Pull Request'
-        if: steps.updates.outputs.had_changes == 'true'
-        uses: 'actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea' # ratchet:actions/github-script@v7
+      # Create a pull request with updated files
+      - name: 'Create/Update Pull Request'
+        if: |
+          ${{ steps.updates.outputs.had_changes == 'true' }}
+        uses: 'abcxyz/pkg/.github/actions/create-pull-request@45258f93afbaca705ef0503c37ef88451ed45b02' # ratchet:abcxyz/pkg/.github/actions/create-pull-request@main
         with:
-          github-token: '${{ secrets.ACTIONS_BOT_TOKEN }}'
-          script: |-
-            const baseBranch = `${{ github.ref_name }}`;
-            const prBranch = `${{ env.PR_BRANCH }}`;
-            const prBody = `Update latest gcloud versions`;
-
-            try {
-              const listResponse = await github.rest.pulls.list({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                state: `open`,
-                head: `${context.repo.owner}:${prBranch}`,
-                base: baseBranch,
-              });
-
-              core.isDebug() && console.log(listResponse);
-
-              if(!listResponse.data.length) {
-                const createResponse = await github.rest.pulls.create({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  title: `Update gcloud versions`,
-                  body: prBody,
-                  head: prBranch,
-                  base: baseBranch,
-                });
-                core.info(`Created PR #${createResponse.data.number} at ${createResponse.data.html_url}`);
-              } else {
-                const updateResponse = await github.rest.pulls.update({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  pull_number: listResponse.data[0].number,
-                  title: `Update gcloud versions`,
-                  body: prBody,
-                });
-                core.info(`Updated PR #${updateResponse.data.number} at ${updateResponse.data.html_url}`);
-              }
-            } catch(err) {
-              console.error(err);
-              core.setFailed(`Failed to create pull request: ${err}`);
-            }
+          token: '${{ secrets.ACTIONS_BOT_TOKEN }}'
+          base_branch: '${{ github.event.repository.default_branch }}'
+          head_branch: '${{ env.PR_BRANCH }}'
+          title: 'Update gcloud versions'
+          body: 'Update latest gcloud versions'
+          changed_paths: |-
+            [
+              "data/versions.json"
+            ]
