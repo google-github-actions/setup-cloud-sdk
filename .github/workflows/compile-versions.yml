@@ -23,6 +23,16 @@ jobs:
         with:
           go-version-file: 'go.mod'
 
+      # This ensures the remote branch is check out or a new local branch is created.
+      # This allows us to diff against existing changes to prevet uneccessary PR updates.
+      - name: 'Setup git'
+        run: |-
+          git config user.name "google-github-actions-bot"
+          git config user.email "github-actions-bot@google.com"
+
+          # fetch the PR branch and switch to it, if it doesnt exist a new local branch is created
+          git fetch origin "${{ env.PR_BRANCH }}" && git switch -c "${{ env.PR_BRANCH }}"
+
       - name: 'Get versions list'
         run: |-
           mkdir -p ./data
@@ -41,10 +51,6 @@ jobs:
 
           echo "had_changes=true" >> ${GITHUB_OUTPUT}
 
-          git config user.name "google-github-actions-bot"
-          git config user.email "github-actions-bot@google.com"
-
-          git checkout -b "${{ env.PR_BRANCH }}"
           git add ./data/versions.json
           git commit -m "Update gcloud versions ($(date --iso-8601=h))"
           git push -f origin "${{ env.PR_BRANCH }}"
