@@ -38,6 +38,7 @@ jobs:
         run: |-
           if git diff --exit-code ./data/versions.json; then
             echo "No changes"
+            echo "had_changes=false" >> ${GITHUB_OUTPUT}
             exit 0
           fi
 
@@ -45,8 +46,8 @@ jobs:
 
       # Create a pull request with updated files
       - name: 'Create/Update Pull Request'
-        if: |
-          ${{ steps.updates.outputs.had_changes == 'true' }}
+        # Skip if there a no changes
+        if: '${{ fromJSON(steps.updates.outputs.had_changes) }}'
         uses: 'abcxyz/pkg/.github/actions/create-pull-request@45258f93afbaca705ef0503c37ef88451ed45b02' # ratchet:abcxyz/pkg/.github/actions/create-pull-request@main
         with:
           token: '${{ secrets.ACTIONS_BOT_TOKEN }}'
