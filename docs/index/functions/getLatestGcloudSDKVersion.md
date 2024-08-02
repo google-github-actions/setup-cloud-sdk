@@ -16,6 +16,6 @@ getLatestGcloudSDKVersion fetches the latest version number from the API.
 
 The latest stable version of the gcloud SDK.
 
-## Source
+## Defined in
 
-[index.ts:261](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L261)
+[index.ts:259](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L259)

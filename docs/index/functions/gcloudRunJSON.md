@@ -27,6 +27,6 @@ Any options.
 
 Parsed JSON as an object (or array).
 
-## Source
+## Defined in
 
-[index.ts:128](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L128)
+[index.ts:126](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L126)

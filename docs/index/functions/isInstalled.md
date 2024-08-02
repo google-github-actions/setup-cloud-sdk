@@ -22,6 +22,6 @@ Checks if gcloud is installed.
 
 true if gcloud is found in toolpath.
 
-## Source
+## Defined in
 
-[index.ts:50](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L50)
+[index.ts:49](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L49)

@@ -24,6 +24,6 @@ specification is installed.
 
 The path of the installed tool.
 
-## Source
+## Defined in
 
-[index.ts:170](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L170)
+[index.ts:168](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L168)

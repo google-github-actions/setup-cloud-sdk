@@ -16,6 +16,6 @@ Returns the correct gcloud command for OS.
 
 gcloud command.
 
-## Source
+## Defined in
 
-[index.ts:65](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L65)
+[index.ts:64](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L64)

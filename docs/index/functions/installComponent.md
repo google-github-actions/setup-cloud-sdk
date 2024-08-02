@@ -22,6 +22,6 @@ gcloud component group to install ie alpha, beta.
 
 CMD output
 
-## Source
+## Defined in
 
-[index.ts:245](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L245)
+[index.ts:243](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L243)

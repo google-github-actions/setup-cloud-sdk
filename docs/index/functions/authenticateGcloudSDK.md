@@ -20,6 +20,6 @@ Path to the credentials file.
 
 `Promise`\<`void`\>
 
-## Source
+## Defined in
 
-[index.ts:225](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L225)
+[index.ts:223](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L223)

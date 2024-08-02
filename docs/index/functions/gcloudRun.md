@@ -28,6 +28,6 @@ Any options.
 
 ExecOutput
 
-## Source
+## Defined in
 
-[index.ts:99](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L99)
+[index.ts:98](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L98)

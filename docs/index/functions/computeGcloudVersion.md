@@ -36,6 +36,6 @@ String representing the latest version.
 
 Callers should use `installGcloudSDK('> 0.0.0.')` instead.
 
-## Source
+## Defined in
 
-[index.ts:212](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L212)
+[index.ts:210](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L210)

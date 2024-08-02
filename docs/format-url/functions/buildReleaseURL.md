@@ -31,6 +31,6 @@ The version of the requested release.
 
 The formatted gcloud SDK release URL.
 
-## Source
+## Defined in
 
 [format-url.ts:33](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/format-url.ts#L33)

@@ -357,7 +357,6 @@ const TEST_SA_KEY_CREDS_FILE = `
 function httpResponse(s: string): () => HttpClientResponse {
   return (): HttpClientResponse => {
     return {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore - There are many, many other fields (50+). Instead of
       // stubbing them all, ignore the TypeScript property errors and only
       // define the specific ones we need.

@@ -27,6 +27,6 @@ List of versions
 
 Best version or an error if no matches are found
 
-## Source
+## Defined in
 
-[index.ts:302](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L302)
+[index.ts:300](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L300)

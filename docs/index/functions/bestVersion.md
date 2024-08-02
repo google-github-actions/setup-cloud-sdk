@@ -23,6 +23,6 @@ Version specification
 
 Resolved version
 
-## Source
+## Defined in
 
-[index.ts:272](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L272)
+[index.ts:270](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L270)

@@ -11,6 +11,6 @@
 userAgentString is the UA to use for this installation. It dynamically pulls
 the app version from the package declaration.
 
-## Source
+## Defined in
 
-[index.ts:42](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L42)
+[index.ts:41](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L41)
