@@ -100,7 +100,7 @@ export declare function authenticateGcloudSDK(filepath: string): Promise<void>;
 /**
  * Sets the GCP Project Id in the gcloud config.
  *
- * @param serviceAccountKey - The service account key used for authentication.
+ * @param projectId - The project ID to set.
  * @returns project ID.
  */
 export declare function setProject(projectId: string): Promise<void>;

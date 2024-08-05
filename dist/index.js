@@ -41821,7 +41821,7 @@ const index_1 = __nccwpck_require__(6144);
 /**
  * Downloads and extracts the tool at the specified URL.
  *
- * @url The URL of the tool to be downloaded.
+ * @param url The URL of the tool to be downloaded.
  * @returns The path to the locally extracted tool.
  */
 function downloadAndExtractTool(url) {
@@ -42187,7 +42187,7 @@ function authenticateGcloudSDK(filepath) {
 /**
  * Sets the GCP Project Id in the gcloud config.
  *
- * @param serviceAccountKey - The service account key used for authentication.
+ * @param projectId - The project ID to set.
  * @returns project ID.
  */
 function setProject(projectId) {
@@ -44306,7 +44306,7 @@ module.exports = parseParams
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.1.7","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint .","format":"eslint --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.10.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.1","@actions/tool-cache":"^2.0.1","@google-github-actions/actions-utils":"^0.8.3","semver":"^7.6.3"},"devDependencies":{"@eslint/eslintrc":"^3.1.0","@eslint/js":"^9.8.0","@types/node":"^22.1.0","@types/semver":"^7.5.8","@typescript-eslint/eslint-plugin":"^8.0.0","@vercel/ncc":"^0.38.1","eslint-config-prettier":"^9.1.0","eslint-plugin-prettier":"^5.2.1","eslint":"^9.8.0","prettier":"^3.3.3","ts-node":"^10.9.2","typedoc-plugin-markdown":"^4.2.3","typedoc":"^0.26.5","typescript-eslint":"^8.0.0","typescript":"^5.5.4"}}');
+module.exports = JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.1.8","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint .","format":"eslint --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.10.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.1","@actions/tool-cache":"^2.0.1","@google-github-actions/actions-utils":"^0.8.3","semver":"^7.6.3"},"devDependencies":{"@eslint/eslintrc":"^3.1.0","@eslint/js":"^9.8.0","@types/node":"^22.1.0","@types/semver":"^7.5.8","@typescript-eslint/eslint-plugin":"^8.0.0","@vercel/ncc":"^0.38.1","eslint-config-prettier":"^9.1.0","eslint-plugin-prettier":"^5.2.1","eslint":"^9.8.0","prettier":"^3.3.3","ts-node":"^10.9.2","typedoc-plugin-markdown":"^4.2.3","typedoc":"^0.26.5","typescript-eslint":"^8.0.0","typescript":"^5.5.4"}}');
 
 /***/ })
 
