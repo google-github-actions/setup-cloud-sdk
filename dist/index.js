@@ -5719,7 +5719,9 @@ module.exports = v4;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isExternalAccount = exports.isServiceAccountKey = exports.parseCredential = void 0;
+exports.parseCredential = parseCredential;
+exports.isServiceAccountKey = isServiceAccountKey;
+exports.isExternalAccount = isExternalAccount;
 const errors_1 = __nccwpck_require2_(6976);
 const encoding_1 = __nccwpck_require2_(3102);
 /**
@@ -5752,7 +5754,6 @@ function parseCredential(input) {
         throw new SyntaxError(`Failed to parse service account key JSON credentials: ${msg}`);
     }
 }
-exports.parseCredential = parseCredential;
 /**
  * isServiceAccountKey returns true if the given interface is a
  * ServiceAccountKey, false otherwise.
@@ -5762,7 +5763,6 @@ exports.parseCredential = parseCredential;
 function isServiceAccountKey(credential) {
     return credential.type === 'service_account';
 }
-exports.isServiceAccountKey = isServiceAccountKey;
 /**
  * isExternalAccount returns true if the given interface is a ExternalAccount,
  * false otherwise.
@@ -5772,7 +5772,6 @@ exports.isServiceAccountKey = isServiceAccountKey;
 function isExternalAccount(credential) {
     return credential.type !== 'external_account';
 }
-exports.isExternalAccount = isExternalAccount;
 exports["default"] = { parseCredential, isServiceAccountKey, isExternalAccount };
 
 
@@ -5821,7 +5820,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.deepClone = void 0;
+exports.deepClone = deepClone;
 const v8 = __importStar(__nccwpck_require2_(4655));
 /**
  * deepClone builds a deep copy (clone) of the given input. By default, it uses
@@ -5838,7 +5837,6 @@ function deepClone(input, useStructuredClone = true) {
     }
     return v8.deserialize(v8.serialize(input));
 }
-exports.deepClone = deepClone;
 
 
 /***/ }),
@@ -5863,7 +5861,8 @@ exports.deepClone = deepClone;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseMultilineCSV = exports.parseCSV = void 0;
+exports.parseCSV = parseCSV;
+exports.parseMultilineCSV = parseMultilineCSV;
 /**
  * parseCSV accepts a comma-separated list of items. Whitespace around entries
  * is removed.
@@ -5883,7 +5882,6 @@ function parseCSV(input) {
     }
     return list;
 }
-exports.parseCSV = parseCSV;
 /**
  * parseMultilineCSV parses a CSV input where entries can be separated by
  * newlines. This is specific for GitHub Actions, since the YAML syntax does not
@@ -5907,7 +5905,6 @@ function parseMultilineCSV(input) {
     }
     return result;
 }
-exports.parseMultilineCSV = parseMultilineCSV;
 
 
 /***/ }),
@@ -5932,7 +5929,8 @@ exports.parseMultilineCSV = parseMultilineCSV;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.fromBase64 = exports.toBase64 = void 0;
+exports.toBase64 = toBase64;
+exports.fromBase64 = fromBase64;
 /**
  * toBase64 base64 encodes the input as URL-encoded, unpadded.
  *
@@ -5947,7 +5945,6 @@ function toBase64(input) {
         .replace(/\//g, '_')
         .replace(/=+$/, '');
 }
-exports.toBase64 = toBase64;
 /**
  * fromBase64 base64 decodes the input, handling URL vs standard encoding and
  * padded vs unpadded. This should only be used to decode string values - the
@@ -5963,7 +5960,6 @@ function fromBase64(input) {
         str += '=';
     return Buffer.from(str, 'base64').toString('utf8');
 }
-exports.fromBase64 = fromBase64;
 
 
 /***/ }),
@@ -5988,7 +5984,7 @@ exports.fromBase64 = fromBase64;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.toEnum = void 0;
+exports.toEnum = toEnum;
 /**
  * toEnum converts the input value to the best enum value. If no enum value
  * exists, it throws an error.
@@ -6011,7 +6007,6 @@ function toEnum(e, s) {
         throw new Error(`Invalid value ${s}, valid values are ${JSON.stringify(keys)}`);
     }
 }
-exports.toEnum = toEnum;
 
 
 /***/ }),
@@ -6036,7 +6031,7 @@ exports.toEnum = toEnum;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.stubEnv = void 0;
+exports.stubEnv = stubEnv;
 /**
  * stubEnv accepts an input dictionary and sets the provided environment
  * variables in the current process environment. Values set to "undefined" are
@@ -6072,7 +6067,6 @@ function stubEnv(input, target = process.env) {
         }
     };
 }
-exports.stubEnv = stubEnv;
 
 
 /***/ }),
@@ -6097,7 +6091,8 @@ exports.stubEnv = stubEnv;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.isNotFoundError = exports.errorMessage = void 0;
+exports.errorMessage = errorMessage;
+exports.isNotFoundError = isNotFoundError;
 /**
  * errorMessage extracts the error message from the given error. It does this
  * via best effort and makes the error embeddable in other errors. It discards
@@ -6154,7 +6149,6 @@ function errorMessage(err) {
     // there are multiple capital letters (e.g. ERRNOFILE).
     return msg;
 }
-exports.errorMessage = errorMessage;
 /**
  * isNotFoundError determines if the given error is "not found". Since there's
  * literally no way to actually do this in Node, it inspects the string output
@@ -6168,7 +6162,6 @@ function isNotFoundError(err) {
     const msg = errorMessage(err);
     return msg.toUpperCase().includes('ENOENT');
 }
-exports.isNotFoundError = isNotFoundError;
 /**
  * isUpper returns true if the given string is uppercase.
  *
@@ -6203,7 +6196,8 @@ function isUpper(str) {
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.readUntil = exports.parseFlags = void 0;
+exports.parseFlags = parseFlags;
+exports.readUntil = readUntil;
 /**
  * parseFlags takes an input string and parses it as posix-compliant flags.
  *
@@ -6286,7 +6280,6 @@ function parseFlags(input) {
     }
     return result;
 }
-exports.parseFlags = parseFlags;
 /**
  * readUntil reads up to and including the given character and returns the
  * result. It ignores escaped versions of the character if they are preceeded by
@@ -6317,7 +6310,6 @@ function readUntil(input, ch) {
     }
     return null;
 }
-exports.readUntil = readUntil;
 
 
 /***/ }),
@@ -6351,7 +6343,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.removeFile = exports.writeSecureFile = exports.isEmptyDir = exports.forceRemove = void 0;
+exports.forceRemove = forceRemove;
+exports.isEmptyDir = isEmptyDir;
+exports.writeSecureFile = writeSecureFile;
+exports.removeFile = removeFile;
 const fs_1 = __nccwpck_require2_(7147);
 const errors_1 = __nccwpck_require2_(6976);
 /**
@@ -6375,7 +6370,6 @@ function forceRemove(pth) {
         }
     });
 }
-exports.forceRemove = forceRemove;
 /**
  * isEmptyDir returns true if the given directory does not exist, or exists but
  * contains no files. It also returns true if the current user does not have
@@ -6390,28 +6384,29 @@ function isEmptyDir(dir) {
             const files = yield fs_1.promises.readdir(dir);
             return files.length <= 0;
         }
-        catch (e) {
+        catch (_a) {
             return true;
         }
     });
 }
-exports.isEmptyDir = isEmptyDir;
 /**
  * writeSecureFile writes a file to disk with 0640 permissions and locks the
  * file during writing.
  *
  * @param outputPath Path in which to create the secure file.
  * @param data Data to write to file.
+ * @param options additional options to pass to writeFile. The default options
+ * are permissions of 0640, write-exclusive, and flush-on-success.
  *
  * @returns Path to written file.
  */
-function writeSecureFile(outputPath, data) {
+function writeSecureFile(outputPath, data, options) {
     return __awaiter(this, void 0, void 0, function* () {
-        yield fs_1.promises.writeFile(outputPath, data, { mode: 0o640, flag: 'wx' });
+        const opts = Object.assign({}, { mode: 0o640, flag: 'wx', flush: true }, options);
+        yield fs_1.promises.writeFile(outputPath, data, opts);
         return outputPath;
     });
 }
-exports.writeSecureFile = writeSecureFile;
 /**
  * removeFile removes the file at the given path. If the file does not exist, it
  * does nothing.
@@ -6437,7 +6432,6 @@ function removeFile(filePath) {
         }
     });
 }
-exports.removeFile = removeFile;
 
 
 /***/ }),
@@ -6471,7 +6465,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseGcloudIgnore = void 0;
+exports.parseGcloudIgnore = parseGcloudIgnore;
 const fs_1 = __nccwpck_require2_(7147);
 const path_1 = __nccwpck_require2_(1017);
 const errors_1 = __nccwpck_require2_(6976);
@@ -6489,7 +6483,7 @@ function parseGcloudIgnore(pth) {
         const parentDir = (0, path_1.dirname)(pth);
         let ignoreContents = [];
         try {
-            ignoreContents = (yield fs_1.promises.readFile(pth, { encoding: 'utf-8' }))
+            ignoreContents = (yield fs_1.promises.readFile(pth, { encoding: 'utf8' }))
                 .toString()
                 .split(/\r?\n/)
                 .filter(shouldKeepIgnoreLine)
@@ -6506,7 +6500,7 @@ function parseGcloudIgnore(pth) {
             if (line.startsWith('#!include:')) {
                 const includeName = line.substring(10).trim();
                 const includePth = (0, path_1.join)(parentDir, includeName);
-                const subIgnoreContents = (yield fs_1.promises.readFile(includePth, { encoding: 'utf-8' }))
+                const subIgnoreContents = (yield fs_1.promises.readFile(includePth, { encoding: 'utf8' }))
                     .toString()
                     .split(/\r?\n/)
                     .filter(shouldKeepIgnoreLine)
@@ -6518,7 +6512,6 @@ function parseGcloudIgnore(pth) {
         return ignoreContents;
     });
 }
-exports.parseGcloudIgnore = parseGcloudIgnore;
 /**
  * shouldKeepIgnoreLine is a helper that returns true if the given line is not
  * blank or a comment.
@@ -6619,7 +6612,7 @@ __exportStar(__nccwpck_require2_(9324), exports);
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseBoolean = void 0;
+exports.parseBoolean = parseBoolean;
 const booleanTable = {
     '1': true,
     't': true,
@@ -6651,7 +6644,6 @@ function parseBoolean(input, defaultValue = false) {
     }
     return booleanTable[key];
 }
-exports.parseBoolean = parseBoolean;
 
 
 /***/ }),
@@ -6679,7 +6671,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.parseKVStringAndFile = exports.parseKVYAML = exports.parseKVJSON = exports.parseKVFile = exports.parseKVString = exports.joinKVStringForGCloud = exports.joinKVString = void 0;
+exports.joinKVString = joinKVString;
+exports.joinKVStringForGCloud = joinKVStringForGCloud;
+exports.parseKVString = parseKVString;
+exports.parseKVFile = parseKVFile;
+exports.parseKVJSON = parseKVJSON;
+exports.parseKVYAML = parseKVYAML;
+exports.parseKVStringAndFile = parseKVStringAndFile;
 const yaml_1 = __importDefault(__nccwpck_require2_(4083));
 const fs_1 = __nccwpck_require2_(7147);
 const errors_1 = __nccwpck_require2_(6976);
@@ -6697,7 +6695,6 @@ function joinKVString(input, separator = ',') {
     })
         .join(separator);
 }
-exports.joinKVString = joinKVString;
 /**
  * joinKVStringForGCloud creates a string suitable for using with gcloud by
  * choosing a custom escape delimiter sequence that does not exist in the input
@@ -6729,7 +6726,6 @@ function joinKVStringForGCloud(input, chars = ',.!@#$%&*()_=+~`[]{}|:;<>?üöÄüç
     }
     return `^${delim}^` + joinKVString(input, delim);
 }
-exports.joinKVStringForGCloud = joinKVStringForGCloud;
 /**
  * parseKVString parses a string of the format "KEY1=VALUE1,KEY2=VALUE2" or
  * "KEY1=VALUE1\nKEY2=VALUE2". Keys or values that contain a separator must be
@@ -6744,7 +6740,7 @@ exports.joinKVStringForGCloud = joinKVStringForGCloud;
 function parseKVString(input) {
     input = (input || '').trim();
     if (!input) {
-        return {};
+        return undefined;
     }
     const result = {};
     if (input === '{}') {
@@ -6798,7 +6794,6 @@ function parseKVString(input) {
     }
     return result;
 }
-exports.parseKVString = parseKVString;
 /**
  * Read and parse an env var file. If the file contents begin with a curly
  * brace, the content is assumed to be JSON and is parsed as JSON. Otherwise,
@@ -6808,9 +6803,9 @@ exports.parseKVString = parseKVString;
  */
 function parseKVFile(filePath) {
     try {
-        const content = (0, validations_1.presence)((0, fs_1.readFileSync)(filePath, 'utf-8'));
+        const content = (0, validations_1.presence)((0, fs_1.readFileSync)(filePath, 'utf8'));
         if (!content || content.length < 1) {
-            return {};
+            return undefined;
         }
         if (content[0] === '{' || content[0] === '[') {
             return parseKVJSON(content);
@@ -6825,7 +6820,6 @@ function parseKVFile(filePath) {
         throw new Error(`Failed to read file '${filePath}': ${msg}`);
     }
 }
-exports.parseKVFile = parseKVFile;
 /**
  * parseKVJSON parses the given string as a set of key=value pairs expressed as
  * JSON. If the input is not valid JSON, it errors. If the keys and values are
@@ -6842,6 +6836,9 @@ exports.parseKVFile = parseKVFile;
 function parseKVJSON(str) {
     str = (str || '').trim();
     if (!str) {
+        return undefined;
+    }
+    if (str === '{}') {
         return {};
     }
     try {
@@ -6870,7 +6867,6 @@ function parseKVJSON(str) {
         throw new Error(`Failed to parse KV pairs as JSON: ${msg}`);
     }
 }
-exports.parseKVJSON = parseKVJSON;
 /**
  * Read and parse contents of the string as YAML. This is mostly just exposed
  * for testing.
@@ -6878,9 +6874,15 @@ exports.parseKVJSON = parseKVJSON;
  * @param str YAML content to parse as K=V pairs.
  */
 function parseKVYAML(str) {
-    if (!str || str.trim().length === 0) {
+    const trimmed = (str || '').trim();
+    if (!trimmed) {
+        return undefined;
+    }
+    if (trimmed === '{}') {
         return {};
     }
+    // Parse the original string here, since trimming could have changed
+    // indentation.
     const yamlContent = yaml_1.default.parse(str);
     const result = {};
     for (const [k, v] of Object.entries(yamlContent)) {
@@ -6891,7 +6893,6 @@ function parseKVYAML(str) {
     }
     return result;
 }
-exports.parseKVYAML = parseKVYAML;
 /**
  * parseKVStringAndFile parses the given KV string and KV file, merging the
  * results (with kvString taking precedence).
@@ -6902,18 +6903,13 @@ exports.parseKVYAML = parseKVYAML;
 function parseKVStringAndFile(kvString, kvFilePath) {
     kvString = (kvString || '').trim();
     kvFilePath = (kvFilePath || '').trim();
-    let result = {};
-    if (kvFilePath) {
-        const parsed = parseKVFile(kvFilePath);
-        result = Object.assign(Object.assign({}, result), parsed);
+    const fromFile = kvFilePath ? parseKVFile(kvFilePath) : undefined;
+    const fromString = kvString ? parseKVString(kvString) : undefined;
+    if (fromFile === undefined && fromString === undefined) {
+        return undefined;
     }
-    if (kvString) {
-        const parsed = parseKVString(kvString);
-        result = Object.assign(Object.assign({}, result), parsed);
-    }
-    return result;
+    return Object.assign({}, fromFile, fromString);
 }
-exports.parseKVStringAndFile = parseKVStringAndFile;
 
 
 /***/ }),
@@ -6954,7 +6950,7 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.inParallel = void 0;
+exports.inParallel = inParallel;
 const os_1 = __nccwpck_require2_(2037);
 const errors_1 = __nccwpck_require2_(6976);
 /**
@@ -7008,7 +7004,6 @@ function inParallel(tasks, concurrency) {
         return results;
     });
 }
-exports.inParallel = inParallel;
 
 
 /***/ }),
@@ -7033,7 +7028,9 @@ exports.inParallel = inParallel;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.toPlatformPath = exports.toWin32Path = exports.toPosixPath = void 0;
+exports.toPosixPath = toPosixPath;
+exports.toWin32Path = toWin32Path;
+exports.toPlatformPath = toPlatformPath;
 const path_1 = __nccwpck_require2_(1017);
 /**
  * toPosixPath converts the given path to the posix form. On Windows, \\ will be
@@ -7045,7 +7042,6 @@ const path_1 = __nccwpck_require2_(1017);
 function toPosixPath(pth) {
     return pth.replace(/[\\]/g, '/');
 }
-exports.toPosixPath = toPosixPath;
 /**
  * toWin32Path converts the given path to the win32 form. On Linux, / will be
  * replaced with \\.
@@ -7056,7 +7052,6 @@ exports.toPosixPath = toPosixPath;
 function toWin32Path(pth) {
     return pth.replace(/[/]/g, '\\');
 }
-exports.toWin32Path = toWin32Path;
 /**
  * toPlatformPath converts the given path to a platform-specific path. It does
  * this by replacing instances of / and \ with the platform-specific path
@@ -7068,7 +7063,6 @@ exports.toWin32Path = toWin32Path;
 function toPlatformPath(pth) {
     return pth.replace(/[/\\]/g, path_1.sep);
 }
-exports.toPlatformPath = toPlatformPath;
 
 
 /***/ }),
@@ -7093,7 +7087,8 @@ exports.toPlatformPath = toPlatformPath;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.randomFilepath = exports.randomFilename = void 0;
+exports.randomFilename = randomFilename;
+exports.randomFilepath = randomFilepath;
 const path_1 = __nccwpck_require2_(1017);
 const crypto_1 = __nccwpck_require2_(6113);
 const os_1 = __nccwpck_require2_(2037);
@@ -7110,7 +7105,6 @@ const os_1 = __nccwpck_require2_(2037);
 function randomFilename(length = 12) {
     return (0, crypto_1.randomBytes)(length).toString('hex');
 }
-exports.randomFilename = randomFilename;
 /**
  * randomFilepath creates a cryptographically random filename inside the given
  * parent. If no parent is given, it defaults to os.tmpdir(). It does not create
@@ -7127,7 +7121,6 @@ exports.randomFilename = randomFilename;
 function randomFilepath(parent = (0, os_1.tmpdir)(), length = 12) {
     return (0, path_1.join)(parent, randomFilename(length));
 }
-exports.randomFilepath = randomFilepath;
 exports["default"] = { randomFilename, randomFilepath };
 
 
@@ -7162,7 +7155,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.withRetries = void 0;
+exports.withRetries = withRetries;
 const errors_1 = __nccwpck_require2_(6976);
 const time_1 = __nccwpck_require2_(7575);
 const DEFAULT_BACKOFF_MILLISECONDS = 100;
@@ -7215,7 +7208,6 @@ function withRetries(fn, opts) {
         });
     };
 }
-exports.withRetries = withRetries;
 
 
 /***/ }),
@@ -7243,7 +7235,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.assertMembers = exports.skipIfMissingEnv = exports.clearEnv = exports.clearInputs = exports.setInputs = exports.setInput = void 0;
+exports.setInput = setInput;
+exports.setInputs = setInputs;
+exports.clearInputs = clearInputs;
+exports.clearEnv = clearEnv;
+exports.skipIfMissingEnv = skipIfMissingEnv;
+exports.assertMembers = assertMembers;
 const node_assert_1 = __importDefault(__nccwpck_require2_(8061));
 /**
  * setInput sets the given name as a GitHub Actions input. It uses the reverse
@@ -7256,7 +7253,6 @@ function setInput(name, value) {
     const envvar = `INPUT_${name.replace(/ /g, '_').toUpperCase()}`;
     process.env[envvar] = value;
 }
-exports.setInput = setInput;
 /**
  * setInputs sets the list of GitHub Actions inputs. See #setInput for more
  * information.
@@ -7266,20 +7262,19 @@ exports.setInput = setInput;
 function setInputs(inputs) {
     Object.entries(inputs).forEach(([key, value]) => setInput(key, value));
 }
-exports.setInputs = setInputs;
 /**
  * clearInputs removes any GitHub Actions inputs set on the environment.
  */
 function clearInputs() {
     clearEnv((key) => key.startsWith(`INPUT_`));
 }
-exports.clearInputs = clearInputs;
 /**
  * clearEnv deletes any keys from the environment for which the function returns
  * true.
  *
  * @param fn Function to determine whether a variable should be deleted.
  */
+// eslint-disable-next-line no-unused-vars
 function clearEnv(fn) {
     Object.keys(process.env).forEach((key) => {
         if (fn(key, process.env[key])) {
@@ -7287,7 +7282,6 @@ function clearEnv(fn) {
         }
     });
 }
-exports.clearEnv = clearEnv;
 /**
  * skipIfMissingEnv is a helper function for skipping a test if an environment
  * variable is missing (unset).
@@ -7303,7 +7297,6 @@ function skipIfMissingEnv(...envs) {
     }
     return false;
 }
-exports.skipIfMissingEnv = skipIfMissingEnv;
 /**
  * assertMembers is an assertion that verifies the expected contains all of the
  * given members, in the order in which they were expected.
@@ -7331,7 +7324,6 @@ function assertMembers(actual, expected) {
         operator: 'subArray',
     });
 }
-exports.assertMembers = assertMembers;
 
 
 /***/ }),
@@ -7365,7 +7357,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sleep = exports.parseDuration = void 0;
+exports.parseDuration = parseDuration;
+exports.sleep = sleep;
 /**
  * parseDuration parses a user-supplied string duration with optional suffix and
  * returns a number representing the number of seconds. It returns 0 when given
@@ -7424,7 +7417,6 @@ function parseDuration(input) {
     }
     return total;
 }
-exports.parseDuration = parseDuration;
 /**
  * sleep waits for a specified duration in milliseconds as a promise.
  *
@@ -7435,7 +7427,6 @@ function sleep() {
         return new Promise((r) => setTimeout(r, ms));
     });
 }
-exports.sleep = sleep;
 
 
 /***/ }),
@@ -7460,7 +7451,7 @@ exports.sleep = sleep;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.expandUniverseEndpoints = void 0;
+exports.expandUniverseEndpoints = expandUniverseEndpoints;
 /**
  * expandUniverseEndpoints takes a list of universe endpoints using the
  * {universe} template and returns the interolated values.
@@ -7469,7 +7460,7 @@ exports.expandUniverseEndpoints = void 0;
  * @param universe is the universe to use
  */
 function expandUniverseEndpoints(endpoints, universe = 'googleapis.com') {
-    const result = Object.assign({});
+    const result = Object.assign({}); // eslint-disable-line no-unused-vars
     for (const key in endpoints) {
         const envOverrideKey = `GHA_ENDPOINT_OVERRIDE_${key}`;
         const envOverrideValue = process.env[envOverrideKey];
@@ -7482,7 +7473,6 @@ function expandUniverseEndpoints(endpoints, universe = 'googleapis.com') {
     }
     return result;
 }
-exports.expandUniverseEndpoints = expandUniverseEndpoints;
 
 
 /***/ }),
@@ -7507,8 +7497,9 @@ exports.expandUniverseEndpoints = expandUniverseEndpoints;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.allOf = exports.exactlyOneOf = exports.presence = void 0;
-/* eslint-disable @typescript-eslint/no-explicit-any */
+exports.presence = presence;
+exports.exactlyOneOf = exactlyOneOf;
+exports.allOf = allOf;
 /**
  * presence takes the given string and converts it to undefined iff it's null,
  * undefined, or the empty string. Otherwise, it returns the trimmed string.
@@ -7520,7 +7511,6 @@ exports.allOf = exports.exactlyOneOf = exports.presence = void 0;
 function presence(input) {
     return (input || '').trim() || undefined;
 }
-exports.presence = presence;
 /**
  * exactlyOneOf iterates over the inputs and ensures one and only one of the
  * elements is truthy. If more than one element is truthy, it returns false. If
@@ -7548,7 +7538,6 @@ function exactlyOneOf(...inputs) {
     }
     return true;
 }
-exports.exactlyOneOf = exactlyOneOf;
 /**
  * allOf iterates over the inputs and ensures all of the elements are truthy. If
  * any elements are falsey, it returns false. If no inputs are given, the result
@@ -7566,7 +7555,6 @@ function allOf(...inputs) {
     }
     return true;
 }
-exports.allOf = allOf;
 
 
 /***/ }),
@@ -7591,7 +7579,8 @@ exports.allOf = allOf;
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.pinnedToHeadWarning = exports.isPinnedToHead = void 0;
+exports.isPinnedToHead = isPinnedToHead;
+exports.pinnedToHeadWarning = pinnedToHeadWarning;
 /**
  * isPinnedToHead is a boolean which returns true if the given GitHub action is
  * pinned to HEAD ("master" or "main"), false otherwise.
@@ -7602,7 +7591,6 @@ function isPinnedToHead() {
     const actionRef = process.env.GITHUB_ACTION_REF;
     return actionRef === 'master' || actionRef === 'main';
 }
-exports.isPinnedToHead = isPinnedToHead;
 /**
  * pinnedToHeadWarning builds a message you can use to emit a consistent warning
  * about an action being pinned to HEAD. It extracts the action name and
@@ -7631,7 +7619,6 @@ function pinnedToHeadWarning(recommended) {
         `\n` +
         `Alternatively, you can pin to any git tag or git SHA in the repository.`);
 }
-exports.pinnedToHeadWarning = pinnedToHeadWarning;
 
 
 /***/ }),
@@ -7708,10 +7695,23 @@ function resolveCollection(CN, ctx, token, onError, tagName, tag) {
         coll.tag = tagName;
     return coll;
 }
-function composeCollection(CN, ctx, token, tagToken, onError) {
+function composeCollection(CN, ctx, token, props, onError) {
+    const tagToken = props.tag;
     const tagName = !tagToken
         ? null
         : ctx.directives.tagName(tagToken.source, msg => onError(tagToken, 'TAG_RESOLVE_FAILED', msg));
+    if (token.type === 'block-seq') {
+        const { anchor, newlineAfterProp: nl } = props;
+        const lastProp = anchor && tagToken
+            ? anchor.offset > tagToken.offset
+                ? anchor
+                : tagToken
+            : (anchor ?? tagToken);
+        if (lastProp && (!nl || nl.offset < lastProp.offset)) {
+            const message = 'Missing newline after block sequence props';
+            onError(lastProp, 'MISSING_CHAR', message);
+        }
+    }
     const expType = token.type === 'block-map'
         ? 'map'
         : token.type === 'block-seq'
@@ -7725,8 +7725,7 @@ function composeCollection(CN, ctx, token, tagToken, onError) {
         !tagName ||
         tagName === '!' ||
         (tagName === YAMLMap.YAMLMap.tagName && expType === 'map') ||
-        (tagName === YAMLSeq.YAMLSeq.tagName && expType === 'seq') ||
-        !expType) {
+        (tagName === YAMLSeq.YAMLSeq.tagName && expType === 'seq')) {
         return resolveCollection(CN, ctx, token, onError, tagName);
     }
     let tag = ctx.schema.tags.find(t => t.tag === tagName && t.collection === expType);
@@ -7787,6 +7786,7 @@ function composeDoc(options, directives, { offset, start, value, end }, onError)
         next: value ?? end?.[0],
         offset,
         onError,
+        parentIndent: 0,
         startOnNewline: true
     });
     if (props.found) {
@@ -7846,7 +7846,7 @@ function composeNode(ctx, token, props, onError) {
         case 'block-map':
         case 'block-seq':
         case 'flow-collection':
-            node = composeCollection.composeCollection(CN, ctx, token, tag, onError);
+            node = composeCollection.composeCollection(CN, ctx, token, props, onError);
             if (anchor)
                 node.anchor = anchor.source.substring(1);
             break;
@@ -7927,7 +7927,7 @@ var resolveFlowScalar = __nccwpck_require2_(7578);
 
 function composeScalar(ctx, token, tagToken, onError) {
     const { value, type, comment, range } = token.type === 'block-scalar'
-        ? resolveBlockScalar.resolveBlockScalar(token, ctx.options.strict, onError)
+        ? resolveBlockScalar.resolveBlockScalar(ctx, token, onError)
         : resolveFlowScalar.resolveFlowScalar(token, ctx.options.strict, onError);
     const tagName = tagToken
         ? ctx.directives.tagName(tagToken.source, msg => onError(tagToken, 'TAG_RESOLVE_FAILED', msg))
@@ -8260,6 +8260,7 @@ function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError, ta
             next: key ?? sep?.[0],
             offset,
             onError,
+            parentIndent: bm.indent,
             startOnNewline: true
         });
         const implicitKey = !keyProps.found;
@@ -8280,7 +8281,7 @@ function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError, ta
                 }
                 continue;
             }
-            if (keyProps.hasNewlineAfterProp || utilContainsNewline.containsNewline(key)) {
+            if (keyProps.newlineAfterProp || utilContainsNewline.containsNewline(key)) {
                 onError(key ?? start[start.length - 1], 'MULTILINE_IMPLICIT_KEY', 'Implicit keys need to be on a single line');
             }
         }
@@ -8302,6 +8303,7 @@ function resolveBlockMap({ composeNode, composeEmptyNode }, ctx, bm, onError, ta
             next: value,
             offset: keyNode.range[2],
             onError,
+            parentIndent: bm.indent,
             startOnNewline: !key || key.type === 'block-scalar'
         });
         offset = valueProps.end;
@@ -8359,9 +8361,9 @@ exports.resolveBlockMap = resolveBlockMap;
 
 var Scalar = __nccwpck_require2_(9338);
 
-function resolveBlockScalar(scalar, strict, onError) {
+function resolveBlockScalar(ctx, scalar, onError) {
     const start = scalar.offset;
-    const header = parseBlockScalarHeader(scalar, strict, onError);
+    const header = parseBlockScalarHeader(scalar, ctx.options.strict, onError);
     if (!header)
         return { value: '', type: null, comment: '', range: [start, start, start] };
     const type = header.mode === '>' ? Scalar.Scalar.BLOCK_FOLDED : Scalar.Scalar.BLOCK_LITERAL;
@@ -8403,6 +8405,10 @@ function resolveBlockScalar(scalar, strict, onError) {
             if (header.indent === 0)
                 trimIndent = indent.length;
             contentStart = i;
+            if (trimIndent === 0 && !ctx.atRoot) {
+                const message = 'Block scalar values in collections must be indented';
+                onError(offset, 'BAD_INDENT', message);
+            }
             break;
         }
         offset += indent.length + content.length + 1;
@@ -8577,6 +8583,7 @@ function resolveBlockSeq({ composeNode, composeEmptyNode }, ctx, bs, onError, ta
             next: value,
             offset,
             onError,
+            parentIndent: bs.indent,
             startOnNewline: true
         });
         if (!props.found) {
@@ -8691,6 +8698,7 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
             next: key ?? sep?.[0],
             offset,
             onError,
+            parentIndent: fc.indent,
             startOnNewline: false
         });
         if (!props.found) {
@@ -8772,6 +8780,7 @@ function resolveFlowCollection({ composeNode, composeEmptyNode }, ctx, fc, onErr
                 next: value,
                 offset: keyNode.range[2],
                 onError,
+                parentIndent: fc.indent,
                 startOnNewline: false
             });
             if (valueProps.found) {
@@ -9101,17 +9110,18 @@ exports.resolveFlowScalar = resolveFlowScalar;
 
 
 
-function resolveProps(tokens, { flow, indicator, next, offset, onError, startOnNewline }) {
+function resolveProps(tokens, { flow, indicator, next, offset, onError, parentIndent, startOnNewline }) {
     let spaceBefore = false;
     let atNewline = startOnNewline;
     let hasSpace = startOnNewline;
     let comment = '';
     let commentSep = '';
     let hasNewline = false;
-    let hasNewlineAfterProp = false;
     let reqSpace = false;
+    let tab = null;
     let anchor = null;
     let tag = null;
+    let newlineAfterProp = null;
     let comma = null;
     let found = null;
     let start = null;
@@ -9123,16 +9133,22 @@ function resolveProps(tokens, { flow, indicator, next, offset, onError, startOnN
                 onError(token.offset, 'MISSING_CHAR', 'Tags and anchors must be separated from the next token by white space');
             reqSpace = false;
         }
+        if (tab) {
+            if (atNewline && token.type !== 'comment' && token.type !== 'newline') {
+                onError(tab, 'TAB_AS_INDENT', 'Tabs are not allowed as indentation');
+            }
+            tab = null;
+        }
         switch (token.type) {
             case 'space':
                 // At the doc level, tabs at line start may be parsed
                 // as leading white space rather than indentation.
                 // In a flow collection, only the parser handles indent.
                 if (!flow &&
-                    atNewline &&
-                    indicator !== 'doc-start' &&
-                    token.source[0] === '\t')
-                    onError(token, 'TAB_AS_INDENT', 'Tabs are not allowed as indentation');
+                    (indicator !== 'doc-start' || next?.type !== 'flow-collection') &&
+                    token.source.includes('\t')) {
+                    tab = token;
+                }
                 hasSpace = true;
                 break;
             case 'comment': {
@@ -9159,7 +9175,7 @@ function resolveProps(tokens, { flow, indicator, next, offset, onError, startOnN
                 atNewline = true;
                 hasNewline = true;
                 if (anchor || tag)
-                    hasNewlineAfterProp = true;
+                    newlineAfterProp = token;
                 hasSpace = true;
                 break;
             case 'anchor':
@@ -9192,7 +9208,8 @@ function resolveProps(tokens, { flow, indicator, next, offset, onError, startOnN
                 if (found)
                     onError(token, 'UNEXPECTED_TOKEN', `Unexpected ${token.source} in ${flow ?? 'collection'}`);
                 found = token;
-                atNewline = false;
+                atNewline =
+                    indicator === 'seq-item-ind' || indicator === 'explicit-key-ind';
                 hasSpace = false;
                 break;
             case 'comma':
@@ -9218,17 +9235,23 @@ function resolveProps(tokens, { flow, indicator, next, offset, onError, startOnN
         next.type !== 'space' &&
         next.type !== 'newline' &&
         next.type !== 'comma' &&
-        (next.type !== 'scalar' || next.source !== ''))
+        (next.type !== 'scalar' || next.source !== '')) {
         onError(next.offset, 'MISSING_CHAR', 'Tags and anchors must be separated from the next token by white space');
+    }
+    if (tab &&
+        ((atNewline && tab.indent <= parentIndent) ||
+            next?.type === 'block-map' ||
+            next?.type === 'block-seq'))
+        onError(tab, 'TAB_AS_INDENT', 'Tabs are not allowed as indentation');
     return {
         comma,
         found,
         spaceBefore,
         comment,
         hasNewline,
-        hasNewlineAfterProp,
         anchor,
         tag,
+        newlineAfterProp,
         end,
         start: start ?? end
     };
@@ -10553,7 +10576,6 @@ class Collection extends Node.NodeBase {
         }
     }
 }
-Collection.maxFlowStringSingleLineLength = 60;
 
 exports.Collection = Collection;
 exports.collectionFromPath = collectionFromPath;
@@ -11209,7 +11231,7 @@ function resolveAsScalar(token, strict = true, onError) {
             case 'double-quoted-scalar':
                 return resolveFlowScalar.resolveFlowScalar(token, strict, _onError);
             case 'block-scalar':
-                return resolveBlockScalar.resolveBlockScalar(token, strict, _onError);
+                return resolveBlockScalar.resolveBlockScalar({ options: { strict } }, token, _onError);
         }
     }
     return null;
@@ -11790,11 +11812,11 @@ function isEmpty(ch) {
             return false;
     }
 }
-const hexDigits = '0123456789ABCDEFabcdef'.split('');
-const tagChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-#;/?:@&=+$_.!~*'()".split('');
-const invalidFlowScalarChars = ',[]{}'.split('');
-const invalidAnchorChars = ' ,[]{}\n\r\t'.split('');
-const isNotAnchorChar = (ch) => !ch || invalidAnchorChars.includes(ch);
+const hexDigits = new Set('0123456789ABCDEFabcdef');
+const tagChars = new Set("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-#;/?:@&=+$_.!~*'()");
+const flowIndicatorChars = new Set(',[]{}');
+const invalidAnchorChars = new Set(' ,[]{}\n\r\t');
+const isNotAnchorChar = (ch) => !ch || invalidAnchorChars.has(ch);
 /**
  * Splits an input string into lexical tokens, i.e. smaller strings that are
  * easily identifiable by `tokens.tokenType()`.
@@ -11860,6 +11882,8 @@ class Lexer {
      */
     *lex(source, incomplete = false) {
         if (source) {
+            if (typeof source !== 'string')
+                throw TypeError('source is not a string');
             this.buffer = this.buffer ? this.buffer + source : source;
             this.lineEndPos = null;
         }
@@ -11959,11 +11983,16 @@ class Lexer {
         }
         if (line[0] === '%') {
             let dirEnd = line.length;
-            const cs = line.indexOf('#');
-            if (cs !== -1) {
+            let cs = line.indexOf('#');
+            while (cs !== -1) {
                 const ch = line[cs - 1];
-                if (ch === ' ' || ch === '\t')
+                if (ch === ' ' || ch === '\t') {
                     dirEnd = cs - 1;
+                    break;
+                }
+                else {
+                    cs = line.indexOf('#', cs + 1);
+                }
             }
             while (true) {
                 const ch = line[dirEnd - 1];
@@ -11994,15 +12023,11 @@ class Lexer {
             if (!this.atEnd && !this.hasChars(4))
                 return this.setNext('line-start');
             const s = this.peek(3);
-            if (s === '---' && isEmpty(this.charAt(3))) {
+            if ((s === '---' || s === '...') && isEmpty(this.charAt(3))) {
                 yield* this.pushCount(3);
                 this.indentValue = 0;
                 this.indentNext = 0;
-                return 'doc';
-            }
-            else if (s === '...' && isEmpty(this.charAt(3))) {
-                yield* this.pushCount(3);
-                return 'stream';
+                return s === '---' ? 'doc' : 'stream';
             }
         }
         this.indentValue = yield* this.pushSpaces(false);
@@ -12229,8 +12254,10 @@ class Lexer {
         if (indent >= this.indentNext) {
             if (this.blockScalarIndent === -1)
                 this.indentNext = indent;
-            else
-                this.indentNext += this.blockScalarIndent;
+            else {
+                this.indentNext =
+                    this.blockScalarIndent + (this.indentNext === 0 ? 1 : this.indentNext);
+            }
             do {
                 const cs = this.continueScalar(nl + 1);
                 if (cs === -1)
@@ -12243,14 +12270,25 @@ class Lexer {
                 nl = this.buffer.length;
             }
         }
-        if (!this.blockScalarKeep) {
+        // Trailing insufficiently indented tabs are invalid.
+        // To catch that during parsing, we include them in the block scalar value.
+        let i = nl + 1;
+        ch = this.buffer[i];
+        while (ch === ' ')
+            ch = this.buffer[++i];
+        if (ch === '\t') {
+            while (ch === '\t' || ch === ' ' || ch === '\r' || ch === '\n')
+                ch = this.buffer[++i];
+            nl = i - 1;
+        }
+        else if (!this.blockScalarKeep) {
             do {
                 let i = nl - 1;
                 let ch = this.buffer[i];
                 if (ch === '\r')
                     ch = this.buffer[--i];
                 const lastChar = i; // Drop the line if last char not more indented
-                while (ch === ' ' || ch === '\t')
+                while (ch === ' ')
                     ch = this.buffer[--i];
                 if (ch === '\n' && i >= this.pos && i + 1 + indent > lastChar)
                     nl = i;
@@ -12270,7 +12308,7 @@ class Lexer {
         while ((ch = this.buffer[++i])) {
             if (ch === ':') {
                 const next = this.buffer[i + 1];
-                if (isEmpty(next) || (inFlow && next === ','))
+                if (isEmpty(next) || (inFlow && flowIndicatorChars.has(next)))
                     break;
                 end = i;
             }
@@ -12285,7 +12323,7 @@ class Lexer {
                     else
                         end = i;
                 }
-                if (next === '#' || (inFlow && invalidFlowScalarChars.includes(next)))
+                if (next === '#' || (inFlow && flowIndicatorChars.has(next)))
                     break;
                 if (ch === '\n') {
                     const cs = this.continueScalar(i + 1);
@@ -12295,7 +12333,7 @@ class Lexer {
                 }
             }
             else {
-                if (inFlow && invalidFlowScalarChars.includes(ch))
+                if (inFlow && flowIndicatorChars.has(ch))
                     break;
                 end = i;
             }
@@ -12340,7 +12378,7 @@ class Lexer {
             case ':': {
                 const inFlow = this.flowLevel > 0;
                 const ch1 = this.charAt(1);
-                if (isEmpty(ch1) || (inFlow && invalidFlowScalarChars.includes(ch1))) {
+                if (isEmpty(ch1) || (inFlow && flowIndicatorChars.has(ch1))) {
                     if (!inFlow)
                         this.indentNext = this.indentValue + 1;
                     else if (this.flowKey)
@@ -12365,11 +12403,11 @@ class Lexer {
             let i = this.pos + 1;
             let ch = this.buffer[i];
             while (ch) {
-                if (tagChars.includes(ch))
+                if (tagChars.has(ch))
                     ch = this.buffer[++i];
                 else if (ch === '%' &&
-                    hexDigits.includes(this.buffer[i + 1]) &&
-                    hexDigits.includes(this.buffer[i + 2])) {
+                    hexDigits.has(this.buffer[i + 1]) &&
+                    hexDigits.has(this.buffer[i + 2])) {
                     ch = this.buffer[(i += 3)];
                 }
                 else
@@ -12775,7 +12813,7 @@ class Parser {
                     }
                     else {
                         Object.assign(it, { key: token, sep: [] });
-                        this.onKeyLine = !includesToken(it.start, 'explicit-key-ind');
+                        this.onKeyLine = !it.explicitKey;
                         return;
                     }
                     break;
@@ -12984,9 +13022,9 @@ class Parser {
                 return;
         }
         if (this.indent >= map.indent) {
-            const atNextItem = !this.onKeyLine &&
-                this.indent === map.indent &&
-                it.sep &&
+            const atMapIndent = !this.onKeyLine && this.indent === map.indent;
+            const atNextItem = atMapIndent &&
+                (it.sep || it.explicitKey) &&
                 this.type !== 'seq-item-ind';
             // For empty nodes, assign newline-separated not indented empty tokens to following node
             let start = [];
@@ -13027,25 +13065,26 @@ class Parser {
                     }
                     return;
                 case 'explicit-key-ind':
-                    if (!it.sep && !includesToken(it.start, 'explicit-key-ind')) {
+                    if (!it.sep && !it.explicitKey) {
                         it.start.push(this.sourceToken);
+                        it.explicitKey = true;
                     }
                     else if (atNextItem || it.value) {
                         start.push(this.sourceToken);
-                        map.items.push({ start });
+                        map.items.push({ start, explicitKey: true });
                     }
                     else {
                         this.stack.push({
                             type: 'block-map',
                             offset: this.offset,
                             indent: this.indent,
-                            items: [{ start: [this.sourceToken] }]
+                            items: [{ start: [this.sourceToken], explicitKey: true }]
                         });
                     }
                     this.onKeyLine = true;
                     return;
                 case 'map-value-ind':
-                    if (includesToken(it.start, 'explicit-key-ind')) {
+                    if (it.explicitKey) {
                         if (!it.sep) {
                             if (includesToken(it.start, 'newline')) {
                                 Object.assign(it, { key: null, sep: [this.sourceToken] });
@@ -13136,9 +13175,7 @@ class Parser {
                 default: {
                     const bv = this.startBlockValue(map);
                     if (bv) {
-                        if (atNextItem &&
-                            bv.type !== 'block-seq' &&
-                            includesToken(it.start, 'explicit-key-ind')) {
+                        if (atMapIndent && bv.type !== 'block-seq') {
                             map.items.push({ start });
                         }
                         this.stack.push(bv);
@@ -13359,7 +13396,7 @@ class Parser {
                     type: 'block-map',
                     offset: this.offset,
                     indent: this.indent,
-                    items: [{ start }]
+                    items: [{ start, explicitKey: true }]
                 };
             }
             case 'map-value-ind': {
@@ -13723,7 +13760,7 @@ const floatNaN = {
     identify: value => typeof value === 'number',
     default: true,
     tag: 'tag:yaml.org,2002:float',
-    test: /^(?:[-+]?\.(?:inf|Inf|INF|nan|NaN|NAN))$/,
+    test: /^(?:[-+]?\.(?:inf|Inf|INF)|\.nan|\.NaN|\.NAN)$/,
     resolve: str => str.slice(-3).toLowerCase() === 'nan'
         ? NaN
         : str[0] === '-'
@@ -14133,7 +14170,7 @@ const floatNaN = {
     identify: value => typeof value === 'number',
     default: true,
     tag: 'tag:yaml.org,2002:float',
-    test: /^[-+]?\.(?:inf|Inf|INF|nan|NaN|NAN)$/,
+    test: /^(?:[-+]?\.(?:inf|Inf|INF)|\.nan|\.NaN|\.NAN)$/,
     resolve: (str) => str.slice(-3).toLowerCase() === 'nan'
         ? NaN
         : str[0] === '-'
@@ -14711,6 +14748,8 @@ const FOLD_QUOTED = 'quoted';
 function foldFlowLines(text, indent, mode = 'flow', { indentAtStart, lineWidth = 80, minContentWidth = 20, onFold, onOverflow } = {}) {
     if (!lineWidth || lineWidth < 0)
         return text;
+    if (lineWidth < minContentWidth)
+        minContentWidth = 0;
     const endStep = Math.max(1 + minContentWidth, 1 + lineWidth - indent.length);
     if (text.length <= endStep)
         return text;
@@ -15312,7 +15351,7 @@ function stringifyPair({ key, value }, ctx, onComment, onChompKeep) {
         if (keyComment) {
             throw new Error('With simple keys, key nodes cannot have comments');
         }
-        if (identity.isCollection(key)) {
+        if (identity.isCollection(key) || (!identity.isNode(key) && typeof key === 'object')) {
             const msg = 'With simple keys, collection cannot be used as a key value';
             throw new Error(msg);
         }
@@ -16236,6 +16275,8 @@ const Range = __nccwpck_require__(9828)
 /***/ 9828:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+const SPACE_CHARACTERS = /\s+/g
+
 // hoisted class for cyclic dependency
 class Range {
   constructor (range, options) {
@@ -16256,7 +16297,7 @@ class Range {
       // just put it in the set and return
       this.raw = range.value
       this.set = [[range]]
-      this.format()
+      this.formatted = undefined
       return this
     }
 
@@ -16267,10 +16308,7 @@ class Range {
     // First reduce all whitespace as much as possible so we do not have to rely
     // on potentially slow regexes like \s*. This is then stored and used for
     // future error messages as well.
-    this.raw = range
-      .trim()
-      .split(/\s+/)
-      .join(' ')
+    this.raw = range.trim().replace(SPACE_CHARACTERS, ' ')
 
     // First, split on ||
     this.set = this.raw
@@ -16304,14 +16342,29 @@ class Range {
       }
     }
 
-    this.format()
+    this.formatted = undefined
+  }
+
+  get range () {
+    if (this.formatted === undefined) {
+      this.formatted = ''
+      for (let i = 0; i < this.set.length; i++) {
+        if (i > 0) {
+          this.formatted += '||'
+        }
+        const comps = this.set[i]
+        for (let k = 0; k < comps.length; k++) {
+          if (k > 0) {
+            this.formatted += ' '
+          }
+          this.formatted += comps[k].toString().trim()
+        }
+      }
+    }
+    return this.formatted
   }
 
   format () {
-    this.range = this.set
-      .map((comps) => comps.join(' ').trim())
-      .join('||')
-      .trim()
     return this.range
   }
 
@@ -41759,7 +41812,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.downloadAndExtractTool = void 0;
+exports.downloadAndExtractTool = downloadAndExtractTool;
 /**
  * Contains download utility functions.
  */
@@ -41790,7 +41843,6 @@ function downloadAndExtractTool(url) {
         return extractedPath;
     });
 }
-exports.downloadAndExtractTool = downloadAndExtractTool;
 /**
  * downloadTool is a temporary hack until native support for module mocking
  * lands:
@@ -41832,7 +41884,7 @@ function downloadTool(url) {
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.buildReleaseURL = void 0;
+exports.buildReleaseURL = buildReleaseURL;
 // archMap is a mapping of how node detects an operating system to the
 // associated cloud sdk architecture value.
 const archMap = {
@@ -41869,7 +41921,6 @@ function buildReleaseURL(os, arch, version) {
     }
     return `https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${encodeURI(objectName)}`;
 }
-exports.buildReleaseURL = buildReleaseURL;
 
 
 /***/ }),
@@ -41930,7 +41981,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.computeBestVersion = exports.bestVersion = exports.getLatestGcloudSDKVersion = exports.installComponent = exports.setProject = exports.authenticateGcloudSDK = exports.computeGcloudVersion = exports.installGcloudSDK = exports.isAuthenticated = exports.isProjectIdSet = exports.gcloudRunJSON = exports.gcloudRun = exports.getToolCommand = exports.isInstalled = exports.userAgentString = void 0;
+exports.userAgentString = void 0;
+exports.isInstalled = isInstalled;
+exports.getToolCommand = getToolCommand;
+exports.gcloudRun = gcloudRun;
+exports.gcloudRunJSON = gcloudRunJSON;
+exports.isProjectIdSet = isProjectIdSet;
+exports.isAuthenticated = isAuthenticated;
+exports.installGcloudSDK = installGcloudSDK;
+exports.computeGcloudVersion = computeGcloudVersion;
+exports.authenticateGcloudSDK = authenticateGcloudSDK;
+exports.setProject = setProject;
+exports.installComponent = installComponent;
+exports.getLatestGcloudSDKVersion = getLatestGcloudSDKVersion;
+exports.bestVersion = bestVersion;
+exports.computeBestVersion = computeBestVersion;
 const path = __importStar(__nccwpck_require__(1017));
 const os = __importStar(__nccwpck_require__(2037));
 const exec_1 = __nccwpck_require__(1514);
@@ -41942,7 +42007,6 @@ const actions_utils_1 = __nccwpck_require__(308);
 const format_url_1 = __nccwpck_require__(3844);
 const download_util_1 = __nccwpck_require__(208);
 // Do not listen to the linter - this can NOT be rewritten as an ES6 import statement.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version: appVersion } = __nccwpck_require__(4147);
 // versionsURL is the URL to the artifact where version information is stored.
 const versionsURL = `https://raw.githubusercontent.com/google-github-actions/setup-cloud-sdk/main/data/versions.json`;
@@ -41966,7 +42030,6 @@ function isInstalled(version) {
     toolPath = toolCache.findAllVersions('gcloud');
     return toolPath.length > 0;
 }
-exports.isInstalled = isInstalled;
 /**
  * Returns the correct gcloud command for OS.
  *
@@ -41981,7 +42044,6 @@ function getToolCommand() {
     }
     return toolCommand;
 }
-exports.getToolCommand = getToolCommand;
 /**
  * gcloudRun executes the given gcloud command using actions/exec under the
  * hood. It handles non-zero exit codes and throws a more semantic error on
@@ -42010,7 +42072,6 @@ function gcloudRun(cmd, options) {
         };
     });
 }
-exports.gcloudRun = gcloudRun;
 /**
  * gcloudRunJSON runs the gcloud command with JSON output and parses the result
  * as JSON. If the parsing fails, it throws an error.
@@ -42020,7 +42081,6 @@ exports.gcloudRun = gcloudRun;
  *
  * @return Parsed JSON as an object (or array).
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function gcloudRunJSON(cmd, options) {
     return __awaiter(this, void 0, void 0, function* () {
         const jsonCmd = ['--format', 'json'].concat(cmd);
@@ -42034,7 +42094,6 @@ function gcloudRunJSON(cmd, options) {
         }
     });
 }
-exports.gcloudRunJSON = gcloudRunJSON;
 /**
  * Checks if the project Id is set in the gcloud config.
  *
@@ -42046,7 +42105,6 @@ function isProjectIdSet() {
         return !result.output.includes('unset');
     });
 }
-exports.isProjectIdSet = isProjectIdSet;
 /**
  * Checks if gcloud is authenticated.
  *
@@ -42058,7 +42116,6 @@ function isAuthenticated() {
         return !result.output.includes('No credentialed accounts.');
     });
 }
-exports.isAuthenticated = isAuthenticated;
 /**
  * Installs the gcloud SDK into the actions environment.
  *
@@ -42089,7 +42146,6 @@ function installGcloudSDK(version) {
         return toolPath;
     });
 }
-exports.installGcloudSDK = installGcloudSDK;
 /**
  * computeGcloudVersion computes the appropriate gcloud version for the given
  * string. If the string is the empty string or the special value "latest", it
@@ -42118,7 +42174,6 @@ function computeGcloudVersion(version) {
         return version;
     });
 }
-exports.computeGcloudVersion = computeGcloudVersion;
 /**
  * Authenticates the gcloud tool using the provided credentials file.
  *
@@ -42129,7 +42184,6 @@ function authenticateGcloudSDK(filepath) {
         yield gcloudRun(['--quiet', 'auth', 'login', '--force', '--cred-file', filepath]);
     });
 }
-exports.authenticateGcloudSDK = authenticateGcloudSDK;
 /**
  * Sets the GCP Project Id in the gcloud config.
  *
@@ -42141,7 +42195,6 @@ function setProject(projectId) {
         yield gcloudRun(['--quiet', 'config', 'set', 'project', projectId]);
     });
 }
-exports.setProject = setProject;
 /**
  * Install a Cloud SDK component.
  *
@@ -42160,7 +42213,6 @@ function installComponent(component) {
         yield gcloudRun(cmd);
     });
 }
-exports.installComponent = installComponent;
 /**
  * getLatestGcloudSDKVersion fetches the latest version number from the API.
  *
@@ -42171,7 +42223,6 @@ function getLatestGcloudSDKVersion() {
         return yield bestVersion('> 0.0.0');
     });
 }
-exports.getLatestGcloudSDKVersion = getLatestGcloudSDKVersion;
 /**
  * bestVersion takes a version constraint and gets the latest available version
  * that satisfies the constraint.
@@ -42199,7 +42250,6 @@ function bestVersion(spec) {
         return computeBestVersion(spec, versions);
     });
 }
-exports.bestVersion = bestVersion;
 /**
  * computeBestVersion computes the latest available version that still satisfies
  * the spec. This is a helper function and is only exported for testing.
@@ -42228,7 +42278,6 @@ function computeBestVersion(spec, versions) {
     }
     return resolved;
 }
-exports.computeBestVersion = computeBestVersion;
 __exportStar(__nccwpck_require__(5911), exports);
 
 
@@ -44257,7 +44306,7 @@ module.exports = parseParams
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.1.7","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint . --ext .ts,.tsx","format":"eslint . --ext .ts,.tsx --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.10.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.1","@actions/tool-cache":"^2.0.1","@google-github-actions/actions-utils":"^0.8.0","semver":"^7.6.2"},"devDependencies":{"@types/node":"^20.12.12","@types/semver":"^7.5.8","@typescript-eslint/eslint-plugin":"^7.10.0","@typescript-eslint/parser":"^7.10.0","@vercel/ncc":"^0.38.1","eslint-config-prettier":"^9.1.0","eslint-plugin-prettier":"^5.1.3","eslint":"^8.57.0","prettier":"^3.2.5","ts-node":"^10.9.2","typedoc-plugin-markdown":"^4.0.2","typedoc":"^0.25.13","typescript":"^5.4.5"}}');
+module.exports = JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.1.7","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint .","format":"eslint --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.10.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.1","@actions/tool-cache":"^2.0.1","@google-github-actions/actions-utils":"^0.8.3","semver":"^7.6.3"},"devDependencies":{"@eslint/eslintrc":"^3.1.0","@eslint/js":"^9.8.0","@types/node":"^22.1.0","@types/semver":"^7.5.8","@typescript-eslint/eslint-plugin":"^8.0.0","@vercel/ncc":"^0.38.1","eslint-config-prettier":"^9.1.0","eslint-plugin-prettier":"^5.2.1","eslint":"^9.8.0","prettier":"^3.3.3","ts-node":"^10.9.2","typedoc-plugin-markdown":"^4.2.3","typedoc":"^0.26.5","typescript-eslint":"^8.0.0","typescript":"^5.5.4"}}');
 
 /***/ })
 

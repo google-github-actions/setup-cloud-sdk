@@ -4,12 +4,12 @@
 
 [@google-github-actions/setup-cloud-sdk](../../modules.md) / [index](../README.md) / ExecOptions
 
-# Type alias: ExecOptions
+# Type Alias: ExecOptions
 
 > **ExecOptions**: `ActionsExecOptions`
 
 ExecOptions is a type alias to core/exec ExecOptions.
 
-## Source
+## Defined in
 
-[index.ts:78](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L78)
+[index.ts:77](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L77)

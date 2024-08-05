@@ -14,12 +14,14 @@ Sets the GCP Project Id in the gcloud config.
 
 • **projectId**: `string`
 
+The project ID to set.
+
 ## Returns
 
 `Promise`\<`void`\>
 
 project ID.
 
-## Source
+## Defined in
 
-[index.ts:235](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L235)
+[index.ts:233](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L233)

@@ -70,4 +70,4 @@ Contributions welcome! See the [Contributing Guide](./CONTRIBUTING.md).
 
 Apache Version 2.0
 
-See [LICENSE](./LICENSE)
+See [LICENSE](_media/LICENSE)

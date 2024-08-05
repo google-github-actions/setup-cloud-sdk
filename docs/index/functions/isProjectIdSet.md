@@ -16,6 +16,6 @@ Checks if the project Id is set in the gcloud config.
 
 true is project Id is set.
 
-## Source
+## Defined in
 
-[index.ts:147](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L147)
+[index.ts:145](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L145)

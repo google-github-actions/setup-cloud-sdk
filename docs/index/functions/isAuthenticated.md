@@ -16,6 +16,6 @@ Checks if gcloud is authenticated.
 
 true is gcloud is authenticated.
 
-## Source
+## Defined in
 
-[index.ts:157](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L157)
+[index.ts:155](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L155)

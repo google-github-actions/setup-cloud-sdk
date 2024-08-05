@@ -29,7 +29,6 @@ import { buildReleaseURL } from './format-url';
 import { downloadAndExtractTool } from './download-util';
 
 // Do not listen to the linter - this can NOT be rewritten as an ES6 import statement.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version: appVersion } = require('../package.json');
 
 // versionsURL is the URL to the artifact where version information is stored.
@@ -124,7 +123,6 @@ export async function gcloudRun(cmd: string[], options?: ExecOptions): Promise<E
  *
  * @return Parsed JSON as an object (or array).
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function gcloudRunJSON(cmd: string[], options?: ExecOptions): Promise<any> {
   const jsonCmd = ['--format', 'json'].concat(cmd);
   const output = await gcloudRun(jsonCmd, options);
@@ -229,7 +227,7 @@ export async function authenticateGcloudSDK(filepath: string): Promise<void> {
 /**
  * Sets the GCP Project Id in the gcloud config.
  *
- * @param serviceAccountKey - The service account key used for authentication.
+ * @param projectId - The project ID to set.
  * @returns project ID.
  */
 export async function setProject(projectId: string): Promise<void> {
