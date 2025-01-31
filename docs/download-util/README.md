@@ -1,4 +1,4 @@
-[**@google-github-actions/setup-cloud-sdk**](../README.md) • **Docs**
+[**@google-github-actions/setup-cloud-sdk**](../README.md)
 
 ***
 
@@ -6,8 +6,6 @@
 
 # download-util
 
-## Index
-
-### Functions
+## Functions
 
 - [downloadAndExtractTool](functions/downloadAndExtractTool.md)

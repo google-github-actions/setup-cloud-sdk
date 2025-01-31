@@ -1,4 +1,4 @@
-[**@google-github-actions/setup-cloud-sdk**](../../README.md) • **Docs**
+[**@google-github-actions/setup-cloud-sdk**](../../README.md)
 
 ***
 
@@ -8,11 +8,15 @@
 
 > **setProject**(`projectId`): `Promise`\<`void`\>
 
+Defined in: [index.ts:233](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L233)
+
 Sets the GCP Project Id in the gcloud config.
 
 ## Parameters
 
-• **projectId**: `string`
+### projectId
+
+`string`
 
 The project ID to set.
 
@@ -21,7 +25,3 @@ The project ID to set.
 `Promise`\<`void`\>
 
 project ID.
-
-## Defined in
-
-[index.ts:233](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L233)

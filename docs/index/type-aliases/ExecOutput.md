@@ -1,4 +1,4 @@
-[**@google-github-actions/setup-cloud-sdk**](../../README.md) • **Docs**
+[**@google-github-actions/setup-cloud-sdk**](../../README.md)
 
 ***
 
@@ -7,6 +7,8 @@
 # Type Alias: ExecOutput
 
 > **ExecOutput**: `object`
+
+Defined in: [index.ts:82](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L82)
 
 ExecOutput is the output returned from a gcloud exec.
 
@@ -23,7 +25,3 @@ ExecOutput is the output returned from a gcloud exec.
 ### stdout
 
 > **stdout**: `string`
-
-## Defined in
-
-[index.ts:82](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L82)

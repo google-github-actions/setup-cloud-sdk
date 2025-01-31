@@ -1,4 +1,4 @@
-[**@google-github-actions/setup-cloud-sdk**](../../README.md) • **Docs**
+[**@google-github-actions/setup-cloud-sdk**](../../README.md)
 
 ***
 
@@ -8,18 +8,18 @@
 
 > **authenticateGcloudSDK**(`filepath`): `Promise`\<`void`\>
 
+Defined in: [index.ts:223](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L223)
+
 Authenticates the gcloud tool using the provided credentials file.
 
 ## Parameters
 
-• **filepath**: `string`
+### filepath
+
+`string`
 
 Path to the credentials file.
 
 ## Returns
 
 `Promise`\<`void`\>
-
-## Defined in
-
-[index.ts:223](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L223)

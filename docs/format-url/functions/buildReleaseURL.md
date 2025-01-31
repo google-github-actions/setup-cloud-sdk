@@ -1,4 +1,4 @@
-[**@google-github-actions/setup-cloud-sdk**](../../README.md) • **Docs**
+[**@google-github-actions/setup-cloud-sdk**](../../README.md)
 
 ***
 
@@ -8,20 +8,28 @@
 
 > **buildReleaseURL**(`os`, `arch`, `version`): `string`
 
+Defined in: [format-url.ts:33](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/format-url.ts#L33)
+
 buildReleaseURL builds the URL at which to dowbnload the gcloud SDK,
 according to the specified arguments.
 
 ## Parameters
 
-• **os**: `string`
+### os
+
+`string`
 
 The OS of the requested release.
 
-• **arch**: `string`
+### arch
+
+`string`
 
 The system architecture of the requested release.
 
-• **version**: `string`
+### version
+
+`string`
 
 The version of the requested release.
 
@@ -30,7 +38,3 @@ The version of the requested release.
 `string`
 
 The formatted gcloud SDK release URL.
-
-## Defined in
-
-[format-url.ts:33](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/format-url.ts#L33)

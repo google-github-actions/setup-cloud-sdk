@@ -1,4 +1,4 @@
-[**@google-github-actions/setup-cloud-sdk**](../../README.md) • **Docs**
+[**@google-github-actions/setup-cloud-sdk**](../../README.md)
 
 ***
 
@@ -8,20 +8,20 @@
 
 > **installComponent**(`component`): `Promise`\<`void`\>
 
+Defined in: [index.ts:243](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L243)
+
 Install a Cloud SDK component.
 
 ## Parameters
 
-• **component**: `string` \| `string`[]
+### component
 
 gcloud component group to install ie alpha, beta.
+
+`string` | `string`[]
 
 ## Returns
 
 `Promise`\<`void`\>
 
 CMD output
-
-## Defined in
-
-[index.ts:243](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L243)

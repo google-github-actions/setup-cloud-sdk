@@ -1,4 +1,4 @@
-[**@google-github-actions/setup-cloud-sdk**](../../README.md) • **Docs**
+[**@google-github-actions/setup-cloud-sdk**](../../README.md)
 
 ***
 
@@ -8,6 +8,8 @@
 
 > **isProjectIdSet**(): `Promise`\<`boolean`\>
 
+Defined in: [index.ts:145](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L145)
+
 Checks if the project Id is set in the gcloud config.
 
 ## Returns
@@ -15,7 +17,3 @@ Checks if the project Id is set in the gcloud config.
 `Promise`\<`boolean`\>
 
 true is project Id is set.
-
-## Defined in
-
-[index.ts:145](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L145)

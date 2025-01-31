@@ -1,4 +1,4 @@
-[**@google-github-actions/setup-cloud-sdk**](../../README.md) • **Docs**
+[**@google-github-actions/setup-cloud-sdk**](../../README.md)
 
 ***
 
@@ -7,6 +7,8 @@
 # Function: ~~computeGcloudVersion()~~
 
 > **computeGcloudVersion**(`version`?): `Promise`\<`string`\>
+
+Defined in: [index.ts:210](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L210)
 
 computeGcloudVersion computes the appropriate gcloud version for the given
 string. If the string is the empty string or the special value "latest", it
@@ -21,7 +23,9 @@ install as a customization.
 
 ## Parameters
 
-• **version?**: `string`
+### version?
+
+`string`
 
 String (or undefined) version. The empty string or other
 falsey values will return the latest gcloud version.
@@ -35,7 +39,3 @@ String representing the latest version.
 ## Deprecated
 
 Callers should use `installGcloudSDK('> 0.0.0.')` instead.
-
-## Defined in
-
-[index.ts:210](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L210)

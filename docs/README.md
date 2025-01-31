@@ -1,4 +1,4 @@
-**@google-github-actions/setup-cloud-sdk** • [**Docs**](modules.md)
+**@google-github-actions/setup-cloud-sdk**
 
 ***
 
