@@ -9,9 +9,6 @@ concurrency:
   group: '${{ github.workflow }}-${{ github.head_ref || github.ref }}'
   cancel-in-progress: true
 
-env:
-  PR_BRANCH: 'actions/gcloud-versions'
-
 jobs:
   compile-versions:
     runs-on: 'ubuntu-latest'
@@ -33,29 +30,12 @@ jobs:
           echo "Computed versions:"
           cat ./data/versions.json
 
-      - id: 'updates'
-        name: 'Update versions list'
-        run: |-
-          if git diff --exit-code ./data/versions.json; then
-            echo "No changes"
-            echo "had_changes=false" >> ${GITHUB_OUTPUT}
-            exit 0
-          fi
-
-          echo "had_changes=true" >> ${GITHUB_OUTPUT}
-
-      # Create a pull request with updated files
       - name: 'Create/Update Pull Request'
-        # Skip if there a no changes
-        if: '${{ fromJSON(steps.updates.outputs.had_changes) }}'
-        uses: 'abcxyz/pkg/.github/actions/create-pull-request@2fb8f8c90a04f2ec263305efdef8a1a4e2c54a55' # ratchet:abcxyz/pkg/.github/actions/create-pull-request@main
+        uses: 'abcxyz/pkg/.github/actions/create-pull-request@main' # ratchet:exclude
         with:
           token: '${{ secrets.ACTIONS_BOT_TOKEN }}'
-          base_branch: '${{ github.event.repository.default_branch }}'
-          head_branch: '${{ env.PR_BRANCH }}'
+          base_branch: '${{ github.ref_name }}'
+          head_branch: 'actions/compile-versions-${{ github.ref_name }}'
           title: 'Update gcloud versions'
           body: 'Update latest gcloud versions'
-          changed_paths: |-
-            [
-              "data/versions.json"
-            ]
+          compute_paths: true
