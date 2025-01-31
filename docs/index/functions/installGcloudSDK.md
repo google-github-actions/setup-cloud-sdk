@@ -1,4 +1,4 @@
-[**@google-github-actions/setup-cloud-sdk**](../../README.md) • **Docs**
+[**@google-github-actions/setup-cloud-sdk**](../../README.md)
 
 ***
 
@@ -8,11 +8,15 @@
 
 > **installGcloudSDK**(`version`): `Promise`\<`string`\>
 
+Defined in: [index.ts:168](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L168)
+
 Installs the gcloud SDK into the actions environment.
 
 ## Parameters
 
-• **version**: `string`
+### version
+
+`string`
 
 The version or version specification to install. If a
 specification is given, the most recent version that still matches the
@@ -23,7 +27,3 @@ specification is installed.
 `Promise`\<`string`\>
 
 The path of the installed tool.
-
-## Defined in
-
-[index.ts:168](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L168)

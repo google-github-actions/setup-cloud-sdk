@@ -1,4 +1,4 @@
-[**@google-github-actions/setup-cloud-sdk**](../README.md) • **Docs**
+[**@google-github-actions/setup-cloud-sdk**](../README.md)
 
 ***
 
@@ -6,23 +6,21 @@
 
 # index
 
-## Index
-
-### Type Aliases
+## Type Aliases
 
 - [ExecOptions](type-aliases/ExecOptions.md)
 - [ExecOutput](type-aliases/ExecOutput.md)
 
-### Variables
+## Variables
 
 - [userAgentString](variables/userAgentString.md)
 
-### Functions
+## Functions
 
 - [authenticateGcloudSDK](functions/authenticateGcloudSDK.md)
 - [bestVersion](functions/bestVersion.md)
 - [computeBestVersion](functions/computeBestVersion.md)
-- [computeGcloudVersion](functions/computeGcloudVersion.md)
+- [~~computeGcloudVersion~~](functions/computeGcloudVersion.md)
 - [gcloudRun](functions/gcloudRun.md)
 - [gcloudRunJSON](functions/gcloudRunJSON.md)
 - [getLatestGcloudSDKVersion](functions/getLatestGcloudSDKVersion.md)

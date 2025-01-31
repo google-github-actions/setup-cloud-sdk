@@ -1,4 +1,4 @@
-[**@google-github-actions/setup-cloud-sdk**](../../README.md) • **Docs**
+[**@google-github-actions/setup-cloud-sdk**](../../README.md)
 
 ***
 
@@ -8,12 +8,16 @@
 
 > **bestVersion**(`spec`): `Promise`\<`string`\>
 
+Defined in: [index.ts:270](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L270)
+
 bestVersion takes a version constraint and gets the latest available version
 that satisfies the constraint.
 
 ## Parameters
 
-• **spec**: `string`
+### spec
+
+`string`
 
 Version specification
 
@@ -22,7 +26,3 @@ Version specification
 `Promise`\<`string`\>
 
 Resolved version
-
-## Defined in
-
-[index.ts:270](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L270)

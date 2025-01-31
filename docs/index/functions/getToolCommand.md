@@ -1,4 +1,4 @@
-[**@google-github-actions/setup-cloud-sdk**](../../README.md) • **Docs**
+[**@google-github-actions/setup-cloud-sdk**](../../README.md)
 
 ***
 
@@ -8,6 +8,8 @@
 
 > **getToolCommand**(): `string`
 
+Defined in: [index.ts:64](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L64)
+
 Returns the correct gcloud command for OS.
 
 ## Returns
@@ -15,7 +17,3 @@ Returns the correct gcloud command for OS.
 `string`
 
 gcloud command.
-
-## Defined in
-
-[index.ts:64](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L64)

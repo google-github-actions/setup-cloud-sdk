@@ -1,4 +1,4 @@
-[**@google-github-actions/setup-cloud-sdk**](../README.md) • **Docs**
+[**@google-github-actions/setup-cloud-sdk**](../README.md)
 
 ***
 
@@ -6,8 +6,6 @@
 
 # format-url
 
-## Index
-
-### Functions
+## Functions
 
 - [buildReleaseURL](functions/buildReleaseURL.md)
