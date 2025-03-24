@@ -24,13 +24,11 @@ import { userAgentString } from './index';
 /**
  * Downloads and extracts the tool at the specified URL.
  *
- * @url The URL of the tool to be downloaded.
+ * @param url The URL of the tool to be downloaded.
  * @returns The path to the locally extracted tool.
  */
 export async function downloadAndExtractTool(url: string): Promise<string> {
-  const downloadPath = await toolCache.downloadTool(url, undefined, undefined, {
-    'User-Agent': userAgentString,
-  });
+  const downloadPath = await downloadTool(url);
   let extractedPath: string;
   if (url.indexOf('.zip') != -1) {
     extractedPath = await toolCache.extractZip(downloadPath);
@@ -42,4 +40,19 @@ export async function downloadAndExtractTool(url: string): Promise<string> {
     throw new Error(`Unexpected download archive type, downloadPath: ${downloadPath}`);
   }
   return extractedPath;
+}
+
+/**
+ * downloadTool is a temporary hack until native support for module mocking
+ * lands:
+ *
+ *     https://github.com/nodejs/node/pull/52848
+ *
+ * For some unknown reason, moving this call into another function makes the
+ * toolCache mockable /shrug.
+ */
+async function downloadTool(url: string): Promise<string> {
+  return await toolCache.downloadTool(url, undefined, undefined, {
+    'User-Agent': userAgentString,
+  });
 }

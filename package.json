@@ -1,23 +1,23 @@
 {
   "name": "@google-github-actions/setup-cloud-sdk",
-  "version": "1.1.2",
-  "description": "Utilities to download, install and interact with the Cloud SDK for GitHub Actions",
+  "version": "1.1.9",
+  "description": "Utilities to download, install, and interact with the Cloud SDK for GitHub Actions",
   "module": "dist/index.js",
   "main": "dist/index.js",
   "types": "dist/index.d.js",
   "scripts": {
     "build": "rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts",
-    "lint": "eslint . --ext .ts,.tsx",
-    "format": "prettier --write **/*.ts",
+    "lint": "eslint .",
+    "format": "eslint --fix",
     "docs": "rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown",
-    "test": "mocha -r ts-node/register -t 600s 'tests/*.ts' --exit"
+    "test": "node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"
   },
   "files": [
     "dist/**/*"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/google-github-actions/setup-cloud-sdk"
+    "url": "git+https://github.com/google-github-actions/setup-cloud-sdk.git"
   },
   "keywords": [
     "Cloud SDK",
@@ -27,31 +27,28 @@
   "author": "Google LLC",
   "license": "Apache-2.0",
   "dependencies": {
-    "@actions/core": "^1.10.0",
+    "@actions/core": "^1.11.1",
     "@actions/exec": "^1.1.1",
-    "@actions/http-client": "^2.1.0",
-    "@actions/tool-cache": "^2.0.1",
-    "@google-github-actions/actions-utils": "^0.4.8",
-    "semver": "^7.5.4"
+    "@actions/http-client": "^2.2.3",
+    "@actions/tool-cache": "^2.0.2",
+    "@google-github-actions/actions-utils": "^0.8.6",
+    "semver": "^7.7.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.x",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^20.4.1",
-    "@types/sinon": "^10.0.15",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "@vercel/ncc": "^0.36.1",
-    "chai": "^4.3.x",
-    "eslint": "^8.44.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^5.0.0",
-    "mocha": "^10.2.0",
-    "prettier": "^3.0.0",
-    "sinon": "^15.2.0",
-    "ts-node": "^10.9.1",
-    "typedoc": "^0.24.8",
-    "typedoc-plugin-markdown": "^3.15.3",
-    "typescript": "^5.1.6"
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.19.0",
+    "@types/node": "^22.13.0",
+    "@types/semver": "^7.5.8",
+    "@typescript-eslint/eslint-plugin": "^8.22.0",
+    "@vercel/ncc": "^0.38.3",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint": "^9.19.0",
+    "prettier": "^3.4.2",
+    "ts-node": "^10.9.2",
+    "typedoc-plugin-markdown": "^4.4.1",
+    "typedoc": "^0.27.6",
+    "typescript-eslint": "^8.22.0",
+    "typescript": "^5.7.3"
   }
 }

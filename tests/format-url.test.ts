@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import 'mocha';
-import { expect } from 'chai';
+import { test } from 'node:test';
+import assert from 'node:assert';
 
 import { buildReleaseURL } from '../src/format-url';
 
-describe('#buildReleaseURL', () => {
+test('#buildReleaseURL', { concurrency: true }, async (suite) => {
   const cases = [
     {
       name: 'unknown os',
@@ -65,16 +65,17 @@ describe('#buildReleaseURL', () => {
     },
   ];
 
-  cases.forEach((tc) => {
-    it(tc.name, async () => {
+  for await (const tc of cases) {
+    await suite.test(tc.name, async () => {
       if (tc.expected) {
-        const exp = `https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${tc.expected}`;
-        expect(buildReleaseURL(tc.os, tc.arch, tc.version)).to.eql(exp);
+        const expected = `https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/${tc.expected}`;
+        const actual = buildReleaseURL(tc.os, tc.arch, tc.version);
+        assert.deepStrictEqual(actual, expected);
       } else if (tc.error) {
-        expect(() => {
+        assert.throws(() => {
           buildReleaseURL(tc.os, tc.arch, tc.version);
-        }).to.throw(tc.error);
+        }, new RegExp(tc.error));
       }
     });
-  });
+  }
 });

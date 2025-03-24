@@ -9,103 +9,33 @@ concurrency:
   group: '${{ github.workflow }}-${{ github.head_ref || github.ref }}'
   cancel-in-progress: true
 
-env:
-  PR_BRANCH: 'actions/gcloud-versions'
-
 jobs:
   compile-versions:
     runs-on: 'ubuntu-latest'
 
     steps:
-    - uses: 'actions/checkout@v3'
+      - name: 'Checkout'
+        uses: 'actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683' # ratchet:actions/checkout@v4
 
-    # We don't want a circular dependency on setup-gcloud. We don't actually
-    # need authentication for this (the bucket is public), but gcloud refuses to
-    # run without auth.
-    - name: 'Authenticate gcloud'
-      run: |-
-        CRED_FILE="${RUNNER_TEMP}/creds.json"
-        cat <<EOF > ${CRED_FILE}
-        ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}
-        EOF
+      - name: 'Setup Go'
+        uses: 'actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34' # ratchet:actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
 
-        gcloud auth login --update-adc --force --cred-file "${CRED_FILE}"
+      - name: 'Get versions list'
+        run: |-
+          mkdir -p ./data
+          go run ./cmd/compile-versions/main.go > ./data/versions.json
 
-    - name: 'Get versions list'
-      run: |-
-        mkdir -p ./data
-        gcloud storage objects list "gs://cloud-sdk-release" \
-          --format='value(name)' \
-          --page-size=1000 \
-          | grep -Po '(\d)+\.(\d)+\.(\d)+' \
-          | sort -h \
-          | uniq \
-          | jq -R -s 'split("\n") | map(select(length > 0))' \
-          > ./data/versions.json
+          echo "Computed versions:"
+          cat ./data/versions.json
 
-        echo "Computed versions:"
-        cat ./data/versions.json
-
-    - id: 'updates'
-      name: 'Update versions list'
-      run: |-
-        if git diff --exit-code ./data/versions.json; then
-          echo "No changes"
-          exit 0
-        fi
-
-        echo "had_changes=true" >> ${GITHUB_OUTPUT}
-
-        git config user.name "google-github-actions-bot"
-        git config user.email "github-actions-bot@google.com"
-
-        git checkout -b "${{ env.PR_BRANCH }}"
-        git add ./data/versions.json
-        git commit -m "Update gcloud versions ($(date --iso-8601=h))"
-        git push -f origin "${{ env.PR_BRANCH }}"
-
-    - name: 'Create Pull Request'
-      if: steps.updates.outputs.had_changes == 'true'
-      uses: 'actions/github-script@v6'
-      with:
-        github-token: '${{ secrets.ACTIONS_BOT_TOKEN }}'
-        script: |-
-          const baseBranch = `${{ github.ref_name }}`;
-          const prBranch = `${{ env.PR_BRANCH }}`;
-          const prBody = `Update latest gcloud versions`;
-
-          try {
-            const listResponse = await github.rest.pulls.list({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              state: `open`,
-              head: `${context.repo.owner}:${prBranch}`,
-              base: baseBranch,
-            });
-
-            core.isDebug() && console.log(listResponse);
-
-            if(!listResponse.data.length) {
-              const createResponse = await github.rest.pulls.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: `Update gcloud versions`,
-                body: prBody,
-                head: prBranch,
-                base: baseBranch,
-              });
-              core.info(`Created PR #${createResponse.data.number} at ${createResponse.data.html_url}`);
-            } else {
-              const updateResponse = await github.rest.pulls.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: listResponse.data[0].number,
-                title: `Update gcloud versions`,
-                body: prBody,
-              });
-              core.info(`Updated PR #${updateResponse.data.number} at ${updateResponse.data.html_url}`);
-            }
-          } catch(err) {
-            console.error(err);
-            core.setFailed(`Failed to create pull request: ${err}`);
-          }
+      - name: 'Create/Update Pull Request'
+        uses: 'abcxyz/pkg/.github/actions/create-pull-request@main' # ratchet:exclude
+        with:
+          token: '${{ secrets.ACTIONS_BOT_TOKEN }}'
+          base_branch: '${{ github.ref_name }}'
+          head_branch: 'actions/compile-versions-${{ github.ref_name }}'
+          title: 'Update gcloud versions'
+          body: 'Update latest gcloud versions'
+          compute_paths: true
