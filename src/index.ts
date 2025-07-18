@@ -23,7 +23,7 @@ import { HttpClient } from '@actions/http-client';
 import * as core from '@actions/core';
 import * as toolCache from '@actions/tool-cache';
 import * as semver from 'semver';
-import { errorMessage } from '@google-github-actions/actions-utils';
+import { errorMessage, withRetries } from '@google-github-actions/actions-utils';
 
 import { buildReleaseURL } from './format-url';
 import { downloadAndExtractTool } from './download-util';
@@ -269,23 +269,32 @@ export async function getLatestGcloudSDKVersion(): Promise<string> {
  */
 export async function bestVersion(spec: string): Promise<string> {
   let versions: string[];
+
   try {
-    const http = new HttpClient(userAgentString, undefined, { allowRetries: true, maxRetries: 3 });
-    const res = await http.get(versionsURL);
+    return await withRetries(
+      async (): Promise<string> => {
+        const http = new HttpClient(userAgentString);
+        const res = await http.get(versionsURL);
 
-    const body = await res.readBody();
-    const statusCode = res.message.statusCode || 500;
-    if (statusCode >= 400) {
-      throw new Error(`(${statusCode}) ${body}`);
-    }
+        const body = await res.readBody();
+        const statusCode = res.message.statusCode || 500;
+        if (statusCode >= 400) {
+          throw new Error(`(${statusCode}) ${body}`);
+        }
 
-    versions = JSON.parse(body) as string[];
+        versions = JSON.parse(body) as string[];
+        return computeBestVersion(spec, versions);
+      },
+      {
+        retries: 3,
+        backoff: 100, // 100 milliseconds
+        backoffLimit: 1_000, // 1 second
+      },
+    )();
   } catch (err) {
     const msg = errorMessage(err);
     throw new Error(`failed to retrieve versions from ${versionsURL}: ${msg}`);
   }
-
-  return computeBestVersion(spec, versions);
 }
 
 /**
