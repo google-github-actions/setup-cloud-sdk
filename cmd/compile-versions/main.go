@@ -68,7 +68,7 @@ func realMain(ctx context.Context) error {
 	versionsMap := make(map[string]struct{}, len(names))
 	for _, name := range names {
 		sub := versionRe.FindStringSubmatch(name)
-		if sub == nil || len(sub) < 2 {
+		if len(sub) < 2 {
 			// no match
 			continue
 		}

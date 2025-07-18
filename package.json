@@ -5,6 +5,10 @@
   "module": "dist/index.js",
   "main": "dist/index.js",
   "types": "dist/index.d.js",
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
   "scripts": {
     "build": "rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts",
     "lint": "eslint .",
