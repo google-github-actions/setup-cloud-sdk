@@ -41835,20 +41835,26 @@ async function getLatestGcloudSDKVersion() {
 async function bestVersion(spec) {
     let versions;
     try {
-        const http = new http_client_1.HttpClient(exports.userAgentString, undefined, { allowRetries: true, maxRetries: 3 });
-        const res = await http.get(versionsURL);
-        const body = await res.readBody();
-        const statusCode = res.message.statusCode || 500;
-        if (statusCode >= 400) {
-            throw new Error(`(${statusCode}) ${body}`);
-        }
-        versions = JSON.parse(body);
+        return await (0, actions_utils_1.withRetries)(async () => {
+            const http = new http_client_1.HttpClient(exports.userAgentString);
+            const res = await http.get(versionsURL);
+            const body = await res.readBody();
+            const statusCode = res.message.statusCode || 500;
+            if (statusCode >= 400) {
+                throw new Error(`(${statusCode}) ${body}`);
+            }
+            versions = JSON.parse(body);
+            return computeBestVersion(spec, versions);
+        }, {
+            retries: 3,
+            backoff: 100, // 100 milliseconds
+            backoffLimit: 1_000, // 1 second
+        })();
     }
     catch (err) {
         const msg = (0, actions_utils_1.errorMessage)(err);
         throw new Error(`failed to retrieve versions from ${versionsURL}: ${msg}`);
     }
-    return computeBestVersion(spec, versions);
 }
 /**
  * computeBestVersion computes the latest available version that still satisfies
@@ -43909,7 +43915,7 @@ module.exports = parseParams
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.1.9","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","engines":{"node":"20.x","npm":"10.x"},"scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint .","format":"eslint --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.11.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.3","@actions/tool-cache":"^2.0.2","@google-github-actions/actions-utils":"^0.8.8","semver":"^7.7.2"},"devDependencies":{"@eslint/eslintrc":"^3.3.1","@eslint/js":"^9.31.0","@types/node":"^24.0.14","@types/semver":"^7.7.0","@typescript-eslint/eslint-plugin":"^8.37.0","@vercel/ncc":"^0.38.3","eslint-config-prettier":"^10.1.5","eslint-plugin-prettier":"^5.5.1","eslint":"^9.31.0","prettier":"^3.6.2","ts-node":"^10.9.2","typedoc-plugin-markdown":"^4.7.0","typedoc":"^0.28.7","typescript-eslint":"^8.37.0","typescript":"^5.8.3"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.2.0","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","engines":{"node":"20.x","npm":"10.x"},"scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint .","format":"eslint --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.11.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.3","@actions/tool-cache":"^2.0.2","@google-github-actions/actions-utils":"^0.8.8","semver":"^7.7.2"},"devDependencies":{"@eslint/eslintrc":"^3.3.1","@eslint/js":"^9.31.0","@types/node":"^24.0.14","@types/semver":"^7.7.0","@typescript-eslint/eslint-plugin":"^8.37.0","@vercel/ncc":"^0.38.3","eslint-config-prettier":"^10.1.5","eslint-plugin-prettier":"^5.5.1","eslint":"^9.31.0","prettier":"^3.6.2","ts-node":"^10.9.2","typedoc-plugin-markdown":"^4.7.0","typedoc":"^0.28.7","typescript-eslint":"^8.37.0","typescript":"^5.8.3"}}');
 
 /***/ })
 
