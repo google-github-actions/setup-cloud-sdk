@@ -6,7 +6,7 @@
 
 # Function: gcloudRunJSON()
 
-> **gcloudRunJSON**(`cmd`, `options`?): `Promise`\<`any`\>
+> **gcloudRunJSON**(`cmd`, `options?`): `Promise`\<`any`\>
 
 Defined in: [index.ts:126](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L126)
 

@@ -6020,11 +6020,14 @@ function toBase64(input) {
  *
  * @return Decoded string.
  */
-function fromBase64(input) {
+function fromBase64(input, outEncoding) {
+    if (!outEncoding) {
+        outEncoding = 'utf8';
+    }
     let str = input.replace(/-/g, '+').replace(/_/g, '/');
     while (str.length % 4)
         str += '=';
-    return Buffer.from(str, 'base64').toString('utf8');
+    return Buffer.from(str, 'base64').toString(outEncoding);
 }
 
 
@@ -6381,7 +6384,7 @@ function readUntil(input, ch) {
 /***/ }),
 
 /***/ 4772:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require2_) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require2_) => {
 
 
 /*
@@ -6399,15 +6402,6 @@ function readUntil(input, ch) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.forceRemove = forceRemove;
 exports.isEmptyDir = isEmptyDir;
@@ -6423,18 +6417,16 @@ const errors_1 = __nccwpck_require2_(3916);
  *
  * @param pth Path to the file or directory to remove.
  */
-function forceRemove(pth) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield fs_1.promises.rm(pth, { force: true, recursive: true });
+async function forceRemove(pth) {
+    try {
+        await fs_1.promises.rm(pth, { force: true, recursive: true });
+    }
+    catch (err) {
+        if (!(0, errors_1.isNotFoundError)(err)) {
+            const msg = (0, errors_1.errorMessage)(err);
+            throw new Error(`Failed to remove "${pth}": ${msg}`);
         }
-        catch (err) {
-            if (!(0, errors_1.isNotFoundError)(err)) {
-                const msg = (0, errors_1.errorMessage)(err);
-                throw new Error(`Failed to remove "${pth}": ${msg}`);
-            }
-        }
-    });
+    }
 }
 /**
  * isEmptyDir returns true if the given directory does not exist, or exists but
@@ -6444,16 +6436,14 @@ function forceRemove(pth) {
  *
  * @param dir Path to a directory.
  */
-function isEmptyDir(dir) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const files = yield fs_1.promises.readdir(dir);
-            return files.length <= 0;
-        }
-        catch (_a) {
-            return true;
-        }
-    });
+async function isEmptyDir(dir) {
+    try {
+        const files = await fs_1.promises.readdir(dir);
+        return files.length <= 0;
+    }
+    catch {
+        return true;
+    }
 }
 /**
  * writeSecureFile writes a file to disk with 0640 permissions and locks the
@@ -6466,12 +6456,10 @@ function isEmptyDir(dir) {
  *
  * @returns Path to written file.
  */
-function writeSecureFile(outputPath, data, options) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const opts = Object.assign({}, { mode: 0o640, flag: 'wx', flush: true }, options);
-        yield fs_1.promises.writeFile(outputPath, data, opts);
-        return outputPath;
-    });
+async function writeSecureFile(outputPath, data, options) {
+    const opts = Object.assign({}, { mode: 0o640, flag: 'wx', flush: true }, options);
+    await fs_1.promises.writeFile(outputPath, data, opts);
+    return outputPath;
 }
 /**
  * removeFile removes the file at the given path. If the file does not exist, it
@@ -6483,27 +6471,25 @@ function writeSecureFile(outputPath, data, options) {
  *
  * @deprecated Use #forceRemove instead.
  */
-function removeFile(filePath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            yield fs_1.promises.unlink(filePath);
-            return true;
+async function removeFile(filePath) {
+    try {
+        await fs_1.promises.unlink(filePath);
+        return true;
+    }
+    catch (err) {
+        if ((0, errors_1.isNotFoundError)(err)) {
+            return false;
         }
-        catch (err) {
-            if ((0, errors_1.isNotFoundError)(err)) {
-                return false;
-            }
-            const msg = (0, errors_1.errorMessage)(err);
-            throw new Error(`Failed to remove "${filePath}": ${msg}`);
-        }
-    });
+        const msg = (0, errors_1.errorMessage)(err);
+        throw new Error(`Failed to remove "${filePath}": ${msg}`);
+    }
 }
 
 
 /***/ }),
 
 /***/ 7237:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require2_) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require2_) => {
 
 
 /*
@@ -6521,15 +6507,6 @@ function removeFile(filePath) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseGcloudIgnore = parseGcloudIgnore;
 const fs_1 = __nccwpck_require2_(9896);
@@ -6544,39 +6521,37 @@ const errors_1 = __nccwpck_require2_(3916);
  * @param pth Path to the gcloudignore file.
  * @return Ordered list of strings from the various ignore files.
  */
-function parseGcloudIgnore(pth) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const parentDir = (0, path_1.dirname)(pth);
-        let ignoreContents = [];
-        try {
-            ignoreContents = (yield fs_1.promises.readFile(pth, { encoding: 'utf8' }))
+async function parseGcloudIgnore(pth) {
+    const parentDir = (0, path_1.dirname)(pth);
+    let ignoreContents = [];
+    try {
+        ignoreContents = (await fs_1.promises.readFile(pth, { encoding: 'utf8' }))
+            .toString()
+            .split(/\r?\n/)
+            .filter(shouldKeepIgnoreLine)
+            .map((line) => line.trim());
+    }
+    catch (err) {
+        if (!(0, errors_1.isNotFoundError)(err)) {
+            throw err;
+        }
+    }
+    // Iterate through each line and parse any includes.
+    for (let i = 0; i < ignoreContents.length; i++) {
+        const line = ignoreContents[i];
+        if (line.startsWith('#!include:')) {
+            const includeName = line.substring(10).trim();
+            const includePth = (0, path_1.join)(parentDir, includeName);
+            const subIgnoreContents = (await fs_1.promises.readFile(includePth, { encoding: 'utf8' }))
                 .toString()
                 .split(/\r?\n/)
                 .filter(shouldKeepIgnoreLine)
                 .map((line) => line.trim());
+            ignoreContents.splice(i, 1, ...subIgnoreContents);
+            i += subIgnoreContents.length;
         }
-        catch (err) {
-            if (!(0, errors_1.isNotFoundError)(err)) {
-                throw err;
-            }
-        }
-        // Iterate through each line and parse any includes.
-        for (let i = 0; i < ignoreContents.length; i++) {
-            const line = ignoreContents[i];
-            if (line.startsWith('#!include:')) {
-                const includeName = line.substring(10).trim();
-                const includePth = (0, path_1.join)(parentDir, includeName);
-                const subIgnoreContents = (yield fs_1.promises.readFile(includePth, { encoding: 'utf8' }))
-                    .toString()
-                    .split(/\r?\n/)
-                    .filter(shouldKeepIgnoreLine)
-                    .map((line) => line.trim());
-                ignoreContents.splice(i, 1, ...subIgnoreContents);
-                i += subIgnoreContents.length;
-            }
-        }
-        return ignoreContents;
-    });
+    }
+    return ignoreContents;
 }
 /**
  * shouldKeepIgnoreLine is a helper that returns true if the given line is not
@@ -6981,7 +6956,7 @@ function parseKVStringAndFile(kvString, kvFilePath) {
 /***/ }),
 
 /***/ 3716:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require2_) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require2_) => {
 
 
 /*
@@ -6999,22 +6974,6 @@ function parseKVStringAndFile(kvString, kvFilePath) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.inParallel = inParallel;
 const os_1 = __nccwpck_require2_(857);
@@ -7028,47 +6987,31 @@ const errors_1 = __nccwpck_require2_(3916);
  *
  * @return Array of results in the order of args.
  */
-function inParallel(tasks, concurrency) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // Concurrency is the minimum of the number of arguments or concurrency. This
-        // prevents additional undefined entries in the results array.
-        concurrency = Math.min(concurrency || (0, os_1.cpus)().length - 1);
-        if (concurrency < 1) {
-            throw new Error(`concurrency must be at least 1`);
-        }
-        const results = [];
-        const errors = [];
-        const runTasks = (iter) => __awaiter(this, void 0, void 0, function* () {
-            var _a, iter_1, iter_1_1;
-            var _b, e_1, _c, _d;
+async function inParallel(tasks, concurrency) {
+    // Concurrency is the minimum of the number of arguments or concurrency. This
+    // prevents additional undefined entries in the results array.
+    concurrency = Math.min(concurrency || (0, os_1.cpus)().length - 1);
+    if (concurrency < 1) {
+        throw new Error(`concurrency must be at least 1`);
+    }
+    const results = [];
+    const errors = [];
+    const runTasks = async (iter) => {
+        for await (const [idx, task] of iter) {
             try {
-                for (_a = true, iter_1 = __asyncValues(iter); iter_1_1 = yield iter_1.next(), _b = iter_1_1.done, !_b; _a = true) {
-                    _d = iter_1_1.value;
-                    _a = false;
-                    const [idx, task] = _d;
-                    try {
-                        results[idx] = yield task();
-                    }
-                    catch (err) {
-                        errors.push((0, errors_1.errorMessage)(err));
-                    }
-                }
+                results[idx] = await task();
             }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (!_a && !_b && (_c = iter_1.return)) yield _c.call(iter_1);
-                }
-                finally { if (e_1) throw e_1.error; }
+            catch (err) {
+                errors.push((0, errors_1.errorMessage)(err));
             }
-        });
-        const workers = new Array(concurrency).fill(tasks.entries()).map(runTasks);
-        yield Promise.allSettled(workers);
-        if (errors.length > 0) {
-            throw new Error(errors.join('\n'));
         }
-        return results;
-    });
+    };
+    const workers = new Array(concurrency).fill(tasks.entries()).map(runTasks);
+    await Promise.allSettled(workers);
+    if (errors.length > 0) {
+        throw new Error(errors.join('\n'));
+    }
+    return results;
 }
 
 
@@ -7193,7 +7136,7 @@ exports["default"] = { randomFilename, randomFilepath };
 /***/ }),
 
 /***/ 9809:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require2_) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require2_) => {
 
 
 /*
@@ -7211,15 +7154,6 @@ exports["default"] = { randomFilename, randomFilepath };
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.withRetries = withRetries;
 const errors_1 = __nccwpck_require2_(3916);
@@ -7234,44 +7168,41 @@ const DEFAULT_BACKOFF_MILLISECONDS = 100;
  * @throws {Error}
  */
 function withRetries(fn, opts) {
-    var _a;
     const retries = opts.retries;
-    const backoffLimit = typeof (opts === null || opts === void 0 ? void 0 : opts.backoffLimit) !== 'undefined' ? Math.max(opts.backoffLimit, 0) : undefined;
+    const backoffLimit = typeof opts?.backoffLimit !== 'undefined' ? Math.max(opts.backoffLimit, 0) : undefined;
     // ensure backoff is limited to start
-    let backoff = (_a = opts.backoff) !== null && _a !== void 0 ? _a : DEFAULT_BACKOFF_MILLISECONDS;
+    let backoff = opts.backoff ?? DEFAULT_BACKOFF_MILLISECONDS;
     if (typeof backoffLimit !== 'undefined') {
         backoff = Math.min(backoff, backoffLimit);
     }
-    return function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            let attemptLimit = retries + 1;
-            let currentBackoff = backoff;
-            const currentBackoffLimit = backoffLimit;
-            let prevBackoff = 0;
-            let errMessage = 'unknown';
-            do {
-                try {
-                    return yield fn();
-                }
-                catch (err) {
-                    errMessage = (0, errors_1.errorMessage)(err);
-                    --attemptLimit;
-                    if (attemptLimit > 0) {
-                        yield (0, time_1.sleep)(currentBackoff);
-                        let newBackoff = prevBackoff + currentBackoff;
-                        if (typeof currentBackoffLimit !== 'undefined') {
-                            newBackoff = Math.min(newBackoff, Number(currentBackoffLimit));
-                        }
-                        prevBackoff = currentBackoff;
-                        currentBackoff = newBackoff;
+    return async function () {
+        let attemptLimit = retries + 1;
+        let currentBackoff = backoff;
+        const currentBackoffLimit = backoffLimit;
+        let prevBackoff = 0;
+        let errMessage = 'unknown';
+        do {
+            try {
+                return await fn();
+            }
+            catch (err) {
+                errMessage = (0, errors_1.errorMessage)(err);
+                --attemptLimit;
+                if (attemptLimit > 0) {
+                    await (0, time_1.sleep)(currentBackoff);
+                    let newBackoff = prevBackoff + currentBackoff;
+                    if (typeof currentBackoffLimit !== 'undefined') {
+                        newBackoff = Math.min(newBackoff, Number(currentBackoffLimit));
                     }
+                    prevBackoff = currentBackoff;
+                    currentBackoff = newBackoff;
                 }
-            } while (attemptLimit > 0);
-            // We always try once.
-            const attempts = opts.retries + 1;
-            const attemptsMsg = attempts === 1 ? `1 attempt` : `${attempts} attempts`;
-            throw new Error(`retry function failed after ${attemptsMsg}: ${errMessage}`);
-        });
+            }
+        } while (attemptLimit > 0);
+        // We always try once.
+        const attempts = opts.retries + 1;
+        const attemptsMsg = attempts === 1 ? `1 attempt` : `${attempts} attempts`;
+        throw new Error(`retry function failed after ${attemptsMsg}: ${errMessage}`);
     };
 }
 
@@ -7395,7 +7326,7 @@ function assertMembers(actual, expected) {
 /***/ }),
 
 /***/ 9834:
-/***/ (function(__unused_webpack_module, exports) {
+/***/ ((__unused_webpack_module, exports) => {
 
 
 /*
@@ -7413,15 +7344,6 @@ function assertMembers(actual, expected) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseDuration = parseDuration;
 exports.sleep = sleep;
@@ -7488,10 +7410,8 @@ function parseDuration(input) {
  *
  * @param ms Duration in milliseconds to sleep.
  */
-function sleep() {
-    return __awaiter(this, arguments, void 0, function* (ms = 0) {
-        return new Promise((r) => setTimeout(r, ms));
-    });
+async function sleep(ms = 0) {
+    return new Promise((r) => setTimeout(r, ms));
 }
 
 
@@ -7689,6 +7609,13 @@ function pinnedToHeadWarning(recommended) {
 
 /***/ }),
 
+/***/ 181:
+/***/ ((module) => {
+
+module.exports = __nccwpck_require__(181);
+
+/***/ }),
+
 /***/ 6982:
 /***/ ((module) => {
 
@@ -7710,20 +7637,6 @@ module.exports = __nccwpck_require__(4589);
 
 /***/ }),
 
-/***/ 4573:
-/***/ ((module) => {
-
-module.exports = __nccwpck_require__(4573);
-
-/***/ }),
-
-/***/ 1708:
-/***/ ((module) => {
-
-module.exports = __nccwpck_require__(1708);
-
-/***/ }),
-
 /***/ 857:
 /***/ ((module) => {
 
@@ -7735,6 +7648,13 @@ module.exports = __nccwpck_require__(857);
 /***/ ((module) => {
 
 module.exports = __nccwpck_require__(6928);
+
+/***/ }),
+
+/***/ 932:
+/***/ ((module) => {
+
+module.exports = __nccwpck_require__(932);
 
 /***/ }),
 
@@ -7816,8 +7736,8 @@ function composeCollection(CN, ctx, token, props, onError) {
             tag = kt;
         }
         else {
-            if (kt?.collection) {
-                onError(tagToken, 'BAD_COLLECTION_TYPE', `${kt.tag} used for ${expType} collection, but expects ${kt.collection}`, true);
+            if (kt) {
+                onError(tagToken, 'BAD_COLLECTION_TYPE', `${kt.tag} used for ${expType} collection, but expects ${kt.collection ?? 'scalar'}`, true);
             }
             else {
                 onError(tagToken, 'TAG_RESOLVE_FAILED', `Unresolved tag: ${tagName}`, true);
@@ -8106,7 +8026,7 @@ exports.composeScalar = composeScalar;
 
 
 
-var node_process = __nccwpck_require2_(1708);
+var node_process = __nccwpck_require2_(932);
 var directives = __nccwpck_require2_(1342);
 var Document = __nccwpck_require2_(3021);
 var errors = __nccwpck_require2_(1464);
@@ -9292,8 +9212,7 @@ function resolveProps(tokens, { flow, indicator, next, offset, onError, parentIn
                 if (token.source.endsWith(':'))
                     onError(token.offset + token.source.length - 1, 'BAD_ALIAS', 'Anchor ending in : is ambiguous', true);
                 anchor = token;
-                if (start === null)
-                    start = token.offset;
+                start ?? (start = token.offset);
                 atNewline = false;
                 hasSpace = false;
                 reqSpace = true;
@@ -9302,8 +9221,7 @@ function resolveProps(tokens, { flow, indicator, next, offset, onError, parentIn
                 if (tag)
                     onError(token, 'MULTIPLE_TAGS', 'A node can have at most one tag');
                 tag = token;
-                if (start === null)
-                    start = token.offset;
+                start ?? (start = token.offset);
                 atNewline = false;
                 hasSpace = false;
                 reqSpace = true;
@@ -9420,8 +9338,7 @@ exports.containsNewline = containsNewline;
 
 function emptyScalarPosition(offset, before, pos) {
     if (before) {
-        if (pos === null)
-            pos = before.length;
+        pos ?? (pos = before.length);
         for (let i = pos - 1; i >= 0; --i) {
             let st = before[i];
             switch (st.type) {
@@ -9885,8 +9802,7 @@ function createNodeAnchors(doc, prefix) {
     return {
         onAnchor: (source) => {
             aliasObjects.push(source);
-            if (!prevAnchors)
-                prevAnchors = anchorNames(doc);
+            prevAnchors ?? (prevAnchors = anchorNames(doc));
             const anchor = findNewAnchor(prefix, prevAnchors);
             prevAnchors.add(anchor);
             return anchor;
@@ -10032,8 +9948,7 @@ function createNode(value, tagName, ctx) {
     if (aliasDuplicateObjects && value && typeof value === 'object') {
         ref = sourceObjects.get(value);
         if (ref) {
-            if (!ref.anchor)
-                ref.anchor = onAnchor(value);
+            ref.anchor ?? (ref.anchor = onAnchor(value));
             return new Alias.Alias(ref.anchor);
         }
         else {
@@ -10401,7 +10316,7 @@ exports.visitAsync = visit.visitAsync;
 
 
 
-var node_process = __nccwpck_require2_(1708);
+var node_process = __nccwpck_require2_(932);
 
 function debug(logLevel, ...messages) {
     if (logLevel === 'debug')
@@ -10447,23 +10362,36 @@ class Alias extends Node.NodeBase {
      * Resolve the value of this alias within `doc`, finding the last
      * instance of the `source` anchor before this node.
      */
-    resolve(doc) {
+    resolve(doc, ctx) {
+        let nodes;
+        if (ctx?.aliasResolveCache) {
+            nodes = ctx.aliasResolveCache;
+        }
+        else {
+            nodes = [];
+            visit.visit(doc, {
+                Node: (_key, node) => {
+                    if (identity.isAlias(node) || identity.hasAnchor(node))
+                        nodes.push(node);
+                }
+            });
+            if (ctx)
+                ctx.aliasResolveCache = nodes;
+        }
         let found = undefined;
-        visit.visit(doc, {
-            Node: (_key, node) => {
-                if (node === this)
-                    return visit.visit.BREAK;
-                if (node.anchor === this.source)
-                    found = node;
-            }
-        });
+        for (const node of nodes) {
+            if (node === this)
+                break;
+            if (node.anchor === this.source)
+                found = node;
+        }
         return found;
     }
     toJSON(_arg, ctx) {
         if (!ctx)
             return { source: this.source };
         const { anchors, doc, maxAliasCount } = ctx;
-        const source = this.resolve(doc);
+        const source = this.resolve(doc, ctx);
         if (!source) {
             const msg = `Unresolved alias (the anchor must be set before the alias): ${this.source}`;
             throw new ReferenceError(msg);
@@ -11137,6 +11065,7 @@ function addPairToJSMap(ctx, map, { key, value }) {
 function stringifyKey(key, jsKey, ctx) {
     if (jsKey === null)
         return '';
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     if (typeof jsKey !== 'object')
         return String(jsKey);
     if (identity.isNode(key) && ctx?.doc) {
@@ -12569,7 +12498,7 @@ exports.LineCounter = LineCounter;
 
 
 
-var node_process = __nccwpck_require2_(1708);
+var node_process = __nccwpck_require2_(932);
 var cst = __nccwpck_require2_(3461);
 var lexer = __nccwpck_require2_(361);
 
@@ -13242,7 +13171,20 @@ class Parser {
                 default: {
                     const bv = this.startBlockValue(map);
                     if (bv) {
-                        if (atMapIndent && bv.type !== 'block-seq') {
+                        if (bv.type === 'block-seq') {
+                            if (!it.explicitKey &&
+                                it.sep &&
+                                !includesToken(it.sep, 'newline')) {
+                                yield* this.pop({
+                                    type: 'error',
+                                    offset: this.offset,
+                                    message: 'Unexpected block-seq-ind on same line with key',
+                                    source: this.source
+                                });
+                                return;
+                            }
+                        }
+                        else if (atMapIndent) {
                             map.items.push({ start });
                         }
                         this.stack.push(bv);
@@ -14134,7 +14076,7 @@ exports.getTags = getTags;
 
 
 
-var node_buffer = __nccwpck_require2_(4573);
+var node_buffer = __nccwpck_require2_(181);
 var Scalar = __nccwpck_require2_(3301);
 var stringifyString = __nccwpck_require2_(3069);
 
@@ -14168,6 +14110,8 @@ const binary = {
         }
     },
     stringify({ comment, type, value }, ctx, onComment, onChompKeep) {
+        if (!value)
+            return '';
         const buf = value; // checked earlier by binary.identify()
         let str;
         if (typeof node_buffer.Buffer === 'function') {
@@ -14185,8 +14129,7 @@ const binary = {
         else {
             throw new Error('This environment does not support writing binary tags; either Buffer or btoa is required');
         }
-        if (!type)
-            type = Scalar.Scalar.BLOCK_LITERAL;
+        type ?? (type = Scalar.Scalar.BLOCK_LITERAL);
         if (type !== Scalar.Scalar.QUOTE_DOUBLE) {
             const lineWidth = Math.max(ctx.options.lineWidth - ctx.indent.length, ctx.options.minContentWidth);
             const n = Math.ceil(str.length / lineWidth);
@@ -14882,7 +14825,7 @@ const timestamp = {
         }
         return new Date(date);
     },
-    stringify: ({ value }) => value.toISOString().replace(/(T00:00:00)?\.000Z$/, '')
+    stringify: ({ value }) => value?.toISOString().replace(/(T00:00:00)?\.000Z$/, '') ?? ''
 };
 
 exports.floatTime = floatTime;
@@ -15125,7 +15068,7 @@ function getTagObject(tags, item) {
         tagObj = tags.find(t => t.nodeClass && obj instanceof t.nodeClass);
     }
     if (!tagObj) {
-        const name = obj?.constructor?.name ?? typeof obj;
+        const name = obj?.constructor?.name ?? (obj === null ? 'null' : typeof obj);
         throw new Error(`Tag not resolved for ${name} value`);
     }
     return tagObj;
@@ -15140,7 +15083,7 @@ function stringifyProps(node, tagObj, { anchors: anchors$1, doc }) {
         anchors$1.add(anchor);
         props.push(`&${anchor}`);
     }
-    const tag = node.tag ? node.tag : tagObj.default ? null : tagObj.tag;
+    const tag = node.tag ?? (tagObj.default ? null : tagObj.tag);
     if (tag)
         props.push(doc.directives.tagString(tag));
     return props.join(' ');
@@ -15166,8 +15109,7 @@ function stringify(item, ctx, onComment, onChompKeep) {
     const node = identity.isNode(item)
         ? item
         : ctx.doc.createNode(item, { onTagObj: o => (tagObj = o) });
-    if (!tagObj)
-        tagObj = getTagObject(ctx.doc.schema.tags, node);
+    tagObj ?? (tagObj = getTagObject(ctx.doc.schema.tags, node));
     const props = stringifyProps(node, tagObj, ctx);
     if (props.length > 0)
         ctx.indentAtStart = (ctx.indentAtStart ?? 0) + props.length + 1;
@@ -15918,10 +15860,9 @@ function plainString(item, ctx, onComment, onChompKeep) {
         (inFlow && /[[\]{},]/.test(value))) {
         return quotedString(value, ctx);
     }
-    if (!value ||
-        /^[\n\t ,[\]{}#&*!|>'"%@`]|^[?-]$|^[?-][ \t]|[\n:][ \t]|[ \t]\n|[\n\t ]#|[\n\t :]$/.test(value)) {
+    if (/^[\n\t ,[\]{}#&*!|>'"%@`]|^[?-]$|^[?-][ \t]|[\n:][ \t]|[ \t]\n|[\n\t ]#|[\n\t :]$/.test(value)) {
         // not allowed:
-        // - empty string, '-' or '?'
+        // - '-' or '?'
         // - start with an indicator character (except [?:-]) or /[?-] /
         // - '\n ', ': ' or ' \n' anywhere
         // - '#' not preceded by a non-space char
@@ -16301,6 +16242,9 @@ exports.visitAsync = visitAsync;
 /***/ 9379:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const ANY = Symbol('SemVer ANY')
 // hoisted class for cyclic dependency
 class Comparator {
@@ -16448,6 +16392,9 @@ const Range = __nccwpck_require__(6782)
 
 /***/ 6782:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const SPACE_CHARACTERS = /\s+/g
 
@@ -17010,6 +16957,9 @@ const testSet = (set, version, options) => {
 /***/ 7163:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const debug = __nccwpck_require__(1159)
 const { MAX_LENGTH, MAX_SAFE_INTEGER } = __nccwpck_require__(5101)
 const { safeRe: re, t } = __nccwpck_require__(5471)
@@ -17334,6 +17284,9 @@ module.exports = SemVer
 /***/ 1799:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const parse = __nccwpck_require__(6353)
 const clean = (version, options) => {
   const s = parse(version.trim().replace(/^[=v]+/, ''), options)
@@ -17346,6 +17299,9 @@ module.exports = clean
 
 /***/ 8646:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const eq = __nccwpck_require__(5082)
 const neq = __nccwpck_require__(4974)
@@ -17405,6 +17361,9 @@ module.exports = cmp
 
 /***/ 5385:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const SemVer = __nccwpck_require__(7163)
 const parse = __nccwpck_require__(6353)
@@ -17473,6 +17432,9 @@ module.exports = coerce
 /***/ 7648:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const SemVer = __nccwpck_require__(7163)
 const compareBuild = (a, b, loose) => {
   const versionA = new SemVer(a, loose)
@@ -17487,6 +17449,9 @@ module.exports = compareBuild
 /***/ 6874:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const compare = __nccwpck_require__(8469)
 const compareLoose = (a, b) => compare(a, b, true)
 module.exports = compareLoose
@@ -17496,6 +17461,9 @@ module.exports = compareLoose
 
 /***/ 8469:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const SemVer = __nccwpck_require__(7163)
 const compare = (a, b, loose) =>
@@ -17508,6 +17476,9 @@ module.exports = compare
 
 /***/ 711:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const parse = __nccwpck_require__(6353)
 
@@ -17574,6 +17545,9 @@ module.exports = diff
 /***/ 5082:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const compare = __nccwpck_require__(8469)
 const eq = (a, b, loose) => compare(a, b, loose) === 0
 module.exports = eq
@@ -17583,6 +17557,9 @@ module.exports = eq
 
 /***/ 6599:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const compare = __nccwpck_require__(8469)
 const gt = (a, b, loose) => compare(a, b, loose) > 0
@@ -17594,6 +17571,9 @@ module.exports = gt
 /***/ 1236:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const compare = __nccwpck_require__(8469)
 const gte = (a, b, loose) => compare(a, b, loose) >= 0
 module.exports = gte
@@ -17603,6 +17583,9 @@ module.exports = gte
 
 /***/ 2338:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const SemVer = __nccwpck_require__(7163)
 
@@ -17630,6 +17613,9 @@ module.exports = inc
 /***/ 3872:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const compare = __nccwpck_require__(8469)
 const lt = (a, b, loose) => compare(a, b, loose) < 0
 module.exports = lt
@@ -17639,6 +17625,9 @@ module.exports = lt
 
 /***/ 6717:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const compare = __nccwpck_require__(8469)
 const lte = (a, b, loose) => compare(a, b, loose) <= 0
@@ -17650,6 +17639,9 @@ module.exports = lte
 /***/ 8511:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const SemVer = __nccwpck_require__(7163)
 const major = (a, loose) => new SemVer(a, loose).major
 module.exports = major
@@ -17659,6 +17651,9 @@ module.exports = major
 
 /***/ 2603:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const SemVer = __nccwpck_require__(7163)
 const minor = (a, loose) => new SemVer(a, loose).minor
@@ -17670,6 +17665,9 @@ module.exports = minor
 /***/ 4974:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const compare = __nccwpck_require__(8469)
 const neq = (a, b, loose) => compare(a, b, loose) !== 0
 module.exports = neq
@@ -17679,6 +17677,9 @@ module.exports = neq
 
 /***/ 6353:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const SemVer = __nccwpck_require__(7163)
 const parse = (version, options, throwErrors = false) => {
@@ -17703,6 +17704,9 @@ module.exports = parse
 /***/ 8756:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const SemVer = __nccwpck_require__(7163)
 const patch = (a, loose) => new SemVer(a, loose).patch
 module.exports = patch
@@ -17712,6 +17716,9 @@ module.exports = patch
 
 /***/ 5714:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const parse = __nccwpck_require__(6353)
 const prerelease = (version, options) => {
@@ -17726,6 +17733,9 @@ module.exports = prerelease
 /***/ 2173:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const compare = __nccwpck_require__(8469)
 const rcompare = (a, b, loose) => compare(b, a, loose)
 module.exports = rcompare
@@ -17736,6 +17746,9 @@ module.exports = rcompare
 /***/ 7192:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const compareBuild = __nccwpck_require__(7648)
 const rsort = (list, loose) => list.sort((a, b) => compareBuild(b, a, loose))
 module.exports = rsort
@@ -17745,6 +17758,9 @@ module.exports = rsort
 
 /***/ 8011:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const Range = __nccwpck_require__(6782)
 const satisfies = (version, range, options) => {
@@ -17763,6 +17779,9 @@ module.exports = satisfies
 /***/ 9872:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const compareBuild = __nccwpck_require__(7648)
 const sort = (list, loose) => list.sort((a, b) => compareBuild(a, b, loose))
 module.exports = sort
@@ -17772,6 +17791,9 @@ module.exports = sort
 
 /***/ 8780:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const parse = __nccwpck_require__(6353)
 const valid = (version, options) => {
@@ -17785,6 +17807,9 @@ module.exports = valid
 
 /***/ 2088:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 // just pre-load all the stuff that index.js lazily exports
 const internalRe = __nccwpck_require__(5471)
@@ -17882,6 +17907,9 @@ module.exports = {
 /***/ 5101:
 /***/ ((module) => {
 
+"use strict";
+
+
 // Note: this is the semver.org version of the spec that it implements
 // Not necessarily the package version of this code.
 const SEMVER_SPEC_VERSION = '2.0.0'
@@ -17924,6 +17952,9 @@ module.exports = {
 /***/ 1159:
 /***/ ((module) => {
 
+"use strict";
+
+
 const debug = (
   typeof process === 'object' &&
   process.env &&
@@ -17939,6 +17970,9 @@ module.exports = debug
 
 /***/ 3348:
 /***/ ((module) => {
+
+"use strict";
+
 
 const numeric = /^[0-9]+$/
 const compareIdentifiers = (a, b) => {
@@ -17969,6 +18003,9 @@ module.exports = {
 
 /***/ 1383:
 /***/ ((module) => {
+
+"use strict";
+
 
 class LRUCache {
   constructor () {
@@ -18017,6 +18054,9 @@ module.exports = LRUCache
 /***/ 356:
 /***/ ((module) => {
 
+"use strict";
+
+
 // parse out just the options we care about
 const looseOption = Object.freeze({ loose: true })
 const emptyOpts = Object.freeze({ })
@@ -18039,6 +18079,9 @@ module.exports = parseOptions
 /***/ 5471:
 /***/ ((module, exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const {
   MAX_SAFE_COMPONENT_LENGTH,
   MAX_SAFE_BUILD_LENGTH,
@@ -18051,6 +18094,7 @@ exports = module.exports = {}
 const re = exports.re = []
 const safeRe = exports.safeRe = []
 const src = exports.src = []
+const safeSrc = exports.safeSrc = []
 const t = exports.t = {}
 let R = 0
 
@@ -18083,6 +18127,7 @@ const createToken = (name, value, isGlobal) => {
   debug(name, index, value)
   t[name] = index
   src[index] = value
+  safeSrc[index] = safe
   re[index] = new RegExp(value, isGlobal ? 'g' : undefined)
   safeRe[index] = new RegExp(safe, isGlobal ? 'g' : undefined)
 }
@@ -18115,12 +18160,14 @@ createToken('MAINVERSIONLOOSE', `(${src[t.NUMERICIDENTIFIERLOOSE]})\\.` +
 
 // ## Pre-release Version Identifier
 // A numeric identifier, or a non-numeric identifier.
+// Non-numberic identifiers include numberic identifiers but can be longer.
+// Therefore non-numberic identifiers must go first.
 
-createToken('PRERELEASEIDENTIFIER', `(?:${src[t.NUMERICIDENTIFIER]
-}|${src[t.NONNUMERICIDENTIFIER]})`)
+createToken('PRERELEASEIDENTIFIER', `(?:${src[t.NONNUMERICIDENTIFIER]
+}|${src[t.NUMERICIDENTIFIER]})`)
 
-createToken('PRERELEASEIDENTIFIERLOOSE', `(?:${src[t.NUMERICIDENTIFIERLOOSE]
-}|${src[t.NONNUMERICIDENTIFIER]})`)
+createToken('PRERELEASEIDENTIFIERLOOSE', `(?:${src[t.NONNUMERICIDENTIFIER]
+}|${src[t.NUMERICIDENTIFIERLOOSE]})`)
 
 // ## Pre-release Version
 // Hyphen, followed by one or more dot-separated pre-release version
@@ -18263,6 +18310,9 @@ createToken('GTE0PRE', '^\\s*>=\\s*0\\.0\\.0-0\\s*$')
 /***/ 2276:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 // Determine if version is greater than all the versions possible in the range.
 const outside = __nccwpck_require__(280)
 const gtr = (version, range, options) => outside(version, range, '>', options)
@@ -18273,6 +18323,9 @@ module.exports = gtr
 
 /***/ 3465:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const Range = __nccwpck_require__(6782)
 const intersects = (r1, r2, options) => {
@@ -18288,6 +18341,9 @@ module.exports = intersects
 /***/ 5213:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const outside = __nccwpck_require__(280)
 // Determine if version is less than all the versions possible in the range
 const ltr = (version, range, options) => outside(version, range, '<', options)
@@ -18298,6 +18354,9 @@ module.exports = ltr
 
 /***/ 5574:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const SemVer = __nccwpck_require__(7163)
 const Range = __nccwpck_require__(6782)
@@ -18331,6 +18390,9 @@ module.exports = maxSatisfying
 /***/ 8595:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const SemVer = __nccwpck_require__(7163)
 const Range = __nccwpck_require__(6782)
 const minSatisfying = (versions, range, options) => {
@@ -18361,6 +18423,9 @@ module.exports = minSatisfying
 
 /***/ 1866:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const SemVer = __nccwpck_require__(7163)
 const Range = __nccwpck_require__(6782)
@@ -18429,6 +18494,9 @@ module.exports = minVersion
 
 /***/ 280:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const SemVer = __nccwpck_require__(7163)
 const Comparator = __nccwpck_require__(9379)
@@ -18517,6 +18585,9 @@ module.exports = outside
 /***/ 2028:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 // given a set of versions and a range, create a "simplified" range
 // that includes the same versions that the original range does
 // If the original range is shorter than the simplified one, return that.
@@ -18570,6 +18641,9 @@ module.exports = (versions, range, options) => {
 
 /***/ 1489:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const Range = __nccwpck_require__(6782)
 const Comparator = __nccwpck_require__(9379)
@@ -18825,6 +18899,9 @@ module.exports = subset
 /***/ 4750:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+"use strict";
+
+
 const Range = __nccwpck_require__(6782)
 
 // Mostly just for testing and legacy API reasons
@@ -18839,6 +18916,9 @@ module.exports = toComparators
 
 /***/ 4737:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
 
 const Range = __nccwpck_require__(6782)
 const validRange = (range, options) => {
@@ -24463,7 +24543,7 @@ module.exports = {
 
 
 const { parseSetCookie } = __nccwpck_require__(8915)
-const { stringify, getHeadersList } = __nccwpck_require__(3834)
+const { stringify } = __nccwpck_require__(3834)
 const { webidl } = __nccwpck_require__(4222)
 const { Headers } = __nccwpck_require__(6349)
 
@@ -24539,14 +24619,13 @@ function getSetCookies (headers) {
 
   webidl.brandCheck(headers, Headers, { strict: false })
 
-  const cookies = getHeadersList(headers).cookies
+  const cookies = headers.getSetCookie()
 
   if (!cookies) {
     return []
   }
 
-  // In older versions of undici, cookies is a list of name:value.
-  return cookies.map((pair) => parseSetCookie(Array.isArray(pair) ? pair[1] : pair))
+  return cookies.map((pair) => parseSetCookie(pair))
 }
 
 /**
@@ -24974,14 +25053,15 @@ module.exports = {
 /***/ }),
 
 /***/ 3834:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+/***/ ((module) => {
 
 "use strict";
 
 
-const assert = __nccwpck_require__(2613)
-const { kHeadersList } = __nccwpck_require__(6443)
-
+/**
+ * @param {string} value
+ * @returns {boolean}
+ */
 function isCTLExcludingHtab (value) {
   if (value.length === 0) {
     return false
@@ -25242,31 +25322,13 @@ function stringify (cookie) {
   return out.join('; ')
 }
 
-let kHeadersListNode
-
-function getHeadersList (headers) {
-  if (headers[kHeadersList]) {
-    return headers[kHeadersList]
-  }
-
-  if (!kHeadersListNode) {
-    kHeadersListNode = Object.getOwnPropertySymbols(headers).find(
-      (symbol) => symbol.description === 'headers list'
-    )
-
-    assert(kHeadersListNode, 'Headers cannot be parsed')
-  }
-
-  const headersList = headers[kHeadersListNode]
-  assert(headersList)
-
-  return headersList
-}
-
 module.exports = {
   isCTLExcludingHtab,
-  stringify,
-  getHeadersList
+  validateCookieName,
+  validateCookiePath,
+  validateCookieValue,
+  toIMFDate,
+  stringify
 }
 
 
@@ -29270,6 +29332,7 @@ const {
   isValidHeaderName,
   isValidHeaderValue
 } = __nccwpck_require__(5523)
+const util = __nccwpck_require__(9023)
 const { webidl } = __nccwpck_require__(4222)
 const assert = __nccwpck_require__(2613)
 
@@ -29823,6 +29886,9 @@ Object.defineProperties(Headers.prototype, {
   [Symbol.toStringTag]: {
     value: 'Headers',
     configurable: true
+  },
+  [util.inspect.custom]: {
+    enumerable: false
   }
 })
 
@@ -38999,6 +39065,20 @@ class Pool extends PoolBase {
       ? { ...options.interceptors }
       : undefined
     this[kFactory] = factory
+
+    this.on('connectionError', (origin, targets, error) => {
+      // If a connection error occurs, we remove the client from the pool,
+      // and emit a connectionError event. They will not be re-used.
+      // Fixes https://github.com/nodejs/undici/issues/3895
+      for (const target of targets) {
+        // Do not use kRemoveClient here, as it will close the client,
+        // but the client cannot be closed in this state.
+        const idx = this[kClients].indexOf(target)
+        if (idx !== -1) {
+          this[kClients].splice(idx, 1)
+        }
+      }
+    })
   }
 
   [kGetDispatcher] () {
@@ -41356,15 +41436,6 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.downloadAndExtractTool = downloadAndExtractTool;
 /**
@@ -41378,24 +41449,22 @@ const index_1 = __nccwpck_require__(9407);
  * @param url The URL of the tool to be downloaded.
  * @returns The path to the locally extracted tool.
  */
-function downloadAndExtractTool(url) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const downloadPath = yield downloadTool(url);
-        let extractedPath;
-        if (url.indexOf('.zip') != -1) {
-            extractedPath = yield toolCache.extractZip(downloadPath);
-        }
-        else if (url.indexOf('.tar.gz') != -1) {
-            extractedPath = yield toolCache.extractTar(downloadPath);
-        }
-        else if (url.indexOf('.7z') != -1) {
-            extractedPath = yield toolCache.extract7z(downloadPath);
-        }
-        else {
-            throw new Error(`Unexpected download archive type, downloadPath: ${downloadPath}`);
-        }
-        return extractedPath;
-    });
+async function downloadAndExtractTool(url) {
+    const downloadPath = await downloadTool(url);
+    let extractedPath;
+    if (url.indexOf('.zip') != -1) {
+        extractedPath = await toolCache.extractZip(downloadPath);
+    }
+    else if (url.indexOf('.tar.gz') != -1) {
+        extractedPath = await toolCache.extractTar(downloadPath);
+    }
+    else if (url.indexOf('.7z') != -1) {
+        extractedPath = await toolCache.extract7z(downloadPath);
+    }
+    else {
+        throw new Error(`Unexpected download archive type, downloadPath: ${downloadPath}`);
+    }
+    return extractedPath;
 }
 /**
  * downloadTool is a temporary hack until native support for module mocking
@@ -41406,11 +41475,9 @@ function downloadAndExtractTool(url) {
  * For some unknown reason, moving this call into another function makes the
  * toolCache mockable /shrug.
  */
-function downloadTool(url) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield toolCache.downloadTool(url, undefined, undefined, {
-            'User-Agent': index_1.userAgentString,
-        });
+async function downloadTool(url) {
+    return await toolCache.downloadTool(url, undefined, undefined, {
+        'User-Agent': index_1.userAgentString,
     });
 }
 
@@ -41535,15 +41602,6 @@ var __importStar = (this && this.__importStar) || (function () {
 var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.userAgentString = void 0;
 exports.isInstalled = isInstalled;
@@ -41618,23 +41676,21 @@ function getToolCommand() {
  *
  * @return ExecOutput
  */
-function gcloudRun(cmd, options) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const toolCommand = getToolCommand();
-        const opts = Object.assign({}, { silent: true, ignoreReturnCode: true }, options);
-        const commandString = `${toolCommand} ${cmd.join(' ')}`;
-        core.debug(`Running command: ${commandString}`);
-        const result = yield (0, exec_1.getExecOutput)(toolCommand, cmd, opts);
-        if (result.exitCode !== 0) {
-            const errMsg = result.stderr || `command exited ${result.exitCode}, but stderr had no output`;
-            throw new Error(`failed to execute command \`${commandString}\`: ${errMsg}`);
-        }
-        return {
-            stderr: result.stderr,
-            stdout: result.stdout,
-            output: result.stdout + '\n' + result.stderr,
-        };
-    });
+async function gcloudRun(cmd, options) {
+    const toolCommand = getToolCommand();
+    const opts = Object.assign({}, { silent: true, ignoreReturnCode: true }, options);
+    const commandString = `${toolCommand} ${cmd.join(' ')}`;
+    core.debug(`Running command: ${commandString}`);
+    const result = await (0, exec_1.getExecOutput)(toolCommand, cmd, opts);
+    if (result.exitCode !== 0) {
+        const errMsg = result.stderr || `command exited ${result.exitCode}, but stderr had no output`;
+        throw new Error(`failed to execute command \`${commandString}\`: ${errMsg}`);
+    }
+    return {
+        stderr: result.stderr,
+        stdout: result.stdout,
+        output: result.stdout + '\n' + result.stderr,
+    };
 }
 /**
  * gcloudRunJSON runs the gcloud command with JSON output and parses the result
@@ -41645,40 +41701,34 @@ function gcloudRun(cmd, options) {
  *
  * @return Parsed JSON as an object (or array).
  */
-function gcloudRunJSON(cmd, options) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const jsonCmd = ['--format', 'json'].concat(cmd);
-        const output = yield gcloudRun(jsonCmd, options);
-        try {
-            const parsed = JSON.parse(output.stdout);
-            return parsed;
-        }
-        catch (err) {
-            throw new Error(`failed to parse output as JSON: ${err}\n\nstdout:\n${output.stdout}\n\nstderr:\n${output.stderr}`);
-        }
-    });
+async function gcloudRunJSON(cmd, options) {
+    const jsonCmd = ['--format', 'json'].concat(cmd);
+    const output = await gcloudRun(jsonCmd, options);
+    try {
+        const parsed = JSON.parse(output.stdout);
+        return parsed;
+    }
+    catch (err) {
+        throw new Error(`failed to parse output as JSON: ${err}\n\nstdout:\n${output.stdout}\n\nstderr:\n${output.stderr}`);
+    }
 }
 /**
  * Checks if the project Id is set in the gcloud config.
  *
  * @returns true is project Id is set.
  */
-function isProjectIdSet() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const result = yield gcloudRun(['config', 'get-value', 'project']);
-        return !result.output.includes('unset');
-    });
+async function isProjectIdSet() {
+    const result = await gcloudRun(['config', 'get-value', 'project']);
+    return !result.output.includes('unset');
 }
 /**
  * Checks if gcloud is authenticated.
  *
  * @returns true is gcloud is authenticated.
  */
-function isAuthenticated() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const result = yield gcloudRun(['auth', 'list']);
-        return !result.output.includes('No credentialed accounts.');
-    });
+async function isAuthenticated() {
+    const result = await gcloudRun(['auth', 'list']);
+    return !result.output.includes('No credentialed accounts.');
 }
 /**
  * Installs the gcloud SDK into the actions environment.
@@ -41688,27 +41738,25 @@ function isAuthenticated() {
  * specification is installed.
  * @returns The path of the installed tool.
  */
-function installGcloudSDK(version) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // Retrieve the release corresponding to the specified version and OS
-        const osPlat = os.platform();
-        const osArch = os.arch();
-        const resolvedVersion = toolCache.isExplicitVersion(version)
-            ? version
-            : yield bestVersion(version);
-        const url = (0, format_url_1.buildReleaseURL)(osPlat, osArch, resolvedVersion);
-        // Download and extract the release
-        const extPath = yield (0, download_util_1.downloadAndExtractTool)(url);
-        if (!extPath) {
-            throw new Error(`Failed to download release, url: ${url}`);
-        }
-        // Install the downloaded release into the github action env
-        const toolRoot = path.join(extPath, 'google-cloud-sdk');
-        let toolPath = yield toolCache.cacheDir(toolRoot, 'gcloud', resolvedVersion);
-        toolPath = path.join(toolPath, 'bin');
-        core.addPath(toolPath);
-        return toolPath;
-    });
+async function installGcloudSDK(version) {
+    // Retrieve the release corresponding to the specified version and OS
+    const osPlat = os.platform();
+    const osArch = os.arch();
+    const resolvedVersion = toolCache.isExplicitVersion(version)
+        ? version
+        : await bestVersion(version);
+    const url = (0, format_url_1.buildReleaseURL)(osPlat, osArch, resolvedVersion);
+    // Download and extract the release
+    const extPath = await (0, download_util_1.downloadAndExtractTool)(url);
+    if (!extPath) {
+        throw new Error(`Failed to download release, url: ${url}`);
+    }
+    // Install the downloaded release into the github action env
+    const toolRoot = path.join(extPath, 'google-cloud-sdk');
+    let toolPath = await toolCache.cacheDir(toolRoot, 'gcloud', resolvedVersion);
+    toolPath = path.join(toolPath, 'bin');
+    core.addPath(toolPath);
+    return toolPath;
 }
 /**
  * computeGcloudVersion computes the appropriate gcloud version for the given
@@ -41729,24 +41777,20 @@ function installGcloudSDK(version) {
  *
  * @return String representing the latest version.
  */
-function computeGcloudVersion(version) {
-    return __awaiter(this, void 0, void 0, function* () {
-        version = (version || '').trim();
-        if (version === '' || version === 'latest') {
-            return yield getLatestGcloudSDKVersion();
-        }
-        return version;
-    });
+async function computeGcloudVersion(version) {
+    version = (version || '').trim();
+    if (version === '' || version === 'latest') {
+        return await getLatestGcloudSDKVersion();
+    }
+    return version;
 }
 /**
  * Authenticates the gcloud tool using the provided credentials file.
  *
  * @param filepath - Path to the credentials file.
  */
-function authenticateGcloudSDK(filepath) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield gcloudRun(['--quiet', 'auth', 'login', '--force', '--cred-file', filepath]);
-    });
+async function authenticateGcloudSDK(filepath) {
+    await gcloudRun(['--quiet', 'auth', 'login', '--force', '--cred-file', filepath]);
 }
 /**
  * Sets the GCP Project Id in the gcloud config.
@@ -41754,10 +41798,8 @@ function authenticateGcloudSDK(filepath) {
  * @param projectId - The project ID to set.
  * @returns project ID.
  */
-function setProject(projectId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield gcloudRun(['--quiet', 'config', 'set', 'project', projectId]);
-    });
+async function setProject(projectId) {
+    await gcloudRun(['--quiet', 'config', 'set', 'project', projectId]);
 }
 /**
  * Install a Cloud SDK component.
@@ -41765,27 +41807,23 @@ function setProject(projectId) {
  * @param component - gcloud component group to install ie alpha, beta.
  * @returns CMD output
  */
-function installComponent(component) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let cmd = ['--quiet', 'components', 'install'];
-        if (Array.isArray(component)) {
-            cmd = cmd.concat(component);
-        }
-        else {
-            cmd.push(component);
-        }
-        yield gcloudRun(cmd);
-    });
+async function installComponent(component) {
+    let cmd = ['--quiet', 'components', 'install'];
+    if (Array.isArray(component)) {
+        cmd = cmd.concat(component);
+    }
+    else {
+        cmd.push(component);
+    }
+    await gcloudRun(cmd);
 }
 /**
  * getLatestGcloudSDKVersion fetches the latest version number from the API.
  *
  * @returns The latest stable version of the gcloud SDK.
  */
-function getLatestGcloudSDKVersion() {
-    return __awaiter(this, void 0, void 0, function* () {
-        return yield bestVersion('> 0.0.0');
-    });
+async function getLatestGcloudSDKVersion() {
+    return await bestVersion('> 0.0.0');
 }
 /**
  * bestVersion takes a version constraint and gets the latest available version
@@ -41794,25 +41832,23 @@ function getLatestGcloudSDKVersion() {
  * @param spec Version specification
  * @return Resolved version
  */
-function bestVersion(spec) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let versions;
-        try {
-            const http = new http_client_1.HttpClient(exports.userAgentString, undefined, { allowRetries: true, maxRetries: 3 });
-            const res = yield http.get(versionsURL);
-            const body = yield res.readBody();
-            const statusCode = res.message.statusCode || 500;
-            if (statusCode >= 400) {
-                throw new Error(`(${statusCode}) ${body}`);
-            }
-            versions = JSON.parse(body);
+async function bestVersion(spec) {
+    let versions;
+    try {
+        const http = new http_client_1.HttpClient(exports.userAgentString, undefined, { allowRetries: true, maxRetries: 3 });
+        const res = await http.get(versionsURL);
+        const body = await res.readBody();
+        const statusCode = res.message.statusCode || 500;
+        if (statusCode >= 400) {
+            throw new Error(`(${statusCode}) ${body}`);
         }
-        catch (err) {
-            const msg = (0, actions_utils_1.errorMessage)(err);
-            throw new Error(`failed to retrieve versions from ${versionsURL}: ${msg}`);
-        }
-        return computeBestVersion(spec, versions);
-    });
+        versions = JSON.parse(body);
+    }
+    catch (err) {
+        const msg = (0, actions_utils_1.errorMessage)(err);
+        throw new Error(`failed to retrieve versions from ${versionsURL}: ${msg}`);
+    }
+    return computeBestVersion(spec, versions);
 }
 /**
  * computeBestVersion computes the latest available version that still satisfies
@@ -41900,27 +41936,6 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _a, _TestToolCache_originalToolsDir, _TestToolCache_originalTempDir;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TestToolCache = void 0;
 /**
@@ -41936,38 +41951,39 @@ const actions_utils_1 = __nccwpck_require__(6160);
  * used.
  */
 class TestToolCache {
+    static rootDir;
+    static toolsDir;
+    static tempDir;
+    static #originalToolsDir;
+    static #originalTempDir;
     /**
      * Creates temporary directories for the runner cache and temp.
      */
-    static start() {
-        return __awaiter(this, void 0, void 0, function* () {
-            __classPrivateFieldSet(this, _a, process.env.RUNNER_TOOL_CACHE, "f", _TestToolCache_originalToolsDir);
-            __classPrivateFieldSet(this, _a, process.env.RUNNER_TEMP, "f", _TestToolCache_originalTempDir);
-            this.setGlobal('TEST_DOWNLOAD_TOOL_RETRY_MIN_SECONDS', '0');
-            this.setGlobal('TEST_DOWNLOAD_TOOL_RETRY_MAX_SECONDS', '0');
-            this.rootDir = path.join(__dirname, 'runner', (0, actions_utils_1.randomFilename)());
-            this.toolsDir = path.join(this.rootDir, 'tools');
-            yield fs.mkdir(this.toolsDir, { recursive: true });
-            process.env.RUNNER_TOOL_CACHE = this.toolsDir;
-            this.tempDir = path.join(this.rootDir, 'temp');
-            yield fs.mkdir(this.tempDir, { recursive: true });
-            process.env.RUNNER_TEMP = this.toolsDir;
-        });
+    static async start() {
+        this.#originalToolsDir = process.env.RUNNER_TOOL_CACHE;
+        this.#originalTempDir = process.env.RUNNER_TEMP;
+        this.setGlobal('TEST_DOWNLOAD_TOOL_RETRY_MIN_SECONDS', '0');
+        this.setGlobal('TEST_DOWNLOAD_TOOL_RETRY_MAX_SECONDS', '0');
+        this.rootDir = path.join(__dirname, 'runner', (0, actions_utils_1.randomFilename)());
+        this.toolsDir = path.join(this.rootDir, 'tools');
+        await fs.mkdir(this.toolsDir, { recursive: true });
+        process.env.RUNNER_TOOL_CACHE = this.toolsDir;
+        this.tempDir = path.join(this.rootDir, 'temp');
+        await fs.mkdir(this.tempDir, { recursive: true });
+        process.env.RUNNER_TEMP = this.toolsDir;
     }
     /**
      * Restores the Action's runner to use the original directories and deletes
      * the temporary files.
      **/
-    static stop() {
-        return __awaiter(this, void 0, void 0, function* () {
-            process.env.RUNNER_TOOL_CACHE = __classPrivateFieldGet(this, _a, "f", _TestToolCache_originalToolsDir);
-            process.env.RUNNER_TEMP = __classPrivateFieldGet(this, _a, "f", _TestToolCache_originalTempDir);
-            delete process.env.TEST_DOWNLOAD_TOOL_RESPONSE_MESSAGE_FACTORY;
-            this.setGlobal('TEST_DOWNLOAD_TOOL_RETRY_MIN_SECONDS', undefined);
-            this.setGlobal('TEST_DOWNLOAD_TOOL_RETRY_MAX_SECONDS', undefined);
-            this.setGlobal('TEST_DOWNLOAD_TOOL_RESPONSE_MESSAGE_FACTORY', undefined);
-            yield (0, actions_utils_1.forceRemove)(this.rootDir);
-        });
+    static async stop() {
+        process.env.RUNNER_TOOL_CACHE = this.#originalToolsDir;
+        process.env.RUNNER_TEMP = this.#originalTempDir;
+        delete process.env.TEST_DOWNLOAD_TOOL_RESPONSE_MESSAGE_FACTORY;
+        this.setGlobal('TEST_DOWNLOAD_TOOL_RETRY_MIN_SECONDS', undefined);
+        this.setGlobal('TEST_DOWNLOAD_TOOL_RETRY_MAX_SECONDS', undefined);
+        this.setGlobal('TEST_DOWNLOAD_TOOL_RESPONSE_MESSAGE_FACTORY', undefined);
+        await (0, actions_utils_1.forceRemove)(this.rootDir);
     }
     static setGlobal(k, v) {
         const g = global;
@@ -41980,9 +41996,6 @@ class TestToolCache {
     }
 }
 exports.TestToolCache = TestToolCache;
-_a = TestToolCache;
-_TestToolCache_originalToolsDir = { value: void 0 };
-_TestToolCache_originalTempDir = { value: void 0 };
 
 
 /***/ }),
@@ -42107,14 +42120,6 @@ module.exports = require("node:assert");
 
 /***/ }),
 
-/***/ 4573:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("node:buffer");
-
-/***/ }),
-
 /***/ 7598:
 /***/ ((module) => {
 
@@ -42128,14 +42133,6 @@ module.exports = require("node:crypto");
 
 "use strict";
 module.exports = require("node:events");
-
-/***/ }),
-
-/***/ 1708:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("node:process");
 
 /***/ }),
 
@@ -42176,6 +42173,14 @@ module.exports = require("path");
 
 "use strict";
 module.exports = require("perf_hooks");
+
+/***/ }),
+
+/***/ 932:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("process");
 
 /***/ }),
 
@@ -43904,7 +43909,7 @@ module.exports = parseParams
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.1.9","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint .","format":"eslint --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.11.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.3","@actions/tool-cache":"^2.0.2","@google-github-actions/actions-utils":"^0.8.6","semver":"^7.7.0"},"devDependencies":{"@eslint/eslintrc":"^3.2.0","@eslint/js":"^9.19.0","@types/node":"^22.13.0","@types/semver":"^7.5.8","@typescript-eslint/eslint-plugin":"^8.22.0","@vercel/ncc":"^0.38.3","eslint-config-prettier":"^10.0.1","eslint-plugin-prettier":"^5.2.3","eslint":"^9.19.0","prettier":"^3.4.2","ts-node":"^10.9.2","typedoc-plugin-markdown":"^4.4.1","typedoc":"^0.27.6","typescript-eslint":"^8.22.0","typescript":"^5.7.3"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.1.9","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","engines":{"node":"20.x","npm":"10.x"},"scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint .","format":"eslint --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.11.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.3","@actions/tool-cache":"^2.0.2","@google-github-actions/actions-utils":"^0.8.8","semver":"^7.7.2"},"devDependencies":{"@eslint/eslintrc":"^3.3.1","@eslint/js":"^9.31.0","@types/node":"^24.0.14","@types/semver":"^7.7.0","@typescript-eslint/eslint-plugin":"^8.37.0","@vercel/ncc":"^0.38.3","eslint-config-prettier":"^10.1.5","eslint-plugin-prettier":"^5.5.1","eslint":"^9.31.0","prettier":"^3.6.2","ts-node":"^10.9.2","typedoc-plugin-markdown":"^4.7.0","typedoc":"^0.28.7","typescript-eslint":"^8.37.0","typescript":"^5.8.3"}}');
 
 /***/ })
 

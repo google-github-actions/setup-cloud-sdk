@@ -6,7 +6,7 @@
 
 # Function: isInstalled()
 
-> **isInstalled**(`version`?): `boolean`
+> **isInstalled**(`version?`): `boolean`
 
 Defined in: [index.ts:49](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L49)
 

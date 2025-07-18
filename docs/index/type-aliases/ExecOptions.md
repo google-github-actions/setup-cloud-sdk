@@ -6,7 +6,7 @@
 
 # Type Alias: ExecOptions
 
-> **ExecOptions**: `ActionsExecOptions`
+> **ExecOptions** = `ActionsExecOptions`
 
 Defined in: [index.ts:77](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L77)
 

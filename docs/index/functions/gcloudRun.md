@@ -6,7 +6,7 @@
 
 # Function: gcloudRun()
 
-> **gcloudRun**(`cmd`, `options`?): `Promise`\<[`ExecOutput`](../type-aliases/ExecOutput.md)\>
+> **gcloudRun**(`cmd`, `options?`): `Promise`\<[`ExecOutput`](../type-aliases/ExecOutput.md)\>
 
 Defined in: [index.ts:98](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L98)
 
