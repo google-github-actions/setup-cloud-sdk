@@ -15,13 +15,13 @@ used.
 
 ## Constructors
 
-### new TestToolCache()
+### Constructor
 
-> **new TestToolCache**(): [`TestToolCache`](TestToolCache.md)
+> **new TestToolCache**(): `TestToolCache`
 
 #### Returns
 
-[`TestToolCache`](TestToolCache.md)
+`TestToolCache`
 
 ## Properties
 

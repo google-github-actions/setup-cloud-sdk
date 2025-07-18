@@ -19,14 +19,14 @@
     "alwaysStrict": true,
     "declaration": true,
     "esModuleInterop": true,
-    "lib": ["es6"],
+    "lib": ["es2022"],
     "module": "commonjs",
     "noImplicitAny": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "sourceMap": true,
     "strict": true,
-    "target": "es6"
+    "target": "es2022"
   },
   "exclude": ["dist/**/*", "node_modules", "**/*.test.ts"],
   "typedocOptions": {

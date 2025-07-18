@@ -6,7 +6,7 @@
 
 # Function: ~~computeGcloudVersion()~~
 
-> **computeGcloudVersion**(`version`?): `Promise`\<`string`\>
+> **computeGcloudVersion**(`version?`): `Promise`\<`string`\>
 
 Defined in: [index.ts:210](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L210)
 
