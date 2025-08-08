@@ -8,7 +8,7 @@
 
 > **installComponent**(`component`): `Promise`\<`void`\>
 
-Defined in: [index.ts:243](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L243)
+Defined in: [index.ts:255](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L255)
 
 Install a Cloud SDK component.
 

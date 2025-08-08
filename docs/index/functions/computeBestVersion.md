@@ -8,7 +8,7 @@
 
 > **computeBestVersion**(`spec`, `versions`): `string`
 
-Defined in: [index.ts:309](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L309)
+Defined in: [index.ts:321](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L321)
 
 computeBestVersion computes the latest available version that still satisfies
 the spec. This is a helper function and is only exported for testing.
