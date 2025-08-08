@@ -41738,7 +41738,7 @@ async function isAuthenticated() {
  * specification is installed.
  * @returns The path of the installed tool.
  */
-async function installGcloudSDK(version) {
+async function installGcloudSDK(version, skipToolCache) {
     // Retrieve the release corresponding to the specified version and OS
     const osPlat = os.platform();
     const osArch = os.arch();
@@ -41751,12 +41751,25 @@ async function installGcloudSDK(version) {
     if (!extPath) {
         throw new Error(`Failed to download release, url: ${url}`);
     }
-    // Install the downloaded release into the github action env
-    const toolRoot = path.join(extPath, 'google-cloud-sdk');
-    let toolPath = await toolCache.cacheDir(toolRoot, 'gcloud', resolvedVersion);
-    toolPath = path.join(toolPath, 'bin');
-    core.addPath(toolPath);
-    return toolPath;
+    // Either cache the tool or just add it directly to the path.
+    if (skipToolCache) {
+        // Caching the tool on disk takes a really long time, and it's not clear
+        // whether it's even valuable since it's ONLY cached on disk on the runner.
+        // For GitHub-managed runners, that is useless since they are ephemeral.
+        //
+        // See https://github.com/google-github-actions/setup-gcloud/issues/701 for
+        // discussion, but it's actually faster to skip the caching and just add the
+        // tool directly to the path.
+        const toolRoot = path.join(extPath, 'google-cloud-sdk');
+        core.addPath(path.join(toolRoot, 'bin'));
+        return toolRoot;
+    }
+    else {
+        const toolRoot = path.join(extPath, 'google-cloud-sdk');
+        const cachedToolRoot = await toolCache.cacheDir(toolRoot, 'gcloud', resolvedVersion, osArch);
+        core.addPath(path.join(cachedToolRoot, 'bin'));
+        return cachedToolRoot;
+    }
 }
 /**
  * computeGcloudVersion computes the appropriate gcloud version for the given
@@ -43915,7 +43928,7 @@ module.exports = parseParams
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.2.0","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","engines":{"node":"20.x","npm":"10.x"},"scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint .","format":"eslint --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.11.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.3","@actions/tool-cache":"^2.0.2","@google-github-actions/actions-utils":"^0.8.8","semver":"^7.7.2"},"devDependencies":{"@eslint/eslintrc":"^3.3.1","@eslint/js":"^9.31.0","@types/node":"^24.0.14","@types/semver":"^7.7.0","@typescript-eslint/eslint-plugin":"^8.37.0","@vercel/ncc":"^0.38.3","eslint-config-prettier":"^10.1.5","eslint-plugin-prettier":"^5.5.1","eslint":"^9.31.0","prettier":"^3.6.2","ts-node":"^10.9.2","typedoc-plugin-markdown":"^4.7.0","typedoc":"^0.28.7","typescript-eslint":"^8.37.0","typescript":"^5.8.3"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.2.1","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","engines":{"node":"20.x","npm":"10.x"},"scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint .","format":"eslint --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.11.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.3","@actions/tool-cache":"^2.0.2","@google-github-actions/actions-utils":"^0.8.8","semver":"^7.7.2"},"devDependencies":{"@eslint/eslintrc":"^3.3.1","@eslint/js":"^9.31.0","@types/node":"^24.0.14","@types/semver":"^7.7.0","@typescript-eslint/eslint-plugin":"^8.37.0","@vercel/ncc":"^0.38.3","eslint-config-prettier":"^10.1.5","eslint-plugin-prettier":"^5.5.1","eslint":"^9.31.0","prettier":"^3.6.2","ts-node":"^10.9.2","typedoc-plugin-markdown":"^4.7.0","typedoc":"^0.28.7","typescript-eslint":"^8.37.0","typescript":"^5.8.3"}}');
 
 /***/ })
 

@@ -8,7 +8,7 @@
 
 > **setProject**(`projectId`): `Promise`\<`void`\>
 
-Defined in: [index.ts:233](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L233)
+Defined in: [index.ts:245](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L245)
 
 Sets the GCP Project Id in the gcloud config.
 

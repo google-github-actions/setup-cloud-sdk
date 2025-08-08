@@ -8,7 +8,7 @@
 
 > **computeGcloudVersion**(`version?`): `Promise`\<`string`\>
 
-Defined in: [index.ts:210](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L210)
+Defined in: [index.ts:222](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L222)
 
 computeGcloudVersion computes the appropriate gcloud version for the given
 string. If the string is the empty string or the special value "latest", it

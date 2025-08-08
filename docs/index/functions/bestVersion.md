@@ -8,7 +8,7 @@
 
 > **bestVersion**(`spec`): `Promise`\<`string`\>
 
-Defined in: [index.ts:270](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L270)
+Defined in: [index.ts:282](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L282)
 
 bestVersion takes a version constraint and gets the latest available version
 that satisfies the constraint.
