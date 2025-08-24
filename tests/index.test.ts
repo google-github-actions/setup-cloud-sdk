@@ -67,7 +67,7 @@ test('#setupCloudSDK', { concurrency: true }, async (suite) => {
     t.before(async () => {
       await TestToolCache.start();
       const version = await setupCloudSDK.getLatestGcloudSDKVersion();
-      await setupCloudSDK.installGcloudSDK(version);
+      await setupCloudSDK.installGcloudSDK(version, true);
     });
 
     t.beforeEach(async () => {
