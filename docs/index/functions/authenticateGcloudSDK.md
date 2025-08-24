@@ -8,7 +8,7 @@
 
 > **authenticateGcloudSDK**(`filepath`): `Promise`\<`void`\>
 
-Defined in: [index.ts:235](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L235)
+Defined in: [index.ts:239](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L239)
 
 Authenticates the gcloud tool using the provided credentials file.
 
