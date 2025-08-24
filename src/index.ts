@@ -165,7 +165,10 @@ export async function isAuthenticated(): Promise<boolean> {
  * specification is installed.
  * @returns The path of the installed tool.
  */
-export async function installGcloudSDK(version: string, skipToolCache?: boolean): Promise<string> {
+export async function installGcloudSDK(
+  version: string,
+  useToolCache: boolean = false,
+): Promise<string> {
   // Retrieve the release corresponding to the specified version and OS
   const osPlat = os.platform();
   const osArch = os.arch();
@@ -181,22 +184,23 @@ export async function installGcloudSDK(version: string, skipToolCache?: boolean)
   }
 
   // Either cache the tool or just add it directly to the path.
-  if (skipToolCache) {
-    // Caching the tool on disk takes a really long time, and it's not clear
-    // whether it's even valuable since it's ONLY cached on disk on the runner.
-    // For GitHub-managed runners, that is useless since they are ephemeral.
-    //
-    // See https://github.com/google-github-actions/setup-gcloud/issues/701 for
-    // discussion, but it's actually faster to skip the caching and just add the
-    // tool directly to the path.
-    const toolRoot = path.join(extPath, 'google-cloud-sdk');
-    core.addPath(path.join(toolRoot, 'bin'));
-    return toolRoot;
-  } else {
+  //
+  // Caching the tool on disk takes a really long time, and it's not clear
+  // whether it's even valuable since it's ONLY cached on disk on the runner.
+  // For GitHub-managed runners, that is useless since they are ephemeral.
+  //
+  // See https://github.com/google-github-actions/setup-gcloud/issues/701 for
+  // discussion, but it's actually faster to skip the caching and just add the
+  // tool directly to the path.
+  if (useToolCache) {
     const toolRoot = path.join(extPath, 'google-cloud-sdk');
     const cachedToolRoot = await toolCache.cacheDir(toolRoot, 'gcloud', resolvedVersion, osArch);
     core.addPath(path.join(cachedToolRoot, 'bin'));
     return cachedToolRoot;
+  } else {
+    const toolRoot = path.join(extPath, 'google-cloud-sdk');
+    core.addPath(path.join(toolRoot, 'bin'));
+    return toolRoot;
   }
 }
 
