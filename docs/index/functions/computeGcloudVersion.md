@@ -4,7 +4,7 @@
 
 [@google-github-actions/setup-cloud-sdk](../../modules.md) / [index](../README.md) / computeGcloudVersion
 
-# Function: ~~computeGcloudVersion()~~
+# ~~Function: computeGcloudVersion()~~
 
 > **computeGcloudVersion**(`version?`): `Promise`\<`string`\>
 
