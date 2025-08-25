@@ -5755,6 +5755,118 @@ function coerce (version, options) {
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 7258:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require2_) {
+
+
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.actionsGenReadme = actionsGenReadme;
+const promises_1 = __nccwpck_require2_(1943);
+const YAML = __importStar(__nccwpck_require2_(8815));
+/**
+ * actionsGenReadme parses the action.yml file and auto-generates README.md
+ * inputs and outputs in a consistent format.
+ */
+async function actionsGenReadme(dir = '') {
+    // For testing
+    if (dir) {
+        process.chdir(dir);
+    }
+    const readmeContents = (await (0, promises_1.readFile)('README.md', 'utf8')).split('\n');
+    const actionContents = await (0, promises_1.readFile)('action.yml', 'utf8');
+    const action = YAML.parse(actionContents);
+    const actionInputs = Object.entries(action.inputs || {});
+    if (actionInputs.length === 0)
+        console.warn(`action.yml inputs are empty`);
+    const inputs = [];
+    for (const [input, opts] of actionInputs) {
+        const required = opts.required ? 'Required' : 'Optional';
+        const description = (opts.description || '')
+            .split('\n')
+            .map((line) => (line.trim() === '' ? '' : `    ${line}`))
+            .join('\n')
+            .trim();
+        if (description === '') {
+            throw new Error(`Input "${input}" is missing a description`);
+        }
+        const def = opts.default ? `, default: \`${opts.default}\`` : '';
+        inputs.push(`-   <a name="__input_${input}"></a><a href="#user-content-__input_${input}"><code>${input}</code></a>: _(${required}${def})_ ${description}\n`);
+    }
+    const startInputs = readmeContents.indexOf('<!-- BEGIN_AUTOGEN_INPUTS -->');
+    const endInputs = readmeContents.indexOf('<!-- END_AUTOGEN_INPUTS -->');
+    readmeContents.splice(startInputs + 1, endInputs - startInputs - 1, '', ...inputs, '');
+    const actionOutputs = Object.entries(action.outputs || {});
+    if (actionOutputs.length === 0)
+        console.warn(`action.yml outputs are empty`);
+    const outputs = [];
+    for (const [output, opts] of actionOutputs) {
+        const description = (opts?.description || '')
+            .split('\n')
+            .map((line) => (line.trim() === '' ? '' : `    ${line}`))
+            .join('\n')
+            .trim();
+        if (description === '') {
+            throw new Error(`Output "${output}" is missing a description`);
+        }
+        outputs.push(`-   <a name="__output_${output}"></a><a href="#user-content-__output_${output}"><code>${output}</code></a>: ${description}\n`);
+    }
+    const startOutputs = readmeContents.indexOf('<!-- BEGIN_AUTOGEN_OUTPUTS -->');
+    const endOutputs = readmeContents.indexOf('<!-- END_AUTOGEN_OUTPUTS -->');
+    readmeContents.splice(startOutputs + 1, endOutputs - startOutputs - 1, '', ...outputs, '');
+    await (0, promises_1.writeFile)('README.md', readmeContents.join('\n'), 'utf8');
+}
+
+
+/***/ }),
+
 /***/ 9081:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require2_) => {
 
@@ -6608,6 +6720,7 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+__exportStar(__nccwpck_require2_(7258), exports);
 __exportStar(__nccwpck_require2_(9081), exports);
 __exportStar(__nccwpck_require2_(3214), exports);
 __exportStar(__nccwpck_require2_(731), exports);
@@ -7627,6 +7740,13 @@ module.exports = __nccwpck_require__(6982);
 /***/ ((module) => {
 
 module.exports = __nccwpck_require__(9896);
+
+/***/ }),
+
+/***/ 1943:
+/***/ ((module) => {
+
+module.exports = __nccwpck_require__(1943);
 
 /***/ }),
 
@@ -43928,7 +44048,7 @@ module.exports = parseParams
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.2.2","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","engines":{"node":">= 20.x","npm":">= 10.x"},"scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint .","format":"eslint --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.11.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.3","@actions/tool-cache":"^2.0.2","@google-github-actions/actions-utils":"^0.8.9","semver":"^7.7.2"},"devDependencies":{"@eslint/eslintrc":"^3.3.1","@eslint/js":"^9.34.0","@types/node":"^24.3.0","@types/semver":"^7.7.0","@typescript-eslint/eslint-plugin":"^8.40.0","@vercel/ncc":"^0.38.3","eslint-config-prettier":"^10.1.8","eslint-plugin-prettier":"^5.5.4","eslint":"^9.34.0","prettier":"^3.6.2","ts-node":"^10.9.2","typedoc-plugin-markdown":"^4.8.1","typedoc":"^0.28.10","typescript-eslint":"^8.40.0","typescript":"^5.9.2"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"@google-github-actions/setup-cloud-sdk","version":"1.2.3","description":"Utilities to download, install, and interact with the Cloud SDK for GitHub Actions","module":"dist/index.js","main":"dist/index.js","types":"dist/index.d.js","engines":{"node":">= 20.x","npm":">= 10.x"},"scripts":{"build":"rm -rf dist/ && ncc build --source-map --no-source-map-register src/index.ts","lint":"eslint .","format":"eslint --fix","docs":"rm -rf docs/ && typedoc --plugin typedoc-plugin-markdown","test":"node --require ts-node/register --test-reporter spec --test tests/download-util.test.ts tests/format-url.test.ts tests/index.test.ts"},"files":["dist/**/*"],"repository":{"type":"git","url":"git+https://github.com/google-github-actions/setup-cloud-sdk.git"},"keywords":["Cloud SDK","google cloud","gcloud"],"author":"Google LLC","license":"Apache-2.0","dependencies":{"@actions/core":"^1.11.1","@actions/exec":"^1.1.1","@actions/http-client":"^2.2.3","@actions/tool-cache":"^2.0.2","@google-github-actions/actions-utils":"^0.8.10","semver":"^7.7.2"},"devDependencies":{"@eslint/eslintrc":"^3.3.1","@eslint/js":"^9.34.0","@types/node":"^24.3.0","@types/semver":"^7.7.0","@typescript-eslint/eslint-plugin":"^8.40.0","@vercel/ncc":"^0.38.3","eslint-config-prettier":"^10.1.8","eslint-plugin-prettier":"^5.5.4","eslint":"^9.34.0","prettier":"^3.6.2","ts-node":"^10.9.2","typedoc-plugin-markdown":"^4.8.1","typedoc":"^0.28.10","typescript-eslint":"^8.40.0","typescript":"^5.9.2"}}');
 
 /***/ })
 
