@@ -70,7 +70,7 @@ export declare function isAuthenticated(): Promise<boolean>;
  * specification is installed.
  * @returns The path of the installed tool.
  */
-export declare function installGcloudSDK(version: string, skipToolCache?: boolean): Promise<string>;
+export declare function installGcloudSDK(version: string, useToolCache?: boolean): Promise<string>;
 /**
  * computeGcloudVersion computes the appropriate gcloud version for the given
  * string. If the string is the empty string or the special value "latest", it
