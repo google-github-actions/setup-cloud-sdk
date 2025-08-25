@@ -6,7 +6,7 @@
 
 # Function: installGcloudSDK()
 
-> **installGcloudSDK**(`version`, `skipToolCache?`): `Promise`\<`string`\>
+> **installGcloudSDK**(`version`, `useToolCache`): `Promise`\<`string`\>
 
 Defined in: [index.ts:168](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L168)
 
@@ -22,9 +22,9 @@ The version or version specification to install. If a
 specification is given, the most recent version that still matches the
 specification is installed.
 
-### skipToolCache?
+### useToolCache
 
-`boolean`
+`boolean` = `false`
 
 ## Returns
 

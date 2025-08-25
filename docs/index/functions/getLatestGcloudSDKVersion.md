@@ -8,7 +8,7 @@
 
 > **getLatestGcloudSDKVersion**(): `Promise`\<`string`\>
 
-Defined in: [index.ts:271](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L271)
+Defined in: [index.ts:275](https://github.com/google-github-actions/setup-cloud-sdk/blob/main/src/index.ts#L275)
 
 getLatestGcloudSDKVersion fetches the latest version number from the API.
 
